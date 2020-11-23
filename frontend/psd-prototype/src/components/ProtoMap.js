@@ -11,7 +11,7 @@ class ProtoMap extends React.Component {
     }
 
     componentDidMount() {
-        const url = 'http://127.0.0.1:8000/landmarks.json'
+        const url = 'http://127.0.0.1:8000/api/landmarks.json'
         fetch(url).then(response => response.json())
                   .then(r => this.setState({landmarks: r, fetched: true}))
     }
