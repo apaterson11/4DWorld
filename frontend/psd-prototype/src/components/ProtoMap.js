@@ -28,9 +28,12 @@ class ProtoMap extends React.Component {
                 </Marker>)
         }
         return (
-            <Map center={[this.props.latitude, this.props.longitude]} zoom={12}>
+            <Map center={[this.props.latitude, this.props.longitude]} zoom={12} maxBounds={[[90,-180],[-90, 180]]}>
                 <TileLayer
                     url='http://{s}.tile.osm.org/{z}/{x}/{y}.png'
+                    minZoom = {1}
+                    maxZoom = {18}
+                    noWrap={true}
                 />
                 {content}
             </Map>
