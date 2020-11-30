@@ -20,8 +20,8 @@ class ProtoMap extends React.Component {
         const {fetched, landmarks} = this.state 
         let content = ''
         if (fetched) {
-            content = landmarks.map(landmark =>
-                <Marker position={[landmark.latitude, landmark.longitude]}>
+            content = landmarks.map((landmark, index) =>
+                <Marker key={index} position={[landmark.latitude, landmark.longitude]}>
                     <Popup>
                         {landmark.description}
                     </Popup>

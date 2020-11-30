@@ -2,7 +2,7 @@ import React from 'react'
 import axiosInstance from '../axios'
 import { Button, Container, CssBaseline, Grid, Typography, TextField } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles';
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 
 const styles = theme => ({
     paper: {
@@ -47,6 +47,7 @@ class Register extends React.Component {
             password: this.state.password
         }).then(res => {
             console.log(res.data)
+            this.props.history.push('/login')
         })
     }
 
