@@ -1,5 +1,6 @@
 import React from 'react';
 import axiosInstance from '../axios'
+import { withRouter } from 'react-router-dom';
 
 
 class Logout extends React.Component {
@@ -11,6 +12,7 @@ class Logout extends React.Component {
         localStorage.removeItem('access_token')
         localStorage.removeItem('refresh_token')
         axiosInstance.defaults.headers['Authorization'] = null
+        this.props.logout()
         this.props.history.push('/login')
     }
 
@@ -21,4 +23,4 @@ class Logout extends React.Component {
     }
 }
 
-export default Logout
+export default withRouter(Logout)

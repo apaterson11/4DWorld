@@ -2,7 +2,7 @@ import React from 'react'
 import axiosInstance from '../axios'
 import { Button, Container, CssBaseline, Grid, Typography, TextField } from '@material-ui/core'
 import { withStyles } from '@material-ui/styles';
-import { Link, Redirect } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 const styles = theme => ({
     paper: {
@@ -17,8 +17,10 @@ const styles = theme => ({
     },
     submit: {
         marginTop: '20px',
-        marginBottom: '20px'
-    }
+        marginBottom: '20px',
+        backgroundColor: '#002e5b',
+        color: 'white'
+    },
 });
 
 class Register extends React.Component {
@@ -141,7 +143,6 @@ class Register extends React.Component {
                             type="submit"
                             fullWidth
                             variant="contained"
-                            color="primary"
                             className={classes.submit}
                             onClick={this.handleSubmit}
                             disabled={disableSubmitBtn}
