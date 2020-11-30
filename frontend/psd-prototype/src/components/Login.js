@@ -2,16 +2,14 @@ import React from 'react';
 import Button from '@material-ui/core/Button';
 import CssBaseline from '@material-ui/core/CssBaseline';
 import TextField from '@material-ui/core/TextField';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Checkbox from '@material-ui/core/Checkbox';
-//import Link from '@material-ui/core/Link';
 import Paper from '@material-ui/core/Paper';
-import Box from '@material-ui/core/Box';
 import Grid from '@material-ui/core/Grid';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
 import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
 import { Link } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
+
+import axiosInstance from '../axios';
 
 
 const styles = theme => ({
@@ -38,7 +36,9 @@ const styles = theme => ({
   },
   submit: {
     marginTop: '20px',
-    marginBottom: '20px'
+    marginBottom: '20px',
+    backgroundColor: '#002e5b',
+    color: 'white'
   },
 
   pad: {
@@ -50,8 +50,36 @@ const styles = theme => ({
 
 class Login extends React.Component {
 
-  handleChange = (e) => {
+  constructor(props) {
+    super(props)
+    this.state = {
+        username: '',
+        password: '',
+    }
+}
 
+  handleChange = (e) => {
+    this.setState({
+      [e.target.name]: e.target.value.trim()
+    })
+  }
+
+  handleSubmit = (e) => {
+    e.preventDefault()
+    
+    // send POST request to the JWT token endpoint
+    axiosInstance.post('token/', {
+      username: this.state.username,
+      password: this.state.password
+    }).then(response => {
+      localStorage.setItem('access_token', response.data.access)
+      localStorage.setItem('refresh_token', response.data.refresh)
+      axiosInstance.defaults.headers['Authorization'] = 'JWT ' + localStorage.getItem('access_token')
+      this.props.login()
+      this.props.history.push("/")  
+    }).catch(err => {
+      console.log(err)
+    })
   }
 
 
@@ -72,11 +100,12 @@ class Login extends React.Component {
                 margin="normal"
                 required
                 fullWidth
-                id="email"
-                label="Email Address"
-                name="email"
-                autoComplete="email"
+                id="username"
+                label="Username"
+                name="username"
+                autoComplete="username"
                 autoFocus
+                onChange={this.handleChange}
               />
               <TextField
                 variant="outlined"
@@ -88,17 +117,14 @@ class Login extends React.Component {
                 type="password"
                 id="password"
                 autoComplete="current-password"
-              />
-              <FormControlLabel
-                control={<Checkbox value="remember" color="primary" />}
-                label="Remember me"
+                onChange={this.handleChange}
               />
               <Button
                 type="submit"
                 fullWidth
                 variant="contained"
-                color="primary"
                 className={classes.submit}
+                onClick={this.handleSubmit}
               >
                 Sign In
               </Button>
@@ -122,4 +148,4 @@ class Login extends React.Component {
   }
 }
 
-export default withStyles(styles)(Login)
+export default withRouter( (withStyles(styles)(Login)) )

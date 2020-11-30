@@ -17,8 +17,10 @@ const styles = theme => ({
     },
     submit: {
         marginTop: '20px',
-        marginBottom: '20px'
-    }
+        marginBottom: '20px',
+        backgroundColor: '#002e5b',
+        color: 'white'
+    },
 });
 
 class Register extends React.Component {
@@ -47,6 +49,7 @@ class Register extends React.Component {
             password: this.state.password
         }).then(res => {
             console.log(res.data)
+            this.props.history.push('/login')
         })
     }
 
@@ -140,7 +143,6 @@ class Register extends React.Component {
                             type="submit"
                             fullWidth
                             variant="contained"
-                            color="primary"
                             className={classes.submit}
                             onClick={this.handleSubmit}
                             disabled={disableSubmitBtn}
