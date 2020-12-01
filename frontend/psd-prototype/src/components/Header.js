@@ -1,11 +1,11 @@
 import '../App.css';
-import { Button, withTheme } from '@material-ui/core'
 import { Link } from 'react-router-dom'
 import MenuIcon from '@material-ui/icons/Menu'
 import { withStyles } from '@material-ui/styles'
 import React from 'react'
 
-const styles = theme => ({
+
+const styles = () => ({
     navbarDiv: {
         display: 'flex',
         justifyContent: 'flex-end'
@@ -14,7 +14,6 @@ const styles = theme => ({
         color: 'white'
     }
 });
-
 
 class Header extends React.Component {
 
@@ -33,10 +32,6 @@ class Header extends React.Component {
 
     render() {
         const {classes} = this.props
-
-        const styles = {
-            color: 'white'
-        }
         
         let navLinks;
         if (this.props.isAuthenticated) {
@@ -65,15 +60,13 @@ class Header extends React.Component {
 
         return (
             <div className="navBar">
-                <button onClick={this.Toggle}>
+                <button className="btn-right" onClick={this.Toggle}>
                     <MenuIcon />
                 </button>
                 <div className={classes.navbarDiv}>
-
                     <ul className={this.state.toggle ? "links show-nav" : "links"}>
                         { navLinks }
                     </ul>
-
                 </div>
             </div>
         )

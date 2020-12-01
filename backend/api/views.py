@@ -7,6 +7,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from api.models import Landmark
 from api.serializers import RegisterUserSerializer, LandmarkSerializer
 
+from rest_framework_simplejwt.views import TokenVerifyView
 
 class UserRegisterView(APIView):
     permission_classes = [AllowAny]
