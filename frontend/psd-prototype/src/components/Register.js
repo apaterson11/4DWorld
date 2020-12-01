@@ -31,13 +31,14 @@ class Register extends React.Component {
             email: '',
             password: '',
             password_confirm: '',
-            isDisabled: true
+            isDisabled: true,
+            emailHasError: false,
+            emailHelpText: ''
         }
     }
 
     handleSubmit = (e) => {
         e.preventDefault()
-        console.log(this.state)
 
         if (this.state.password !== this.state.password_confirm) {
             return
@@ -47,16 +48,42 @@ class Register extends React.Component {
             username: this.state.username,
             email: this.state.email,
             password: this.state.password
-        }).then(res => {
-            console.log(res.data)
-            this.props.history.push('/login')
-        })
+        }).then(res => this.props.history.push('/login'))
     }
 
     handleChange = (e) => {
+        const value = e.target.value.trim()
         this.setState({
-            [e.target.name]: e.target.value.trim()
+            [e.target.name]: value
         })
+
+        if (e.target.name == 'email') {
+            this.emailValidate(value)
+        }
+    }
+
+    emailValidate = (value) => {
+        if (value.indexOf('@') != -1) {
+            axiosInstance.post('/ajax/check_email/', {email: value}).then(res => {
+                // check the return data and inform user if email is taken
+                if (res.data.exists) {
+                    this.setState({
+                        emailHasError: true,
+                        emailHelpText: 'This email is already taken'
+                    })
+                } else {
+                    this.setState({
+                        emailHasError: false,
+                        emailHelpText: ''
+                    })
+                }
+            })
+        } else {
+            this.setState({
+                emailHasError: true,
+                emailHelpText: ''
+            })
+        }
     }
 
     disableSubmit = () => {
@@ -68,7 +95,7 @@ class Register extends React.Component {
         // check passwords match
         const no_pw = this.state.password.length < 4
         const no_pw_match = this.state.password != this.state.password_confirm
-        return no_username || has_spaces || no_pw || no_pw_match
+        return no_username || has_spaces || no_pw || no_pw_match || this.state.emailHasError
     }
 
     render() {
@@ -87,6 +114,8 @@ class Register extends React.Component {
                             <Grid item xs={12}>
                                 <TextField
                                     variant="outlined"
+                                    error={this.state.emailHasError}
+                                    helperText={this.state.emailHelpText}
                                     required 
                                     fullWidth
                                     id="email"

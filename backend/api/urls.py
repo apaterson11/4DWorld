@@ -1,6 +1,7 @@
 from django.urls import path
 from rest_framework.routers import DefaultRouter
 from api.views import BlacklistTokenUpdateView, UserRegisterView, LandmarkAPIView
+from api.views_ajax import check_email
 
 router = DefaultRouter()
 router.register('landmarks', LandmarkAPIView, basename='landmarks')
@@ -11,4 +12,8 @@ urlpatterns = [
     path('logout/blacklist/', BlacklistTokenUpdateView.as_view(), name='blacklist')
 ]
 
-urlpatterns += router.urls
+ajax_urls = [
+    path('ajax/check_email/', check_email, name='ajax-check-email')
+]
+
+urlpatterns += router.urls + ajax_urls
