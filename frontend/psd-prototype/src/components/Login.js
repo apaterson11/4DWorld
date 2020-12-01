@@ -55,6 +55,11 @@ class Login extends React.Component {
     this.state = {
         username: '',
         password: '',
+        isDisabled: true,
+        usernameHasError: false,
+        usernameHelpText: '',
+        passwordHasError: false,
+        passwordHelpText: ''
     }
 }
 
@@ -63,6 +68,14 @@ class Login extends React.Component {
       [e.target.name]: e.target.value.trim()
     })
   }
+
+  disableSubmit = () => {
+    // check all fields entered
+    const noUsername = this.state.username.length === 0
+    const noPassword = this.state.password.length === 0
+    
+    return noUsername || noPassword
+}
 
   handleSubmit = (e) => {
     e.preventDefault()
@@ -74,17 +87,40 @@ class Login extends React.Component {
     }).then(response => {
       localStorage.setItem('access_token', response.data.access)
       localStorage.setItem('refresh_token', response.data.refresh)
+      localStorage.setItem('user', this.state.username)
       axiosInstance.defaults.headers['Authorization'] = 'JWT ' + localStorage.getItem('access_token')
       this.props.login()
       this.props.history.push("/")  
     }).catch(err => {
-      console.log(err)
+      this.setState({
+        passwordHasError: false,
+        usernameHasError: false,
+        passwordHelpText: '',
+        usernameHelpText: ''
+      })
+      axiosInstance.post('/ajax/check_username/', {username: this.state.username}).then(res => {
+        if (err.response.status == 401) {
+          if (res.data.exists) {
+            // wrong password
+            this.setState({
+              passwordHasError: true,
+              passwordHelpText: 'Incorrect password'
+            })
+          } else {
+            // username does not exist
+            this.setState({
+              usernameHasError: true,
+              usernameHelpText: 'No account is associated with this username'
+          })
+          }
+        }
+      })
     })
   }
 
-
   render() {
     const {classes} = this.props
+    const disableSubmitBtn = this.disableSubmit()
     return (
       <Grid container component="main" className={classes.root}>
         <CssBaseline />
@@ -97,6 +133,8 @@ class Login extends React.Component {
             <form className={classes.form} noValidate>
               <TextField
                 variant="outlined"
+                error={this.state.usernameHasError}
+                helperText={this.state.usernameHelpText}
                 margin="normal"
                 required
                 fullWidth
@@ -109,6 +147,8 @@ class Login extends React.Component {
               />
               <TextField
                 variant="outlined"
+                error={this.state.passwordHasError}
+                helperText={this.state.passwordHelpText}
                 margin="normal"
                 required
                 fullWidth
@@ -125,6 +165,7 @@ class Login extends React.Component {
                 variant="contained"
                 className={classes.submit}
                 onClick={this.handleSubmit}
+                disabled={disableSubmitBtn}
               >
                 Sign In
               </Button>

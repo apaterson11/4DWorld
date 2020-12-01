@@ -6,6 +6,7 @@ import Login from './components/Login'
 import Logout from './components/Logout'
 import Register from './components/Register'
 import ProtoMap from './components/ProtoMap'
+import axiosInstance from './axios'
 
 class App extends React.Component {
   
@@ -15,6 +16,18 @@ class App extends React.Component {
       defaultLat: "55.86515",
       defaultLon: "-4.25763",
       isAuthenticated: false
+    }
+  }
+
+  componentDidMount() {
+    // On the App component mounting, check to see if user logged in already
+    const token = localStorage.getItem('access_token')
+    if (token) {
+      // verify token is correct
+      axiosInstance.post('token/verify/', {token: localStorage.getItem('access_token')}).then((res) => {
+          axiosInstance.defaults.headers['Authorization'] = 'JWT ' + localStorage.getItem('access_token')
+          this.setState({isAuthenticated: true})
+      }).catch((err) => {console.log(err)})
     }
   }
 
@@ -33,7 +46,7 @@ class App extends React.Component {
           <Header isAuthenticated={this.state.isAuthenticated} />
           <Switch>
             <Route exact path="/" render={() => (
-                <ProtoMap latitude={this.state.defaultLat} longitude={this.state.defaultLon}/>
+              <ProtoMap latitude={this.state.defaultLat} longitude={this.state.defaultLon}/>
             )} />
             <Route exact path="/register/" component={Register}/>
             <Route exact path="/login/" render={() => (
@@ -45,7 +58,8 @@ class App extends React.Component {
           </Switch>
         </React.StrictMode>
       </Router>
-    ); }
+    );
+  }
 }
 
 export default App;

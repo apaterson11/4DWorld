@@ -33,7 +33,13 @@ class Register extends React.Component {
             password_confirm: '',
             isDisabled: true,
             emailHasError: false,
-            emailHelpText: ''
+            emailHelpText: '',
+            usernameHasError: false,
+            usernameHelpText: '',
+            passwordHasError: false,
+            passwordHelpText: '',
+            passwordMismatch: false,
+            mismatchHelpText: ''
         }
     }
 
@@ -60,13 +66,32 @@ class Register extends React.Component {
         if (e.target.name == 'email') {
             this.emailValidate(value)
         }
+        else if (e.target.name == 'username') {
+            this.usernameValidate(value)
+        }
+        else if (e.target.name == 'password') {
+            this.validatePassword(value)
+        }
+        else if (e.target.name == 'password_confirm') {
+            this.checkPasswordsMatch(value)
+        }
     }
 
     emailValidate = (value) => {
         if (value.indexOf('@') != -1) {
             axiosInstance.post('/ajax/check_email/', {email: value}).then(res => {
+                const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                let lenAfterAt = value.length - value.indexOf('@')
+
+                // check email provided is of a right format
+                if (!pattern.test(value)) {
+                    this.setState({
+                        emailHasError: true,
+                        emailHelpText: (lenAfterAt > 4) ? 'This is not a valid email' : ''
+                    })
+                }
                 // check the return data and inform user if email is taken
-                if (res.data.exists) {
+                else if (res.data.exists) {
                     this.setState({
                         emailHasError: true,
                         emailHelpText: 'This email is already taken'
@@ -86,16 +111,68 @@ class Register extends React.Component {
         }
     }
 
-    disableSubmit = () => {
-        // check valid email
-        // check username contains no spaces
-        const no_username = this.state.username.length === 0
-        const has_spaces = this.state.username.split(" ").length > 1
+    usernameValidate = (value) => {
+        let hasSpaces = value.split(" ").length > 1
+        if (hasSpaces) {
+            this.setState({
+                usernameHasError: true,
+                usernameHelpText: 'Username should not contain spaces'
+            }) 
+        } else {
+            axiosInstance.post('/ajax/check_username/', {username: value}).then(res => {
+                if (res.data.exists) {
+                    this.setState({
+                        usernameHasError: true,
+                        usernameHelpText: 'This username is already taken'
+                    })
+                } else {
+                    this.setState({
+                        usernameHasError: (value.length > 0) ? false : true,
+                        usernameHelpText: ''
+                    })
+                }
+            })
+        }
+    }
 
-        // check passwords match
-        const no_pw = this.state.password.length < 4
-        const no_pw_match = this.state.password != this.state.password_confirm
-        return no_username || has_spaces || no_pw || no_pw_match || this.state.emailHasError
+    validatePassword = (value) => {
+        if (value.length < 4) {
+            this.setState({
+                passwordHasError: true,
+                passwordHelpText: (value.length > 0) ? 'Password is too short' : ''
+            })
+        } else {
+            this.setState({
+                passwordHasError: false,
+                passwordHelpText: ''
+            })
+        }
+    }
+
+    checkPasswordsMatch = (value) => {
+        if (value != this.state.password) {
+            this.setState({
+                passwordMismatch: true,
+                mismatchHelpText: (value.length > 0) ? 'Passwords do not match' : ''
+            })
+        } else {
+            this.setState({
+                passwordMismatch: false,
+                mismatchHelpText: ''
+            })
+        }
+    }
+
+    disableSubmit = () => {
+        // check all fields entered
+        const noEmail = this.state.email.length === 0
+        const noUsername = this.state.username.length === 0
+        const noPassword = this.state.password.length === 0
+        const noConfirmPassword = this.state.password_confirm.length === 0
+        
+        return noEmail || noUsername || noPassword || noConfirmPassword || 
+            this.state.emailHasError || this.state.usernameHasError ||
+            this.state.passwordHasError || this.state.passwordMismatch
     }
 
     render() {
@@ -129,6 +206,8 @@ class Register extends React.Component {
                             <Grid item xs={12}>
                                 <TextField
                                     variant="outlined"
+                                    error={this.state.usernameHasError}
+                                    helperText={this.state.usernameHelpText}
                                     required 
                                     fullWidth
                                     id="username"
@@ -142,6 +221,8 @@ class Register extends React.Component {
                             <Grid item xs={12}>
                                 <TextField
                                     variant="outlined"
+                                    error={this.state.passwordHasError}
+                                    helperText={this.state.passwordHelpText}
                                     required 
                                     fullWidth
                                     type="password"
@@ -156,6 +237,8 @@ class Register extends React.Component {
                             <Grid item xs={12}>
                                 <TextField
                                     variant="outlined"
+                                    error={this.state.passwordMismatch}
+                                    helperText={this.state.mismatchHelpText}
                                     required 
                                     fullWidth
                                     type="password"
