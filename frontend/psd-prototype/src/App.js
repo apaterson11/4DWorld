@@ -24,10 +24,14 @@ class App extends React.Component {
     const token = localStorage.getItem('access_token')
     if (token) {
       // verify token is correct
-      axiosInstance.post('token/verify/', {token: localStorage.getItem('access_token')}).then((res) => {
-          axiosInstance.defaults.headers['Authorization'] = 'JWT ' + localStorage.getItem('access_token')
+      axiosInstance.post('token/refresh/', {refresh: localStorage.getItem('refresh_token')}).then((res) => {
+          axiosInstance.defaults.headers['Authorization'] = 'JWT ' + res.data.access
           this.setState({isAuthenticated: true})
-      }).catch((err) => {console.log(err)})
+      }).catch((err) => {
+        console.log(err)
+        localStorage.removeItem('access_token')
+        localStorage.removeItem('refresh_token')
+      })
     }
   }
 
