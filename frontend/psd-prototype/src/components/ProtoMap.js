@@ -1,10 +1,7 @@
-import { map } from 'leaflet';
 import React from 'react';
 import {Map, TileLayer, Marker} from 'react-leaflet';
 import Popup from 'react-leaflet-editable-popup';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
-
-let numMapClicks = 0
 
 class ProtoMap extends React.Component {
     constructor(props) {
@@ -80,22 +77,30 @@ class ProtoMap extends React.Component {
     }
 
     render() {
+        const markerText = {
+            sample: 'sample text'
+        }
         const {fetched, landmarks, popup} = this.state 
         let content = ''
+        let new_content = ''
         if (fetched) {
             content = landmarks.map((landmark, index) =>
                 <Marker key={index} position={[landmark.latitude, landmark.longitude]}>
-                    <Popup removable editable nametag={'marker'} autoClose={false}
+                    <Popup removable editable nametag={'marker'}
                     removalCallback={ index => this.removeMarkerFromState(index) }
                     saveContentCallback={ (content, index) => this.saveContentToState(content, index) }>
                         {landmark.name}
                     </Popup>
                 </Marker>)
             
-        }
-
-        const markerText = {
-            sample: 'sample text'
+            new_content = this.state.markers.map((position, index) =>
+                <Marker key = {`marker-${index}`} position={position}>
+                    <Popup removable editable nametag={'marker'} autoClose={false}
+                    removalCallback={ index => this.removeMarkerFromState(index) }
+                    saveContentCallback={ (content, index) => this.saveContentToState(content, index) }>
+                        {markerText.sample}
+                    </Popup>
+                </Marker>)
         }
 
         return (
@@ -106,14 +111,8 @@ class ProtoMap extends React.Component {
                     maxZoom = {18}
                     noWrap={true}
                 />
-                {this.state.markers.map((position, index) =>
-                    <Marker key = {`marker-${index}`} position={position}>
-                        <Popup removable editable nametag={'marker'} autoClose={false}
-                        removalCallback={ index => this.removeMarkerFromState(index) }
-                        saveContentCallback={ (content, index) => this.saveContentToState(content, index) }>
-                            {markerText.sample}
-                        </Popup>
-                    </Marker>)}
+                {content}
+                {new_content}
             </Map>
         )
     }
