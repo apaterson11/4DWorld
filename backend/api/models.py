@@ -9,10 +9,15 @@ class Profile(User):
 
 
 class Landmark(models.Model):
-    name = models.CharField(max_length=32)
+    name = models.TextField()
     latitude = models.FloatField()
     longitude = models.FloatField()
     description = models.TextField()
 
     def __str__(self):
         return self.name
+
+    #def save(self, *args, **kwargs):
+        #self.latitude = latitude
+        #self.longitude = longitude
+        #super(Landmark, self).save(*args, **kwargs)
