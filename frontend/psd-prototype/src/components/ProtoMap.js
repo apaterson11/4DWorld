@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useEffect, useState, useRef, useMemo, useCallback } from "react";
 import {Map, TileLayer, Marker} from 'react-leaflet';
 import Popup from 'react-leaflet-editable-popup';
+import { v4 as uuidv4 } from 'uuid';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
 
 class ProtoMap extends React.Component {
@@ -13,10 +14,6 @@ class ProtoMap extends React.Component {
             name: "",
         };
     }
-
-    setMapRef = (map) => {
-        this.setState({ mapRef: map });
-    };
 
     shouldComponentUpdate(nextProps, nextState) {
         if (this.state.markers.length !== nextState.markers.length) {
@@ -31,9 +28,12 @@ class ProtoMap extends React.Component {
             }
         }
     }
-
+    
     removeMarkerFromState = (index) => {
         
+        //const { mapRef } = this.state;
+        //mapRef.current.leafletElement.closePopup()
+
         // Create a new array identical to the old one, and modify it - immutability!
         const newMarkers = [...this.state.markers]
         newMarkers.splice(index, 1)
@@ -41,11 +41,10 @@ class ProtoMap extends React.Component {
         // ...and save to state
         this.setState({
             markers: newMarkers
-        })
-      }
+        });
+      };
     
-      saveContentToState = (content, index) => {
-    
+    saveContentToState = (content, index) => {
           const newMarkers = this.state.markers.map( (marker, i) => {
              if (i === index) {
                 return {
@@ -53,16 +52,14 @@ class ProtoMap extends React.Component {
                    popupContent: content,
                 }
              } else {
-                return marker
+                return marker;
              }
-          })
+          });
     
           this.setState({
              markers: newMarkers
-          })
-    
-      }
-
+          });
+      };
 
     componentDidMount() {
         const url = 'http://127.0.0.1:8000/api/landmarks.json'
@@ -71,36 +68,58 @@ class ProtoMap extends React.Component {
     }
 
     addMarker = (e) => {
+        //broken
         const {markers} = this.state
-        markers.push(e.latlng)
-        this.setState({markers})
-    }
+        //markers.push(e.latlng)
+        this.setState({
+            markers: [
+                ...this.state.markers,
+                {
+                    coords: e.latlng,
+                    popupContent: 'skkrt skkrt',
+                    open: false,
+                    autoClose: false
+                },
+            ],
+        });
+    };
 
     render() {
         const markerText = {
-            sample: 'sample text'
+            popupContent: '<h2>sample text</h2>sample text',
+            open: false,
+            autoClose: true,
         }
+
         const {fetched, landmarks, popup} = this.state 
         let content = ''
         let new_content = ''
         if (fetched) {
             content = landmarks.map((landmark, index) =>
-                <Marker key={index} position={[landmark.latitude, landmark.longitude]}>
-                    <Popup removable editable nametag={'marker'}
-                    removalCallback={ index => this.removeMarkerFromState(index) }
-                    saveContentCallback={ (content, index) => this.saveContentToState(content, index) }>
-                        {landmark.name}
+                <Marker key={uuidv4()} position={[landmark.latitude, landmark.longitude]}>
+                    <Popup 
+                    autoClose={false} 
+                    nametag={'marker'} 
+                    editable removable 
+                    removalCallback={ () => {this.removeMarkerFromState(index)} }
+                    saveContentCallback={ content => {this.saveContentToState(content, index)} }
+                    >
+                        {markerText.popupContent}
                     </Popup>
                 </Marker>)
             
             new_content = this.state.markers.map((position, index) =>
-                <Marker key = {`marker-${index}`} position={position}>
-                    <Popup removable editable nametag={'marker'} autoClose={false}
-                    removalCallback={ index => this.removeMarkerFromState(index) }
-                    saveContentCallback={ (content, index) => this.saveContentToState(content, index) }>
-                        {markerText.sample}
+                <Marker key = {uuidv4()} position={position}>
+                    <Popup
+                    autoClose={false} 
+                    nametag={'marker'} 
+                    editable removable 
+                    removalCallback={ () => {this.removeMarkerFromState(index)} }
+                    saveContentCallback={ content => {this.saveContentToState(content, index)} }>
+                        {markerText.popupContent}
                     </Popup>
                 </Marker>)
+
         }
 
         return (
@@ -113,9 +132,46 @@ class ProtoMap extends React.Component {
                 />
                 {content}
                 {new_content}
+                
             </Map>
         )
     }
 }
+
+/*const DraggableMarker = ({key, position, content}) => {
+    const [draggable, setDraggable] = useState(false)
+    const [pos, setPosition] = useState(position)
+    const markerRef = useRef(key)
+    const eventHandlers = useMemo(
+      () => ({
+        dragend() {
+          const marker = markerRef.current
+          if (marker != null) {
+            setPosition(marker.getLatLng())
+          }
+        },
+      }),
+      [],
+    )
+    const toggleDraggable = useCallback(() => {
+      setDraggable((d) => !d)
+    }, [])
+  
+    return (
+      <Marker
+        draggable={draggable}
+        eventHandlers={eventHandlers}
+        position={pos}
+        ref={markerRef}>
+        <Popup minWidth={90}>
+          <span onClick={toggleDraggable}>
+            {draggable
+              ? {content}
+              : {content}}
+          </span>
+        </Popup>
+      </Marker>
+    )
+  }*/
 
 export default ProtoMap

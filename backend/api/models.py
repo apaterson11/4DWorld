@@ -17,7 +17,5 @@ class Landmark(models.Model):
     def __str__(self):
         return self.name
 
-    #def save(self, *args, **kwargs):
-        #self.latitude = latitude
-        #self.longitude = longitude
-        #super(Landmark, self).save(*args, **kwargs)
+    def save(self, *args, **kwargs):
+        super(Landmark, self).save(*args, **kwargs)
