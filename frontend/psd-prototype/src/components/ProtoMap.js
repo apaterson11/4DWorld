@@ -68,6 +68,10 @@ class ProtoMap extends React.Component {
     }
 
     addMarker = (e) => {
+        const {markers} = this.state
+        markers.push(e.latlng)
+        this.setState({markers})
+        /*
         //broken
         const {markers} = this.state
         //markers.push(e.latlng)
@@ -81,7 +85,7 @@ class ProtoMap extends React.Component {
                     autoClose: false
                 },
             ],
-        });
+        });*/
     };
 
     render() {
