@@ -37,8 +37,11 @@ class Header extends React.Component {
         if (this.props.isAuthenticated) {
             navLinks = (
                 <React.Fragment>
-                    <li>
+                    {/* <li>
                         <Link className={classes.linkText} to="/">Project</Link>
+                    </li> */}
+                    <li>
+                        <Link className={classes.linkText} to="/profile">Profile</Link>
                     </li>
                     <li>
                         <Link className={classes.linkText} to="/logout/">Logout</Link>
