@@ -41,6 +41,9 @@ class Header extends React.Component {
                         <Link className={classes.linkText} to="/">Projects</Link>
                     </li>
                     <li>
+                        <Link className={classes.linkText} to="/">Groups</Link>
+                    </li>
+                    <li>
                         <Link className={classes.linkText} to="/logout/">Logout</Link>
                     </li>
                 </React.Fragment>

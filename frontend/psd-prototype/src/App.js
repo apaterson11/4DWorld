@@ -6,10 +6,13 @@ import Login from './components/Login'
 import Logout from './components/Logout'
 import Register from './components/Register'
 import ProtoMap from './components/ProtoMap'
+import About from './components/About'
+//import Projects from './components/Projects'
 import axiosInstance from './axios'
 
 class App extends React.Component {
   
+  // This sets the default map to be Glasgow city
   constructor(props) {
     super(props)
     this.state = {
@@ -53,6 +56,7 @@ class App extends React.Component {
               <ProtoMap latitude={this.state.defaultLat} longitude={this.state.defaultLon}/>
             )} />
             <Route exact path="/register/" component={Register}/>
+            <Route exact path ="/about/" component={About}/>
             <Route exact path="/login/" render={() => (
               <Login login={this.login}/>
             )} />
