@@ -38,7 +38,7 @@ class Header extends React.Component {
             navLinks = (
                 <React.Fragment>
                     <li>
-                        <Link className={classes.linkText} to="/">Project</Link>
+                        <Link className={classes.linkText} to="/">Projects</Link>
                     </li>
                     <li>
                         <Link className={classes.linkText} to="/logout/">Logout</Link>
@@ -50,6 +50,9 @@ class Header extends React.Component {
                 <React.Fragment>
                     <li>
                         <Link className={classes.linkText} to="/login/">Login</Link>
+                    </li>
+                    <li>
+                        <Link className={classes.linkText} to="/about/">About</Link>
                     </li>
                     <li>
                         <Link className={classes.linkText} to="/register/">Register</Link>
