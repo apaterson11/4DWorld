@@ -3,6 +3,7 @@ import {Map, TileLayer, Marker} from 'react-leaflet';
 import Popup from 'react-leaflet-editable-popup';
 import { v4 as uuidv4 } from 'uuid';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
+import { marker } from "leaflet";
 
 class ProtoMap extends React.Component {
     constructor(props) {
@@ -44,7 +45,7 @@ class ProtoMap extends React.Component {
         });
       };
     
-    saveContentToState = (content, index) => {
+    saveContentToState = (content, position, index) => {
           const newMarkers = this.state.markers.map( (marker, i) => {
              if (i === index) {
                 return {
@@ -59,6 +60,32 @@ class ProtoMap extends React.Component {
           this.setState({
              markers: newMarkers
           });
+
+          console.log(position)
+
+          const {name} = 'lol'
+          const { latitude, longitude } = position;
+          const {description} = content
+
+          const response = fetch('http://127.0.0.1:8000/api/landmarks.json',
+        {
+            method: 'POST',
+            mode:'cors',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: {
+                name,
+                latitude,
+                longitude,
+                description
+            }
+        }).then(function (response) {
+            console.log(response);
+        })
+        .catch(function (error) {
+            console.log(error);
+        })
       };
 
     componentDidMount() {
@@ -70,7 +97,12 @@ class ProtoMap extends React.Component {
     addMarker = (e) => {
         const {markers} = this.state
         markers.push(e.latlng)
+        const { lat, lng } = e.latlng;
+        console.log(lat)
         this.setState({markers})
+        //const {name}='lol';
+        //const {desc}='ah';
+
         /*
         //broken
         const {markers} = this.state
@@ -106,20 +138,20 @@ class ProtoMap extends React.Component {
                     nametag={'marker'} 
                     editable removable 
                     removalCallback={ () => {this.removeMarkerFromState(index)} }
-                    saveContentCallback={ content => {this.saveContentToState(content, index)} }
+                    saveContentCallback={ content => {this.saveContentToState(content, landmark.latitude, landmark.longitude, index)} }
                     >
-                        {markerText.popupContent}
+                        {landmark.name}
                     </Popup>
                 </Marker>)
             
             new_content = this.state.markers.map((position, index) =>
-                <Marker key = {uuidv4()} position={position}>
+                <Marker key = {uuidv4()} position={position} name={markerText.popupContent}>
                     <Popup
                     autoClose={false} 
                     nametag={'marker'} 
                     editable removable 
                     removalCallback={ () => {this.removeMarkerFromState(index)} }
-                    saveContentCallback={ content => {this.saveContentToState(content, index)} }>
+                    saveContentCallback={ content => {this.saveContentToState(content, position, index)} }>
                         {markerText.popupContent}
                     </Popup>
                 </Marker>)
