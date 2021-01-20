@@ -37,11 +37,11 @@ class Header extends React.Component {
         if (this.props.isAuthenticated) {
             navLinks = (
                 <React.Fragment>
-                    {/* <li>
-                        <Link className={classes.linkText} to="/">Project</Link>
-                    </li> */}
                     <li>
-                        <Link className={classes.linkText} to="/profile">Profile</Link>
+                        <Link className={classes.linkText} to="/">Home</Link>
+                    </li>
+                    <li>
+                        <Link className={classes.linkText} to="/profile">Dashboard</Link>
                     </li>
                     <li>
                         <Link className={classes.linkText} to="/logout/">Logout</Link>
@@ -51,6 +51,9 @@ class Header extends React.Component {
         } else {
             navLinks = (
                 <React.Fragment>
+                    <li>
+                        <Link className={classes.linkText} to="/">Home</Link>
+                    </li>
                     <li>
                         <Link className={classes.linkText} to="/login/">Login</Link>
                     </li>
@@ -63,7 +66,7 @@ class Header extends React.Component {
 
         return (
             <div className="navBar">
-                <button className="btn-right" onClick={this.Toggle}>
+                <button className="btn-right menu-hamburger-icon" onClick={this.Toggle}>
                     <MenuIcon />
                 </button>
                 <div className={classes.navbarDiv}>
