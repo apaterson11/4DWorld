@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import './App.css';
 import {Route, BrowserRouter as Router, Switch} from 'react-router-dom';
+import About from './components/About'
 import Header from './components/Header'
 import Login from './components/Login'
 import Logout from './components/Logout'
@@ -53,10 +54,11 @@ class App extends React.Component {
         <React.StrictMode>
           <Header isAuthenticated={this.state.isAuthenticated} />
           <Switch>
-            <Route exact path="/demo-map" render={() => (
+            <Route exact path="/" component={About}/>
+            <Route exact path="/demo-map/" render={() => (
               <ProtoMap latitude={this.state.defaultLat} longitude={this.state.defaultLon}/>
             )} />
-            <Route exact path="/profile" render={() => (
+            <Route exact path="/profile/" render={() => (
               <Profile userDetails={this.state.userDetails}/>
             )} />
             <Route exact path="/register/" component={Register}/>

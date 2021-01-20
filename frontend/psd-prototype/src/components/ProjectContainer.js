@@ -1,7 +1,9 @@
 import React from 'react'
 import { makeStyles } from '@material-ui/core/styles'
-import Typography from '@material-ui/core/Typography';
+import Grid from '@material-ui/core/Grid';
+import Typography from '@material-ui/core/Typography'
 import ProjectCard from './ProjectCard'
+import AddCircleIcon from '@material-ui/icons/AddCircle';
 
 const useStyles = makeStyles({
     root: {
@@ -18,6 +20,13 @@ const useStyles = makeStyles({
     header: {
         marginTop: '50px',
         marginLeft: '40px'
+    },
+    row: {
+        display: 'flex',
+        justifyContent: 'space-between'
+    },
+    padding: {
+        margin: '50px 50px 0px 10px',
     }
 });
 
@@ -35,9 +44,17 @@ function ProjectContainer(props) {
 
     return (
         <React.Fragment>
-            <Typography gutterBottom variant="h5" component="h2" className={classes.header}>
-                My Projects
-            </Typography>
+            <div className={classes.row}>
+                <div>
+                    <Typography gutterBottom variant="h5" component="h2" className={classes.header}>
+                        My Projects
+                    </Typography>
+                </div>
+                <div>
+                    <AddCircleIcon className={classes.padding} color="primary" />
+                </div>
+            </div>
+
             <div className={classes.paper}>
                 {renderCard()}
             </div>

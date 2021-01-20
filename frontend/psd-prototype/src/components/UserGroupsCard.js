@@ -27,7 +27,7 @@ const useStyles = makeStyles({
   }
 });
 
-export default function ProfileCard(props) {
+export default function UserGroupsCard(props) {
   const classes = useStyles();
 
   return (
@@ -37,28 +37,22 @@ export default function ProfileCard(props) {
                 <CardActionArea>
                 <CardContent>
                     <Typography gutterBottom variant="h5" component="h2">
-                    { props.userDetails.username }
+                    My Groups
                     </Typography>
                     <TableContainer>
                         <Table size="small">
                             <TableBody>
                                 <TableRow key="name">
                                     <TableCell component="th" scope="row">
-                                        Name
+                                        CS23
                                     </TableCell>
-                                    <TableCell align="right">{props.userDetails.name}</TableCell>
+                                    <TableCell align="right">5 members</TableCell>
                                 </TableRow>
                                 <TableRow key="email">
                                     <TableCell component="th" scope="row">
-                                        Email
+                                        Testing
                                     </TableCell>
-                                    <TableCell align="right">{props.userDetails.email}</TableCell>
-                                </TableRow>
-                                <TableRow key="department">
-                                    <TableCell component="th" scope="row">
-                                        Department
-                                    </TableCell>
-                                    <TableCell align="right">{props.userDetails.department}</TableCell>
+                                    <TableCell align="right">3 members</TableCell>
                                 </TableRow>
                             </TableBody>
                         </Table>
@@ -67,7 +61,7 @@ export default function ProfileCard(props) {
                 </CardActionArea>
                 <CardActions>
                 <Button size="small" color="primary">
-                    Edit Profile
+                    Create a new group
                 </Button>
                 </CardActions>
             </Card>
