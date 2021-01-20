@@ -42,7 +42,7 @@ class Map(models.Model):
 
 
 class Landmark(models.Model):
-    name = models.CharField(max_length=32)
+    name = models.TextField()
     latitude = models.FloatField()
     longitude = models.FloatField()
     description = models.TextField()
@@ -52,3 +52,6 @@ class Landmark(models.Model):
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        super(Landmark, self).save(*args, **kwargs)

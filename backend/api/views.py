@@ -6,6 +6,8 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from api.models import Landmark
 from api.serializers import RegisterUserSerializer, LandmarkSerializer
+from api.serializers import RegisterUserSerializer, LandmarkSerializer, CreateLandmarkSerializer
+
 from rest_framework_simplejwt.views import TokenVerifyView
 
 
@@ -15,17 +17,16 @@ class UserRegisterView(APIView):
     def post(self, request):
         serializer = RegisterUserSerializer(data=request.data)
         if serializer.is_valid():
-            new_user = serializer.save()
+            new_user = serializer.save()    #.create()?
             if new_user:
                 return Response(status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
 class LandmarkAPIView(viewsets.ModelViewSet):
+    permission_classes = [AllowAny]
     serializer_class = LandmarkSerializer
     model = Landmark
     queryset = Landmark.objects.all()
-
 
 class BlacklistTokenUpdateView(APIView):
     permission_classes = [AllowAny]
