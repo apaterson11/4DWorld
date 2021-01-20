@@ -202,7 +202,7 @@ class ProtoMap extends React.Component {
                 {content}
                 {new_content}
                 <Control position="bottomright">
-                      <button class="btn-resetview" onClick={this.handleClick}>Reset view</button>
+                      <button className="btn-resetview" onClick={this.handleClick}>Reset view</button>
                 </Control>
             </Map>   
             </React.Fragment>
