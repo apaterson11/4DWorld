@@ -15,44 +15,32 @@ class UserRegisterView(APIView):
     def post(self, request):
         serializer = RegisterUserSerializer(data=request.data)
         if serializer.is_valid():
-            new_user = serializer.save()
+            new_user = serializer.save()    #.create()?
             if new_user:
                 return Response(status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class LandmarkAPIView(viewsets.ModelViewSet):
+class LandmarkAPIView(viewsets.ModelViewSet): #ApiView? viewsets.ModelViewSet?
+    permission_classes = [AllowAny]
     serializer_class = LandmarkSerializer
     model = Landmark
     queryset = Landmark.objects.all()
 
-    def post(self, request, format=None):
-        if not self.request.session.exists(self.request.session.session_key):
-            self.request.session.create()
-
-        serializer = self.serializer_class(data=request.data)
+class CreateLandmark(APIView):
+    permission_classes = [AllowAny]
+    serializer_class = LandmarkSerializer
+    def post(self, request):
+        serializer = serializer_class(data=request.data)
         if serializer.is_valid():
             name = serializer.data.get('name')
             latitude = serializer.data.get('latitude')
             longitude = serializer.data.get('longitude')
             description = serializer.data.get('description')
-            host = self.request.session.session_key
-            queryset = Landmark.objects.filter(host=host)
-            if queryset.exists():
-                landmark = queryset[0]
-                landmark.name = name
-                landmark.latitude = latitude
-                landmark.longitude = longitude
-                landmark.description - description
-                landmark.save(update_fields=['name', 'latitude', 'longitude', 'description'])
-            else:
-                landmark = Landmark(name=name, latitude=latitude, longitude=longitude, description=description)
-                landmark.save()
+
+            landmark = Landmark(name=name, latitude=latitude, longitude=longitude, description=description)
+            landmark.save()
 
             return Response(LandmarkSerializer(landmark).data, status=status.HTTP_201_CREATED)
-
-
-    
-
 
 class BlacklistTokenUpdateView(APIView):
     permission_classes = [AllowAny]

@@ -67,19 +67,18 @@ class ProtoMap extends React.Component {
           const { latitude, longitude } = position;
           const {description} = content
 
-          const response = fetch('http://127.0.0.1:8000/api/landmarks.json',
+          const response = fetch('http://localhost:8000/api/landmarks/',
         {
             method: 'POST',
-            mode:'cors',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: {
-                name,
-                latitude,
-                longitude,
-                description
-            }
+            body: JSON.stringify({
+                'name':name,
+                'latitude':latitude,
+                'longitude':longitude,
+                'description':description,
+            })
         }).then(function (response) {
             console.log(response);
         })
@@ -89,7 +88,7 @@ class ProtoMap extends React.Component {
       };
 
     componentDidMount() {
-        const url = 'http://127.0.0.1:8000/api/landmarks.json'
+        const url = 'http://localhost:8000/api/landmarks/'
         fetch(url).then(response => response.json())
                   .then(r => this.setState({landmarks: r, fetched: true}))
     }
@@ -100,24 +99,29 @@ class ProtoMap extends React.Component {
         const { lat, lng } = e.latlng;
         console.log(lat)
         this.setState({markers})
-        //const {name}='lol';
-        //const {desc}='ah';
 
-        /*
-        //broken
-        const {markers} = this.state
-        //markers.push(e.latlng)
-        this.setState({
-            markers: [
-                ...this.state.markers,
-                {
-                    coords: e.latlng,
-                    popupContent: 'skkrt skkrt',
-                    open: false,
-                    autoClose: false
-                },
-            ],
-        });*/
+        const {name} = 'lol'
+        const { latitude, longitude } = e.latlng;
+        const {description} = 'lol'
+
+        const response = fetch('http://localhost:8000/api/landmarks/',
+        {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: {
+                'name':name,
+                'latitude':latitude,
+                'longitude':longitude,
+                'description':description,
+            }
+        }).then(function (response) {
+            console.log(response);
+        })
+        .catch(function (error) {
+            console.log(error);
+        })
     };
 
     render() {
