@@ -4,6 +4,7 @@ import Popup from 'react-leaflet-editable-popup';
 import { v4 as uuidv4 } from 'uuid';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
 import { marker } from "leaflet";
+import axiosInstance from './axios'
 
 class ProtoMap extends React.Component {
     constructor(props) {
@@ -63,9 +64,13 @@ class ProtoMap extends React.Component {
 
           console.log(position)
 
-          const {name} = 'lol'
+          const {name} = "lol"
           const { latitude, longitude } = position;
-          const {description} = content
+          const {description} = "content"
+          console.log(typeof(name))
+          console.log(typeof(latitude))
+          console.log(typeof(longitude))
+          console.log(typeof(description))
 
           const response = fetch('http://localhost:8000/api/landmarks/',
         {
@@ -73,6 +78,7 @@ class ProtoMap extends React.Component {
             headers: {
                 'Content-Type': 'application/json'
             },
+            mode: 'no-cors',
             body: JSON.stringify({
                 'name':name,
                 'latitude':latitude,
@@ -103,18 +109,23 @@ class ProtoMap extends React.Component {
         const {name} = 'lol'
         const { latitude, longitude } = e.latlng;
         const {description} = 'lol'
+        console.log({name}.toString)
+        console.log(typeof({latitude}))
+        console.log(typeof({longitude}))
+        console.log(typeof({description}))
 
         const response = fetch('http://localhost:8000/api/landmarks/',
         {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Accept': 'application/json, text/plain',
+                'Content-Type': 'application/json;charset=UTF-8'
             },
-            body: {
-                'name':name,
-                'latitude':latitude,
-                'longitude':longitude,
-                'description':description,
+            body: { 
+                name:'lol',
+                latitude:0.0,
+                longitude:0.0,
+                description:'woo',
             }
         }).then(function (response) {
             console.log(response);
@@ -147,19 +158,6 @@ class ProtoMap extends React.Component {
                         {landmark.name}
                     </Popup>
                 </Marker>)
-            
-            new_content = this.state.markers.map((position, index) =>
-                <Marker key = {uuidv4()} position={position} name={markerText.popupContent}>
-                    <Popup
-                    autoClose={false} 
-                    nametag={'marker'} 
-                    editable removable 
-                    removalCallback={ () => {this.removeMarkerFromState(index)} }
-                    saveContentCallback={ content => {this.saveContentToState(content, position, index)} }>
-                        {markerText.popupContent}
-                    </Popup>
-                </Marker>)
-
         }
 
         return (
@@ -171,7 +169,17 @@ class ProtoMap extends React.Component {
                     noWrap={true}
                 />
                 {content}
-                {new_content}
+                new_content = this.state.markers.map((position, index) =>
+                <Marker key = {uuidv4()} position={position} name={markerText.popupContent}>
+                    <Popup
+                    autoClose={false} 
+                    nametag={'marker'} 
+                    editable removable 
+                    removalCallback={ () => {this.removeMarkerFromState(index)} }
+                    saveContentCallback={ content => {this.saveContentToState(content, position, index)} }>
+                        {markerText.popupContent}
+                    </Popup>
+                </Marker>)
                 
             </Map>
         )
