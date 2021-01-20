@@ -1,10 +1,17 @@
 import React, { useEffect, useState, useRef, useMemo, useCallback } from "react";
 import {Map, TileLayer, Marker} from 'react-leaflet';
+
+import Control from '@skyeer/react-leaflet-custom-control' 
 import Popup from 'react-leaflet-editable-popup';
 import { v4 as uuidv4 } from 'uuid';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
 import { marker } from "leaflet";
 import axiosInstance from '../axios'
+
+const DEFAULT_VIEWPORT = {
+    center: [55.86515, -4.25763],
+    zoom: 13,
+  }
 
 class ProtoMap extends React.Component {
     constructor(props) {
@@ -14,8 +21,22 @@ class ProtoMap extends React.Component {
             mapRef: null,
             markers: [],
             name: "",
+            defLat: this.props.latitude,
+            defLng: this.props.longitude,
+            test: false,
+            viewport: DEFAULT_VIEWPORT
+
         };
     }
+
+    handleClick = () => {
+        this.setState({ viewport: DEFAULT_VIEWPORT })
+    }
+    
+    onViewportChanged = viewport => {
+        this.setState({ viewport })
+    }
+
 
     shouldComponentUpdate(nextProps, nextState) {
         if (this.state.markers.length !== nextState.markers.length) {
@@ -64,33 +85,29 @@ class ProtoMap extends React.Component {
 
           console.log(position)
 
-          const {name} = "lol"
-          const { latitude, longitude } = position;
-          const {description} = "content"
-          console.log(typeof(name))
-          console.log(typeof(latitude))
-          console.log(typeof(longitude))
-          console.log(typeof(description))
+          const {name} = content
+          const { lat, lng } = position;
+          const {description} = content
 
           const response = fetch('http://localhost:8000/api/landmarks/',
-        {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            mode: 'no-cors',
-            body: JSON.stringify({
-                'name':name,
-                'latitude':latitude,
-                'longitude':longitude,
-                'description':description,
-            })
-        }).then(function (response) {
-            console.log(response);
-        })
-        .catch(function (error) {
-            console.log(error);
-        })
+          {
+              method: 'POST',
+              headers: {
+                  'Accept': 'application/json',
+                  'Content-Type': 'application/json;charset=UTF-8'
+              },
+              body: JSON.stringify({ 
+                  name:'x',
+                  latitude: lat,
+                  longitude: lng,
+                  description:'y',
+              })
+          }).then(function (response) {
+              console.log(response);
+          })
+          .catch(function (error) {
+              console.log(error);
+          })
       };
 
     componentDidMount() {
@@ -105,8 +122,8 @@ class ProtoMap extends React.Component {
         const { lat, lng } = e.latlng;
         this.setState({markers})
 
-        const {name} = 'lol'
-        const {description} = 'lol'
+        const {x} = 'lol'
+        const {y} = 'lol'
 
         const response = fetch('http://localhost:8000/api/landmarks/',
         {
@@ -116,10 +133,10 @@ class ProtoMap extends React.Component {
                 'Content-Type': 'application/json;charset=UTF-8'
             },
             body: JSON.stringify({ 
-                name:"lol",
+                name:'x',
                 latitude: lat,
                 longitude: lng,
-                description:"woo",
+                description:'y',
             })
         }).then(function (response) {
             console.log(response);
@@ -138,9 +155,10 @@ class ProtoMap extends React.Component {
 
         const {fetched, landmarks, popup} = this.state 
         let content = ''
+        let new_content = ''
         if (fetched) {
             content = landmarks.map((landmark, index) =>
-                <Marker key={landmark.id} position={[landmark.latitude, landmark.longitude]}>
+                <Marker key={uuidv4()} position={[landmark.latitude, landmark.longitude]}>
                     <Popup 
                     autoClose={false} 
                     nametag={'marker'} 
@@ -151,33 +169,43 @@ class ProtoMap extends React.Component {
                         {landmark.name}
                     </Popup>
                 </Marker>)
+            
+            new_content = this.state.markers.map((position, index) =>
+                <Marker key = {uuidv4()} position={position} name={markerText.popupContent}>
+                    <Popup
+                    autoClose={false} 
+                    nametag={'marker'} 
+                    editable removable 
+                    removalCallback={ () => {this.removeMarkerFromState(index)} }
+                    saveContentCallback={ content => {this.saveContentToState(content, position, index)} }>
+                        {markerText.popupContent}
+                    </Popup>
+                </Marker>)
+
         }
 
-        let new_content = this.state.markers.map((position, index) =>
-            <Marker key = {uuidv4()} position={position} name={markerText.popupContent}>
-                <Popup
-                autoClose={false} 
-                nametag={'marker'} 
-                editable removable 
-                removalCallback={ () => {this.removeMarkerFromState(index)} }
-                saveContentCallback={ content => {this.saveContentToState(content, position, index)} }>
-                    {markerText.popupContent}
-                </Popup>
-            </Marker>
-        )
+        // return (
 
         return (
-            <Map center={[this.props.latitude, this.props.longitude]} onClick={this.addMarker} zoom={12} maxBounds={[[90,-180],[-90, 180]]}>
-                <TileLayer
-                    url='http://{s}.tile.osm.org/{z}/{x}/{y}.png'
-                    minZoom = {1}
-                    maxZoom = {18}
-                    noWrap={true}
-                />
+            
+
+            <React.Fragment>
+            {/* <button  onClick={this.resetView}>Reset view</button> */}
+
+            <Map onViewportChanged={this.onViewportChanged} viewport={this.state.viewport} center={[this.props.latitude, this.props.longitude]} onClick={this.addMarker} zoom={4} maxBounds={[[90,-180],[-90, 180]]}>
+            <TileLayer
+                url='http://{s}.tile.osm.org/{z}/{x}/{y}.png'
+                minZoom = {1}
+                maxZoom = {18}
+                noWrap={true}
+            />
                 {content}
                 {new_content}
-                
-            </Map>
+                <Control position="bottomright">
+                      <button class="btn-resetview" onClick={this.handleClick}>Reset view</button>
+                </Control>
+            </Map>   
+            </React.Fragment>
         )
     }
 }
