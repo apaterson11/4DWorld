@@ -6,6 +6,8 @@ import Login from './components/Login'
 import Logout from './components/Logout'
 import Register from './components/Register'
 import ProtoMap from './components/ProtoMap'
+// import JustMap from './components/JustMap'
+
 import axiosInstance from './axios'
 
 class App extends React.Component {
@@ -50,6 +52,7 @@ class App extends React.Component {
           <Header isAuthenticated={this.state.isAuthenticated} />
           <Switch>
             <Route exact path="/" render={() => (
+              // <Example />
               <ProtoMap latitude={this.state.defaultLat} longitude={this.state.defaultLon}/>
             )} />
             <Route exact path="/register/" component={Register}/>

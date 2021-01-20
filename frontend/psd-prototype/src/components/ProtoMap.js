@@ -1,9 +1,17 @@
-import React, { useEffect, useState, useRef, useMemo, useCallback } from "react";
+import React, { Component, useEffect, useState, useRef, useMemo, useCallback } from "react";
 import {Map, TileLayer, Marker} from 'react-leaflet';
+// import JustMap from './components/JustMap';
+
+import Control from '@skyeer/react-leaflet-custom-control'
 import Popup from 'react-leaflet-editable-popup';
 import { v4 as uuidv4 } from 'uuid';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
 import { marker } from "leaflet";
+
+const DEFAULT_VIEWPORT = {
+    center: [55.86515, -4.25763],
+    zoom: 13,
+  }
 
 class ProtoMap extends React.Component {
     constructor(props) {
@@ -13,8 +21,22 @@ class ProtoMap extends React.Component {
             mapRef: null,
             markers: [],
             name: "",
+            defLat: this.props.latitude,
+            defLng: this.props.longitude,
+            test: false,
+            viewport: DEFAULT_VIEWPORT
         };
     }
+
+
+      handleClick = () => {
+        this.setState({ viewport: DEFAULT_VIEWPORT })
+      }
+    
+      onViewportChanged = viewport => {
+        this.setState({ viewport })
+      }
+
 
     shouldComponentUpdate(nextProps, nextState) {
         if (this.state.markers.length !== nextState.markers.length) {
@@ -120,6 +142,11 @@ class ProtoMap extends React.Component {
         });*/
     };
 
+
+// const center = [51.505, -0.09]
+// const zoom = 13
+
+
     render() {
         const markerText = {
             popupContent: '<h2>sample text</h2>sample text',
@@ -158,56 +185,47 @@ class ProtoMap extends React.Component {
 
         }
 
-        return (
-            <Map center={[this.props.latitude, this.props.longitude]} onClick={this.addMarker} zoom={12} maxBounds={[[90,-180],[-90, 180]]}>
-                <TileLayer
-                    url='http://{s}.tile.osm.org/{z}/{x}/{y}.png'
-                    minZoom = {1}
-                    maxZoom = {18}
-                    noWrap={true}
-                />
+        // return (
+
+            return (
+            
+
+            <React.Fragment>
+            {/* <button  onClick={this.resetView}>Reset view</button> */}
+
+            <Map onViewportChanged={this.onViewportChanged} viewport={this.state.viewport} center={[this.props.latitude, this.props.longitude]} onClick={this.addMarker} zoom={4} maxBounds={[[90,-180],[-90, 180]]}>
+            <TileLayer
+                url='http://{s}.tile.osm.org/{z}/{x}/{y}.png'
+                minZoom = {1}
+                maxZoom = {18}
+                noWrap={true}
+                    />
                 {content}
                 {new_content}
+            <Control position="bottomright">
+                      <button class="btn-resetview" onClick={this.handleClick}>Reset view</button>
+                    </Control>
+            </Map>   
+            </React.Fragment>
+
+            )
+
+            
+            // <Map center={[this.props.latitude, this.props.longitude]} onClick={this.addMarker} zoom={12} maxBounds={[[90,-180],[-90, 180]]}>
+            //     <TileLayer
+            //         url='http://{s}.tile.osm.org/{z}/{x}/{y}.png'
+            //         minZoom = {1}
+            //         maxZoom = {18}
+            //         noWrap={true}
+            //     />
+            //     {content}
+            //     {new_content}
                 
-            </Map>
-        )
+            // </Map>
+        
     }
 }
 
-/*const DraggableMarker = ({key, position, content}) => {
-    const [draggable, setDraggable] = useState(false)
-    const [pos, setPosition] = useState(position)
-    const markerRef = useRef(key)
-    const eventHandlers = useMemo(
-      () => ({
-        dragend() {
-          const marker = markerRef.current
-          if (marker != null) {
-            setPosition(marker.getLatLng())
-          }
-        },
-      }),
-      [],
-    )
-    const toggleDraggable = useCallback(() => {
-      setDraggable((d) => !d)
-    }, [])
-  
-    return (
-      <Marker
-        draggable={draggable}
-        eventHandlers={eventHandlers}
-        position={pos}
-        ref={markerRef}>
-        <Popup minWidth={90}>
-          <span onClick={toggleDraggable}>
-            {draggable
-              ? {content}
-              : {content}}
-          </span>
-        </Popup>
-      </Marker>
-    )
-  }*/
+
 
 export default ProtoMap

@@ -23,6 +23,11 @@ li {
   float: right;
 }
 
+.btn-resetview {
+  color: red;
+  size: 70px;
+}
+
 /* Class */
 .navBar {
   max-width: 100%;
