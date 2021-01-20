@@ -158,6 +158,17 @@ class ProtoMap extends React.Component {
                         {landmark.name}
                     </Popup>
                 </Marker>)
+            new_content = this.state.markers.map((position, index) =>
+            <Marker key = {uuidv4()} position={position} name={markerText.popupContent}>
+                <Popup
+                autoClose={false} 
+                nametag={'marker'} 
+                editable removable 
+                removalCallback={ () => {this.removeMarkerFromState(index)} }
+                saveContentCallback={ content => {this.saveContentToState(content, position, index)} }>
+                    {markerText.popupContent}
+                </Popup>
+            </Marker>)
         }
 
         return (
@@ -169,17 +180,7 @@ class ProtoMap extends React.Component {
                     noWrap={true}
                 />
                 {content}
-                new_content = this.state.markers.map((position, index) =>
-                <Marker key = {uuidv4()} position={position} name={markerText.popupContent}>
-                    <Popup
-                    autoClose={false} 
-                    nametag={'marker'} 
-                    editable removable 
-                    removalCallback={ () => {this.removeMarkerFromState(index)} }
-                    saveContentCallback={ content => {this.saveContentToState(content, position, index)} }>
-                        {markerText.popupContent}
-                    </Popup>
-                </Marker>)
+                {new_content}
                 
             </Map>
         )
