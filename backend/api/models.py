@@ -47,7 +47,7 @@ class Landmark(models.Model):
     longitude = models.FloatField()
     description = models.TextField()
     map = models.ForeignKey(
-        Map, on_delete=models.CASCADE, related_name='landmarks', null=True
+        Map, on_delete=models.CASCADE, related_name='landmarks', null=True, blank=True
     )
 
     def __str__(self):

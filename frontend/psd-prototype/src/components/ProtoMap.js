@@ -4,7 +4,7 @@ import Popup from 'react-leaflet-editable-popup';
 import { v4 as uuidv4 } from 'uuid';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
 import { marker } from "leaflet";
-import axiosInstance from './axios'
+import axiosInstance from '../axios'
 
 class ProtoMap extends React.Component {
     constructor(props) {
@@ -103,30 +103,24 @@ class ProtoMap extends React.Component {
         const {markers} = this.state
         markers.push(e.latlng)
         const { lat, lng } = e.latlng;
-        console.log(lat)
         this.setState({markers})
 
         const {name} = 'lol'
-        const { latitude, longitude } = e.latlng;
         const {description} = 'lol'
-        console.log({name}.toString)
-        console.log(typeof({latitude}))
-        console.log(typeof({longitude}))
-        console.log(typeof({description}))
 
         const response = fetch('http://localhost:8000/api/landmarks/',
         {
             method: 'POST',
             headers: {
-                'Accept': 'application/json, text/plain',
+                'Accept': 'application/json',
                 'Content-Type': 'application/json;charset=UTF-8'
             },
-            body: { 
-                name:'lol',
-                latitude:0.0,
-                longitude:0.0,
-                description:'woo',
-            }
+            body: JSON.stringify({ 
+                name:"lol",
+                latitude: lat,
+                longitude: lng,
+                description:"woo",
+            })
         }).then(function (response) {
             console.log(response);
         })
@@ -144,10 +138,9 @@ class ProtoMap extends React.Component {
 
         const {fetched, landmarks, popup} = this.state 
         let content = ''
-        let new_content = ''
         if (fetched) {
             content = landmarks.map((landmark, index) =>
-                <Marker key={uuidv4()} position={[landmark.latitude, landmark.longitude]}>
+                <Marker key={landmark.id} position={[landmark.latitude, landmark.longitude]}>
                     <Popup 
                     autoClose={false} 
                     nametag={'marker'} 

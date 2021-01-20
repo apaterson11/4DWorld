@@ -28,6 +28,23 @@ class LandmarkAPIView(viewsets.ModelViewSet):
     model = Landmark
     queryset = Landmark.objects.all()
 
+# class CreateLandmark(APIView):
+#     permission_classes = [AllowAny]
+#     serializer_class = LandmarkSerializer
+#     def post(self, request):
+#         serializer = serializer_class(data=request.data)
+#         if serializer.is_valid():
+#             name = serializer.data.get('name')
+#             latitude = serializer.data.get('latitude')
+#             longitude = serializer.data.get('longitude')
+#             description = serializer.data.get('description')
+
+#             landmark = Landmark(name=name, latitude=latitude, longitude=longitude, description=description)
+#             landmark.save()
+
+#             return Response(LandmarkSerializer(landmark).data, status=status.HTTP_201_CREATED)
+
+
 class BlacklistTokenUpdateView(APIView):
     permission_classes = [AllowAny]
     authentication_classes = ()
