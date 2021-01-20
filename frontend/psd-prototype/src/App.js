@@ -6,7 +6,9 @@ import Login from './components/Login'
 import Logout from './components/Logout'
 import Register from './components/Register'
 import ProtoMap from './components/ProtoMap'
+import Profile from './components/Profile'
 import axiosInstance from './axios'
+import jwt from 'jwt-decode'
 
 class App extends React.Component {
   
@@ -15,7 +17,8 @@ class App extends React.Component {
     this.state = {
       defaultLat: "55.86515",
       defaultLon: "-4.25763",
-      isAuthenticated: false
+      isAuthenticated: false,
+      userDetails: null
     }
   }
 
@@ -36,7 +39,8 @@ class App extends React.Component {
   }
 
   login = () => {
-    this.setState({isAuthenticated: true})
+    const userData = jwt(localStorage.getItem('access_token'))
+    this.setState({isAuthenticated: true, userDetails: userData})
   }
 
   logout = () => {
@@ -49,8 +53,11 @@ class App extends React.Component {
         <React.StrictMode>
           <Header isAuthenticated={this.state.isAuthenticated} />
           <Switch>
-            <Route exact path="/" render={() => (
+            <Route exact path="/demo-map" render={() => (
               <ProtoMap latitude={this.state.defaultLat} longitude={this.state.defaultLon}/>
+            )} />
+            <Route exact path="/profile" render={() => (
+              <Profile userDetails={this.state.userDetails}/>
             )} />
             <Route exact path="/register/" component={Register}/>
             <Route exact path="/login/" render={() => (
@@ -59,6 +66,7 @@ class App extends React.Component {
             <Route path="/logout/" render={() => (
               <Logout logout={this.logout}/>
             )} />
+
           </Switch>
         </React.StrictMode>
       </Router>
