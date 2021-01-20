@@ -66,7 +66,7 @@ class Header extends React.Component {
 
         return (
             <div className="navBar">
-                <button className="btn-right" onClick={this.Toggle}>
+                <button className="btn-right menu-hamburger-icon" onClick={this.Toggle}>
                     <MenuIcon />
                 </button>
                 <div className={classes.navbarDiv}>
