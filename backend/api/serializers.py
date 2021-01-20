@@ -15,10 +15,10 @@ class RegisterUserSerializer(ModelSerializer):
 class LandmarkSerializer(ModelSerializer):
     class Meta:
         model = Landmark
-        fields = ('id', 'name', 'latitude', 'longitude', 'description')
+        fields = ('id', 'content', 'latitude', 'longitude')
 
 class CreateLandmarkSerializer(ModelSerializer):
     class Meta:
         model = Landmark
-        fields = ('id', 'name', 'latitude', 'longitude', 'description')
+        fields = ('id', 'content', 'latitude', 'longitude')
 

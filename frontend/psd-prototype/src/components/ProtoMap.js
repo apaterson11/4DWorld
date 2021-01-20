@@ -1,18 +1,23 @@
-import React, { useEffect, useState, useRef, useMemo, useCallback } from "react";
+import React from "react";
 import {Map, TileLayer, Marker} from 'react-leaflet';
 
 import Control from '@skyeer/react-leaflet-custom-control' 
 import Popup from 'react-leaflet-editable-popup';
 import { v4 as uuidv4 } from 'uuid';
-import MarkerClusterGroup from 'react-leaflet-markercluster';
+//import MarkerClusterGroup from 'react-leaflet-markercluster';
 import { marker } from "leaflet";
-import axiosInstance from '../axios'
+///import axiosInstance from '../axios'
 
 const DEFAULT_VIEWPORT = {
     center: [55.86515, -4.25763],
     zoom: 13,
   }
 
+const markerText = {
+    popupContent: '<h2>sample text</h2>sample text',
+    open: false,
+    autoClose: true,
+}
 class ProtoMap extends React.Component {
     constructor(props) {
         super(props);
@@ -67,9 +72,9 @@ class ProtoMap extends React.Component {
         });
       };
     
-    saveContentToState = (content, position, index) => {
+    saveContentToState = (content, lat, lng) => {
           const newMarkers = this.state.markers.map( (marker, i) => {
-             if (i === index) {
+             if (i === 0) {
                 return {
                    ...marker,
                    popupContent: content,
@@ -83,24 +88,20 @@ class ProtoMap extends React.Component {
              markers: newMarkers
           });
 
-          console.log(position)
-
-          const {name} = content
-          const { lat, lng } = position;
-          const {description} = content
+          console.log(content)
+          console.log(lng)
 
           const response = fetch('http://localhost:8000/api/landmarks/',
           {
-              method: 'POST',
+              method: 'PUT',
               headers: {
                   'Accept': 'application/json',
                   'Content-Type': 'application/json;charset=UTF-8'
               },
               body: JSON.stringify({ 
-                  name:'x',
+                  content: content,
                   latitude: lat,
                   longitude: lng,
-                  description:'y',
               })
           }).then(function (response) {
               console.log(response);
@@ -133,10 +134,9 @@ class ProtoMap extends React.Component {
                 'Content-Type': 'application/json;charset=UTF-8'
             },
             body: JSON.stringify({ 
-                name:'x',
+                content: 'x',
                 latitude: lat,
                 longitude: lng,
-                description:'y',
             })
         }).then(function (response) {
             console.log(response);
@@ -147,12 +147,6 @@ class ProtoMap extends React.Component {
     };
 
     render() {
-        const markerText = {
-            popupContent: '<h2>sample text</h2>sample text',
-            open: false,
-            autoClose: true,
-        }
-
         const {fetched, landmarks, popup} = this.state 
         let content = ''
         let new_content = ''
@@ -166,7 +160,7 @@ class ProtoMap extends React.Component {
                     removalCallback={ () => {this.removeMarkerFromState(index)} }
                     saveContentCallback={ content => {this.saveContentToState(content, landmark.latitude, landmark.longitude, index)} }
                     >
-                        {landmark.name}
+                        {landmark.content}
                     </Popup>
                 </Marker>)
             
@@ -202,7 +196,7 @@ class ProtoMap extends React.Component {
                 {content}
                 {new_content}
                 <Control position="bottomright">
-                      <button class="btn-resetview" onClick={this.handleClick}>Reset view</button>
+                      <button className="btn-resetview" onClick={this.handleClick}>Reset view</button>
                 </Control>
             </Map>   
             </React.Fragment>
