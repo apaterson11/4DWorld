@@ -43,7 +43,7 @@ class ProtoMap extends React.Component {
     }
 
 
-    shouldComponentUpdate(nextProps, nextState) {
+    /*shouldComponentUpdate(nextProps, nextState) {
         if (this.state.markers.length !== nextState.markers.length) {
             return true;
         }
@@ -55,10 +55,22 @@ class ProtoMap extends React.Component {
                 return true;
             }
         }
-    }
+    }*/
     
     removeMarkerFromState = (index) => {
-        
+
+        console.log(index)
+
+        const response = fetch('http://localhost:8000/api/landmarks/'+index+'/',
+          {
+              method: 'DELETE',
+          }).then(function (response) {
+              console.log(response);
+          })
+          .catch(function (error) {
+              console.log(error);
+          })
+
         //const { mapRef } = this.state;
         //mapRef.current.leafletElement.closePopup()
 
@@ -70,45 +82,47 @@ class ProtoMap extends React.Component {
         this.setState({
             markers: newMarkers
         });
+
       };
     
-    saveContentToState = (content, lat, lng) => {
-          const newMarkers = this.state.markers.map( (marker, i) => {
-             if (i === 0) {
-                return {
-                   ...marker,
-                   popupContent: content,
-                }
-             } else {
-                return marker;
-             }
-          });
-    
-          this.setState({
-             markers: newMarkers
-          });
-
+    saveContentToState = (content, lat, lng, index) => {
           console.log(content)
           console.log(lng)
+          console.log(index)
 
-          const response = fetch('http://localhost:8000/api/landmarks/',
+          const response = fetch('http://localhost:8000/api/landmarks/'+index+'/',
           {
-              method: 'PUT',
-              headers: {
-                  'Accept': 'application/json',
-                  'Content-Type': 'application/json;charset=UTF-8'
-              },
-              body: JSON.stringify({ 
+            method: 'PUT',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ 
                   content: content,
                   latitude: lat,
                   longitude: lng,
-              })
+            })
           }).then(function (response) {
               console.log(response);
           })
           .catch(function (error) {
               console.log(error);
           })
+
+          const newMarkers = this.state.markers.map( (marker, i) => {
+            if (i === 0) {
+               return {
+                  ...marker,
+                  popupContent: content,
+               }
+            } else {
+               return marker;
+            }
+         });
+   
+         this.setState({
+            markers: newMarkers
+         });
       };
 
     componentDidMount() {
@@ -118,11 +132,7 @@ class ProtoMap extends React.Component {
     }
 
     addMarker = (e) => {
-        const {markers} = this.state
-        markers.push(e.latlng)
         const { lat, lng } = e.latlng;
-        this.setState({markers})
-
         const {x} = 'lol'
         const {y} = 'lol'
 
@@ -144,6 +154,10 @@ class ProtoMap extends React.Component {
         .catch(function (error) {
             console.log(error);
         })
+
+        const {markers} = this.state
+        markers.push(e.latlng)
+        this.setState({markers})
     };
 
     render() {
@@ -157,8 +171,8 @@ class ProtoMap extends React.Component {
                     autoClose={false} 
                     nametag={'marker'} 
                     editable removable 
-                    removalCallback={ () => {this.removeMarkerFromState(index)} }
-                    saveContentCallback={ content => {this.saveContentToState(content, landmark.latitude, landmark.longitude, index)} }
+                    removalCallback={ () => {this.removeMarkerFromState(landmark.id)} }
+                    saveContentCallback={ content => {this.saveContentToState(content, landmark.latitude, landmark.longitude, landmark.id)} }   // why +1? idk
                     >
                         {landmark.content}
                     </Popup>
@@ -178,13 +192,10 @@ class ProtoMap extends React.Component {
 
         }
 
-        // return (
-
         return (
             
 
             <React.Fragment>
-            {/* <button  onClick={this.resetView}>Reset view</button> */}
 
             <Map onViewportChanged={this.onViewportChanged} viewport={this.state.viewport} center={[this.props.latitude, this.props.longitude]} onClick={this.addMarker} zoom={4} maxBounds={[[90,-180],[-90, 180]]}>
             <TileLayer
