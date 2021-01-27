@@ -4,9 +4,9 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from api.models import Landmark
+from api.models import Landmark, Project
 from api.serializers import RegisterUserSerializer, LandmarkSerializer
-from api.serializers import RegisterUserSerializer, LandmarkSerializer, CreateLandmarkSerializer
+from api.serializers import RegisterUserSerializer, LandmarkSerializer, CreateLandmarkSerializer, UserProjectsSerializer
 
 from rest_framework_simplejwt.views import TokenVerifyView
 
@@ -77,7 +77,16 @@ class LandmarkAPIView(viewsets.ModelViewSet):
 
              return Response(LandmarkSerializer(landmark).data, status=status.HTTP_201_CREATED)
              '''
+class ProjectAPIView(viewsets.ModelViewSet):
+    permission_classes = [AllowAny]
+    serializer_class = UserProjectsSerializer
+    model = Project
 
+    def get_queryset(self):
+        user = self.request.user
+        user_groups = user.groups.all()
+        return Project.objects.filter(group__in=user_groups)
+        
 
 class BlacklistTokenUpdateView(APIView):
     permission_classes = [AllowAny]

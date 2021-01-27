@@ -23,7 +23,7 @@ function ProjectCard(props) {
             <CardActionArea>
             <CardContent>
                 <Typography gutterBottom variant="h6" component="h5">
-                    <Link to="demo-map">Project {props.proj_id}</Link>
+                    <Link to="demo-map">{props.title}</Link>
                 </Typography>
             </CardContent>
             </CardActionArea>
