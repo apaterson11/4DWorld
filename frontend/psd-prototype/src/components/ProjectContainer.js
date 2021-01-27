@@ -1,9 +1,9 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
+import axiosInstance from '../axios'
 import { makeStyles } from '@material-ui/core/styles'
-import Grid from '@material-ui/core/Grid';
 import Typography from '@material-ui/core/Typography'
 import ProjectCard from './ProjectCard'
-import AddCircleIcon from '@material-ui/icons/AddCircle';
+import AddCircleIcon from '@material-ui/icons/AddCircle'
 
 const useStyles = makeStyles({
     root: {
@@ -32,14 +32,20 @@ const useStyles = makeStyles({
 
 function ProjectContainer(props) {
     const classes = useStyles()
-    const count = 8
+    const [projects, setProjects] = useState([])
+
+    useEffect(() => {
+        const response = axiosInstance.get('http://localhost:8000/api/projects/')
+            .then(response => setProjects(response.data))
+    }, [])
 
     let renderCard = () => {
-        let components = []
-        for (let i=1; i<=count; i++) {
-            components.push(<ProjectCard proj_id={i}/>)
+        if (projects.length === 0) {
+            return <Typography>You have no projects yet</Typography>
         }
-        return components
+        return projects.map(
+            project => <ProjectCard title={project.title} key={project.id}/>
+        )
     }
 
     return (
