@@ -28,7 +28,7 @@ function Profile(props) {
         <Grid container component="main">
             <Grid item xs={12} sm={6} md={4} className={classes.pad} component={Paper} square>
                 <Grid item xs={12}>
-                    <ProfileCard userDetails={props.userDetails} />
+                    <ProfileCard userDetails={props.userDetails} setUserDetails={props.setUserDetails}/>
                 </Grid>
                 <Grid item xs={12}>
                     <UserGroupsCard userDetails={props.userDetails} />

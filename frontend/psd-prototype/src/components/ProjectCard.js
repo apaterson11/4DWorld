@@ -1,6 +1,7 @@
 import React from 'react';
-import CardActionArea from '@material-ui/core/CardActionArea';
+import Button from '@material-ui/core/Button'
 import CardContent from '@material-ui/core/CardContent';
+import CardActions from '@material-ui/core/CardActions';
 import Card from '@material-ui/core/Card';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
@@ -18,15 +19,25 @@ const useStyles = makeStyles({
 function ProjectCard(props) {
     const classes = useStyles()
     
+    const handleClick = (e) => {
+        console.log('clicked')
+    } 
+
     return (
         <Card className={classes.card}>
-            <CardActionArea>
             <CardContent>
                 <Typography gutterBottom variant="h6" component="h5">
                     <Link to="demo-map">{props.title}</Link>
                 </Typography>
             </CardContent>
-            </CardActionArea>
+            <CardActions>
+                <Button size="small" color="primary" onClick={handleClick}>
+                    Edit
+                </Button>
+                <Button size="small" color="primary" onClick={handleClick}>
+                    View
+                </Button>
+            </CardActions>
         </Card>
     )
 }

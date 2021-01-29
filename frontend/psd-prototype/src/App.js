@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import './App.css';
 import {Route, BrowserRouter as Router, Switch} from 'react-router-dom';
 import About from './components/About'
@@ -11,69 +11,64 @@ import Profile from './components/Profile'
 import axiosInstance from './axios'
 import jwt from 'jwt-decode'
 
-class App extends React.Component {
-  
-  constructor(props) {
-    super(props)
-    this.state = {
-      defaultLat: "55.86515",
-      defaultLon: "-4.25763",
-      isAuthenticated: false,
-      userDetails: null
-    }
-  }
+function App(props) {
 
-  componentDidMount() {
+  const [defaultLocation, setDefaultLocation] = useState({
+    defaultLat: "55.86515",
+    defaultLon: "-4.25763"
+  })
+
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [userDetails, setUserDetails] = useState()
+
+  useEffect(() => {
     // On the App component mounting, check to see if user logged in already
     const token = localStorage.getItem('access_token')
     if (token) {
       // verify token is correct
       axiosInstance.post('token/refresh/', {refresh: localStorage.getItem('refresh_token')}).then((res) => {
           axiosInstance.defaults.headers['Authorization'] = 'JWT ' + res.data.access
-          this.setState({isAuthenticated: true})
+          setIsAuthenticated(true)
       }).catch((err) => {
         console.log(err)
         localStorage.removeItem('access_token')
         localStorage.removeItem('refresh_token')
       })
     }
-  }
-
-  login = () => {
+  }, [])
+  
+  const login = () => {
     const userData = jwt(localStorage.getItem('access_token'))
-    this.setState({isAuthenticated: true, userDetails: userData})
+    setIsAuthenticated(true)
+    setUserDetails(userData)
   }
 
-  logout = () => {
-    this.setState({isAuthenticated: false})
+  const logout = () => {
+    setIsAuthenticated(false)
   }
 
-  render() {
-    return (
-      <Router>
-        <React.StrictMode>
-          <Header isAuthenticated={this.state.isAuthenticated} />
-          <Switch>
-            <Route exact path="/" component={About}/>
-            <Route exact path="/demo-map/" render={() => (
-              <ProtoMap latitude={this.state.defaultLat} longitude={this.state.defaultLon}/>
-            )} />
-            <Route exact path="/profile/" render={() => (
-              <Profile userDetails={this.state.userDetails}/>
-            )} />
-            <Route exact path="/register/" component={Register}/>
-            <Route exact path="/login/" render={() => (
-              <Login login={this.login}/>
-            )} />
-            <Route path="/logout/" render={() => (
-              <Logout logout={this.logout}/>
-            )} />
-
-          </Switch>
-        </React.StrictMode>
-      </Router>
-    );
-  }
+  return (
+    <Router>
+        <Header isAuthenticated={isAuthenticated} />
+        <Switch>
+          <Route exact path="/" component={About}/>
+          <Route exact path="/demo-map/" render={() => (
+            <ProtoMap latitude={defaultLocation.defaultLat} longitude={defaultLocation.defaultLon}/>
+          )} />
+          <Route exact path="/profile/" render={() => (
+            <Profile userDetails={userDetails} setUserDetails={setUserDetails}/>
+          )} />
+          <Route exact path="/register/" component={Register}/>
+          <Route exact path="/login/" render={() => (
+            <Login login={login}/>
+          )} />
+          <Route path="/logout/" render={() => (
+            <Logout logout={logout}/>
+          )} />
+        </Switch>
+    </Router>
+  )
 }
+
 
 export default App;
