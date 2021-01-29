@@ -56,6 +56,12 @@ export default function ProfileCard(props) {
         department: newProfile.newDepartment
       })
       .then(response => {
+        props.setUserDetails({
+          ...props.userDetails,
+          name: response.data.user.first_name,
+          email: response.data.user.email,
+          department: response.data.department
+        })
         handleCloseEditProfile()
       })
   }
@@ -64,6 +70,7 @@ export default function ProfileCard(props) {
     <React.Fragment>
         <EditProfileModal 
           open={open} 
+          userDetails={props.userDetails}
           onClose={handleCloseEditProfile} 
           onSubmit={handleSubmit} 
           newProfile={newProfile}

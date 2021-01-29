@@ -39,6 +39,7 @@ export default function EditProfileModal(props) {
             label="Name"
             fullWidth
             name="newName"
+            defaultValue={props.userDetails.name}
             onChange={handleChange}
           />
           <TextField
@@ -48,6 +49,7 @@ export default function EditProfileModal(props) {
             type="email"
             fullWidth
             name="newEmail"
+            defaultValue={props.userDetails.email}
             onChange={handleChange}
           />
           <TextField
@@ -56,6 +58,7 @@ export default function EditProfileModal(props) {
             label="Department"
             fullWidth
             name="newDepartment"
+            defaultValue={props.userDetails.department}
             onChange={handleChange}
           />
         </DialogContent>

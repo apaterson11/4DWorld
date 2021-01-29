@@ -13,12 +13,13 @@ import jwt from 'jwt-decode'
 
 function App(props) {
 
-  const [state, setState] = useState({
+  const [defaultLocation, setDefaultLocation] = useState({
     defaultLat: "55.86515",
-    defaultLon: "-4.25763",
-    isAuthenticated: false,
-    userDetails: null
+    defaultLon: "-4.25763"
   })
+
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const [userDetails, setUserDetails] = useState()
 
   useEffect(() => {
     // On the App component mounting, check to see if user logged in already
@@ -27,7 +28,7 @@ function App(props) {
       // verify token is correct
       axiosInstance.post('token/refresh/', {refresh: localStorage.getItem('refresh_token')}).then((res) => {
           axiosInstance.defaults.headers['Authorization'] = 'JWT ' + res.data.access
-          setState({...state, isAuthenticated: true})
+          setIsAuthenticated(true)
       }).catch((err) => {
         console.log(err)
         localStorage.removeItem('access_token')
@@ -38,23 +39,24 @@ function App(props) {
   
   const login = () => {
     const userData = jwt(localStorage.getItem('access_token'))
-    setState({isAuthenticated: true, userDetails: userData})
+    setIsAuthenticated(true)
+    setUserDetails(userData)
   }
 
   const logout = () => {
-    setState({isAuthenticated: false})
+    setIsAuthenticated(false)
   }
 
   return (
     <Router>
-        <Header isAuthenticated={state.isAuthenticated} />
+        <Header isAuthenticated={isAuthenticated} />
         <Switch>
           <Route exact path="/" component={About}/>
           <Route exact path="/demo-map/" render={() => (
-            <ProtoMap latitude={state.defaultLat} longitude={state.defaultLon}/>
+            <ProtoMap latitude={defaultLocation.defaultLat} longitude={defaultLocation.defaultLon}/>
           )} />
           <Route exact path="/profile/" render={() => (
-            <Profile userDetails={state.userDetails}/>
+            <Profile userDetails={userDetails} setUserDetails={setUserDetails}/>
           )} />
           <Route exact path="/register/" component={Register}/>
           <Route exact path="/login/" render={() => (
@@ -63,7 +65,6 @@ function App(props) {
           <Route path="/logout/" render={() => (
             <Logout logout={logout}/>
           )} />
-  
         </Switch>
     </Router>
   )
