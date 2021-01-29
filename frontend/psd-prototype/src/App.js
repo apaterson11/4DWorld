@@ -3,11 +3,11 @@ import './App.css';
 import {Route, BrowserRouter as Router, Switch} from 'react-router-dom';
 import About from './components/About'
 import Header from './components/Header'
-import Login from './components/Login'
-import Logout from './components/Logout'
-import Register from './components/Register'
+import Login from './components/Auth/Login'
+import Logout from './components/Auth/Logout'
+import Register from './components/Auth/Register'
 import ProtoMap from './components/ProtoMap'
-import Profile from './components/Profile'
+import Profile from './components/Profile/Profile'
 import axiosInstance from './axios'
 import jwt from 'jwt-decode'
 
