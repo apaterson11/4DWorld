@@ -56,7 +56,7 @@ export default function ProfileCard(props) {
         department: newProfile.newDepartment
       })
       .then(response => {
-        console.log(response)
+        handleCloseEditProfile()
       })
   }
 
