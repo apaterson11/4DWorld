@@ -32,22 +32,13 @@ export default function ProfileCard(props) {
 
   const [open, setOpen] = useState(false);
   const [newProfile, setNewProfile] = useState({
-    newName: "",
-    newEmail: "",
-    newDepartment: ""
+    newName: props.userDetails.name,
+    newEmail: props.userDetails.email,
+    newDepartment: props.userDetails.department
   })
 
-  const handleEditProfile = () => {
-    setOpen(true);
-  }
-
-  const handleCloseEditProfile = () => {
-    setOpen(false);
-  }
-
   const handleSubmit = () => {
-    const response = axiosInstance.put(
-      `http://localhost:8000/api/user-details/${props.userDetails.profile_id}/`,
+    const response = axiosInstance.put(`/user-details/${props.userDetails.profile_id}/`,
       {
         user: {
           first_name: newProfile.newName,
@@ -62,7 +53,7 @@ export default function ProfileCard(props) {
           email: response.data.user.email,
           department: response.data.department
         })
-        handleCloseEditProfile()
+        setOpen(false);
       })
   }
 
@@ -71,7 +62,7 @@ export default function ProfileCard(props) {
         <EditProfileModal 
           open={open} 
           userDetails={props.userDetails}
-          onClose={handleCloseEditProfile} 
+          onClose={() => setOpen(false)} 
           onSubmit={handleSubmit} 
           newProfile={newProfile}
           setNewProfile={setNewProfile}
@@ -108,7 +99,7 @@ export default function ProfileCard(props) {
                     </TableContainer>
                 </CardContent>
                 <CardActions>
-                <Button size="small" color="primary" onClick={handleEditProfile}>
+                <Button size="small" color="primary" onClick={() => setOpen(true)}>
                     Edit Profile
                 </Button>
                 </CardActions>

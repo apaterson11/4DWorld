@@ -35,7 +35,7 @@ function ProjectContainer(props) {
     const [projects, setProjects] = useState([])
 
     useEffect(() => {
-        const response = axiosInstance.get('http://localhost:8000/api/projects/')
+        const response = axiosInstance.get('/projects/')
             .then(response => setProjects(response.data))
     }, [])
 
