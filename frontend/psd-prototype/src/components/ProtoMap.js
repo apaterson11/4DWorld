@@ -6,12 +6,12 @@ import Popup from 'react-leaflet-editable-popup';
 import { v4 as uuidv4 } from 'uuid';
 //import MarkerClusterGroup from 'react-leaflet-markercluster';
 import { marker } from "leaflet";
-///import axiosInstance from '../axios'
+import axiosInstance from '../axios'
 
 const DEFAULT_VIEWPORT = {
     center: [55.86515, -4.25763],
     zoom: 13,
-  }
+}
 
 const markerText = {
     popupContent: '<h2>sample text</h2>sample text',
@@ -19,19 +19,16 @@ const markerText = {
     autoClose: true,
 }
 class ProtoMap extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            fetched: false,
-            mapRef: null,
-            markers: [],
-            name: "",
-            defLat: this.props.latitude,
-            defLng: this.props.longitude,
-            test: false,
-            viewport: DEFAULT_VIEWPORT
+    state = {
+        fetched: false,
+        defLat: this.props.latitude,
+        defLng: this.props.longitude,
+        viewport: DEFAULT_VIEWPORT
+    }
 
-        };
+    componentDidMount() {
+        /* Fetch the list of landmarks on component loading */
+        axiosInstance.get('/landmarks/').then(response => this.setState({landmarks: response.data, fetched: true}))
     }
 
     handleClick = () => {
@@ -41,176 +38,92 @@ class ProtoMap extends React.Component {
     onViewportChanged = viewport => {
         this.setState({ viewport })
     }
-
-
-    /*shouldComponentUpdate(nextProps, nextState) {
-        if (this.state.markers.length !== nextState.markers.length) {
-            return true;
-        }
-        else {
-            if (this.state.markers !== nextState.markers) {
-                return false;
-            }
-            else {
-                return true;
-            }
-        }
-    }*/
     
-    removeMarkerFromState = (index) => {
-
-        console.log(index)
-
-        const response = fetch('http://localhost:8000/api/landmarks/'+index+'/',
-          {
-              method: 'DELETE',
-          }).then(function (response) {
-              console.log(response);
-          })
-          .catch(function (error) {
-              console.log(error);
-          })
-
-        //const { mapRef } = this.state;
-        //mapRef.current.leafletElement.closePopup()
-
-        // Create a new array identical to the old one, and modify it - immutability!
-        const newMarkers = [...this.state.markers]
-        newMarkers.splice(index, 1)
-    
-        // ...and save to state
-        this.setState({
-            markers: newMarkers
-        });
-
-      };
-    
-    saveContentToState = (content, lat, lng, index) => {
-          console.log(content)
-          console.log(lng)
-          console.log(index)
-
-          const response = fetch('http://localhost:8000/api/landmarks/'+index+'/',
-          {
-            method: 'PUT',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ 
-                  content: content,
-                  latitude: lat,
-                  longitude: lng,
+    removeMarkerFromState = (landmark_id) => {
+        /* Deletes the given landmark from the state, by sending a DELETE request to the API */
+        const response = axiosInstance.delete(`/landmarks/${landmark_id}/`)
+            .then(response => {
+                // filter out the landmark that's been deleted from the state
+                this.setState({
+                    landmarks: this.state.landmarks.filter(landmark => landmark.id !== landmark_id)
+                })
             })
-          }).then(function (response) {
-              console.log(response);
-          })
-          .catch(function (error) {
-              console.log(error);
-          })
-
-          const newMarkers = this.state.markers.map( (marker, i) => {
-            if (i === 0) {
-               return {
-                  ...marker,
-                  popupContent: content,
-               }
-            } else {
-               return marker;
-            }
-         });
-   
-         this.setState({
-            markers: newMarkers
-         });
       };
+    
+    updateLandmarks = (content, lat, lng, landmark_id) => {
+        /* Updates the landmarks by sending a PUT request to the API,
+           and updating the state in the then() callback
+        */
+        const response = axiosInstance.put(`/landmarks/${landmark_id}/`, {
+            content: content,
+            latitude: lat,
+            longitude: lng
+        }).then(response => {
+            let updatedLandmarks = [...this.state.landmarks]  // copy original state
+            
+            // find the index of the landmark we need to change
+            let idx = updatedLandmarks.findIndex(landmark => landmark.id === landmark_id)
+            
+            // splice out the landmark to be changed, replacing it with the data from the API response
+            updatedLandmarks.splice(idx, 1, response.data)
 
-    componentDidMount() {
-        const url = 'http://localhost:8000/api/landmarks/'
-        fetch(url).then(response => response.json())
-                  .then(r => this.setState({landmarks: r, fetched: true}))
-    }
+            // set the state with the newly updated landmark
+            this.setState({
+                landmarks: updatedLandmarks
+            })
+        })
+      };
 
     addMarker = (e) => {
+        /* Adds a new landmark to the map at a given latitude and longitude, via a POST request */
         const { lat, lng } = e.latlng;
-        const {x} = 'lol'
-        const {y} = 'lol'
-
-        const response = fetch('http://localhost:8000/api/landmarks/',
-        {
-            method: 'POST',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json;charset=UTF-8'
-            },
-            body: JSON.stringify({ 
-                content: 'x',
-                latitude: lat,
-                longitude: lng,
-            })
-        }).then(function (response) {
-            console.log(response);
+        const response = axiosInstance.post('/landmarks/', {
+            content: 'x',
+            latitude: lat,
+            longitude: lng
+        }).then(response => {
+            let newLandmarks = [...this.state.landmarks] // copy original state
+            newLandmarks.push(response.data)  // add the new landmark to the copy
+            this.setState({landmarks: newLandmarks}) // update the state with the new landmark
         })
-        .catch(function (error) {
-            console.log(error);
-        })
-
-        const {markers} = this.state
-        markers.push(e.latlng)
-        this.setState({markers})
     };
 
     render() {
         const {fetched, landmarks, popup} = this.state 
         let content = ''
-        let new_content = ''
         if (fetched) {
             content = landmarks.map((landmark, index) =>
-                <Marker key={uuidv4()} position={[landmark.latitude, landmark.longitude]}>
+                <Marker key={landmark.id} position={[landmark.latitude, landmark.longitude]}>
                     <Popup 
                     autoClose={false} 
                     nametag={'marker'} 
                     editable removable 
                     removalCallback={ () => {this.removeMarkerFromState(landmark.id)} }
-                    saveContentCallback={ content => {this.saveContentToState(content, landmark.latitude, landmark.longitude, landmark.id)} }   // why +1? idk
+                    saveContentCallback={ content => {this.updateLandmarks(content, landmark.latitude, landmark.longitude, landmark.id)} }   // why +1? idk
                     >
                         {landmark.content}
                     </Popup>
                 </Marker>)
-            
-            new_content = this.state.markers.map((position, index) =>
-                <Marker key = {uuidv4()} position={position} name={markerText.popupContent}>
-                    <Popup
-                    autoClose={false} 
-                    nametag={'marker'} 
-                    editable removable 
-                    removalCallback={ () => {this.removeMarkerFromState(index)} }
-                    saveContentCallback={ content => {this.saveContentToState(content, position, index)} }>
-                        {markerText.popupContent}
-                    </Popup>
-                </Marker>)
-
         }
 
         return (
-            
-
-            <React.Fragment>
-
-            <Map onViewportChanged={this.onViewportChanged} viewport={this.state.viewport} center={[this.props.latitude, this.props.longitude]} onClick={this.addMarker} zoom={4} maxBounds={[[90,-180],[-90, 180]]}>
-            <TileLayer
-                url='http://{s}.tile.osm.org/{z}/{x}/{y}.png'
-                minZoom = {1}
-                maxZoom = {18}
-                noWrap={true}
-            />
+            <Map onViewportChanged={this.onViewportChanged} 
+                viewport={this.state.viewport} 
+                center={[this.props.latitude, this.props.longitude]} 
+                onClick={this.addMarker} 
+                zoom={4} 
+                maxBounds={[[90,-180],[-90, 180]]}>
+                <TileLayer
+                    url='http://{s}.tile.osm.org/{z}/{x}/{y}.png'
+                    minZoom = {1}
+                    maxZoom = {18}
+                    noWrap={true}
+                />
                 {content}
-                {new_content}
                 <Control position="bottomright">
                       <button className="btn-resetview" onClick={this.handleClick}>Reset view</button>
                 </Control>
             </Map>   
-            </React.Fragment>
         )
     }
 }
