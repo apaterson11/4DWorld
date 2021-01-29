@@ -1,12 +1,20 @@
 from django.urls import path
 from rest_framework.routers import DefaultRouter
-from api.views import BlacklistTokenUpdateView, ProjectAPIView, UserRegisterView, LandmarkAPIView, UserDetailsAPIView
+from api.views import (
+    BlacklistTokenUpdateView, 
+    GroupAPIView, 
+    LandmarkAPIView,
+    ProjectAPIView,
+    UserDetailsAPIView,
+    UserRegisterView
+)
 from api.views_ajax import check_email, check_username
 
 router = DefaultRouter()
 router.register('landmarks', LandmarkAPIView, basename='landmarks')
 router.register('projects', ProjectAPIView, basename='projects')
 router.register('user-details', UserDetailsAPIView, basename='user-details')
+router.register('groups', GroupAPIView, basename='groups')
 
 urlpatterns = [
     path('register/', UserRegisterView.as_view(), name='register'),

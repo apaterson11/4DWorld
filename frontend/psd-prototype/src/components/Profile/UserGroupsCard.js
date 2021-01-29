@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
@@ -10,7 +10,8 @@ import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableRow from '@material-ui/core/TableRow';
-
+import axiosInstance from '../../axios'
+import EditGroupsCardModal from './EditGroupsCardModal'
 
 const useStyles = makeStyles({
   root: {
@@ -25,43 +26,72 @@ const useStyles = makeStyles({
   }
 });
 
-export default function UserGroupsCard(props) {
+export default function UserGroupsCard({userDetails}) {
   const classes = useStyles();
+  const [groups, setGroups] = useState([])
+  const [open, setOpen] = useState(false)
+  
+  useEffect(() => {
+    axiosInstance.get(`/user-details/${userDetails.user_id}`).then(response => {
+        setGroups(response.data.user.groups)
+    })
+  }, [])
+
+  const handleSubmit = (newGroup) => {
+      axiosInstance.post(`/groups/`, {
+          name: newGroup.name
+      }).then(response => {
+        let groupsClone = [...groups]
+        groupsClone.push(response.data)
+        setGroups(groupsClone)
+        setOpen(false)
+      })
+  }
+
+  const getRows = () => {
+    if (groups.length > 0) {
+        return groups.map(group => {
+            return (
+                <TableRow key={group.id}>
+                    <TableCell component="th" scope="row">
+                        {group.name}
+                    </TableCell>
+                    <TableCell align="right">{group.user_count} {group.user_count > 1 ? "members" : "member"} </TableCell>
+                </TableRow>
+            )
+        })
+    }
+    return <Typography>You have no groups yet</Typography>
+  }
 
   return (
-    <React.Fragment>
-        <div className={classes.paper}>
-            <Card className={classes.root}>
-                <CardContent>
-                    <Typography gutterBottom variant="h5" component="h2">
-                    My Groups
-                    </Typography>
-                    <TableContainer>
-                        <Table size="small">
-                            <TableBody>
-                                <TableRow key="name">
-                                    <TableCell component="th" scope="row">
-                                        CS23
-                                    </TableCell>
-                                    <TableCell align="right">5 members</TableCell>
-                                </TableRow>
-                                <TableRow key="email">
-                                    <TableCell component="th" scope="row">
-                                        Testing
-                                    </TableCell>
-                                    <TableCell align="right">3 members</TableCell>
-                                </TableRow>
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
-                </CardContent>
-                <CardActions>
-                <Button size="small" color="primary">
-                    Create a new group
-                </Button>
-                </CardActions>
-            </Card>
-        </div>
-    </React.Fragment>
+    <>
+    <EditGroupsCardModal 
+        open={open}
+        onClose={() => setOpen(false)} 
+        onSubmit={handleSubmit} 
+    />
+    <div className={classes.paper}>
+        <Card className={classes.root}>
+            <CardContent>
+                <Typography gutterBottom variant="h5" component="h2">
+                My Groups
+                </Typography>
+                <TableContainer>
+                    <Table size="small">
+                        <TableBody>
+                            {getRows()}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+            </CardContent>
+            <CardActions>
+            <Button size="small" color="primary" onClick={() => setOpen(true)}>
+                Create a new group
+            </Button>
+            </CardActions>
+        </Card>
+    </div>
+    </>
   );
 }
