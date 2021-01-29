@@ -1,12 +1,19 @@
 from django.shortcuts import render
+from django.contrib.auth.models import Group
 from rest_framework import status, viewsets
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from api.models import Landmark, Project, Profile
-from api.serializers import RegisterUserSerializer, LandmarkSerializer
-from api.serializers import RegisterUserSerializer, LandmarkSerializer, CreateLandmarkSerializer, UserProjectsSerializer, UserDetailsSerializer
+from api.serializers import (
+    RegisterUserSerializer, 
+    LandmarkSerializer, 
+    CreateLandmarkSerializer,
+    GroupSerializer,
+    UserProjectsSerializer, 
+    ProfileDetailsSerializer
+)
 
 from rest_framework_simplejwt.views import TokenVerifyView
 
@@ -24,9 +31,20 @@ class UserRegisterView(APIView):
 
 class UserDetailsAPIView(viewsets.ModelViewSet):
     permission_classes = [AllowAny]
-    serializer_class = UserDetailsSerializer
+    serializer_class = ProfileDetailsSerializer
     model = Profile
     queryset = Profile.objects.all()
+
+
+class GroupAPIView(viewsets.ModelViewSet):
+    permission_classes = [AllowAny]
+    serializer_class = GroupSerializer
+    model = Group
+    queryset = Group.objects.all()
+
+    def perform_create(self, serializer):
+        group = serializer.save()
+        group.user_set.add(self.request.user)
 
 
 class LandmarkAPIView(viewsets.ModelViewSet):
@@ -35,55 +53,7 @@ class LandmarkAPIView(viewsets.ModelViewSet):
     model = Landmark
     queryset = Landmark.objects.all()
 
-'''
-    def put(self, request):
-        try:
-            serializer = LandmarkSerializer(data=request.data)
-            content = request.data.get('content')
-            latitude = request.data.get('latitude')
-            longitude = request.data.get('longitude')
-            
 
-            landmark = landmark(content=content, latitude=latitude, longitude=longitude)
-            landmark.save()
-            return Response(status=status.HTTP_202_ACCEPTED)
-            #if serializer.is_valid():
-             #   serializer.save()
-              #  return Response(serializer.data)
-            
-        except Exception as e:
-            return Response(status=status.HTTP_405_BAD_REQUEST)
-            '''
-
-'''
-        if serializer.is_valid():
-            content = serializer.data.get('content')
-            latitude = serializer.data.get('latitude')
-            longitude = serializer.data.get('longitude')
-
-            landmark = Landmark(content=content, latitude=latitude, longitude=longitude)
-            landmark.save()
-    
-            return Response(LandmarkSerializer(landmark).data, status=status.HTTP_201_CREATED)
-'''
-'''
- class CreateLandmark(APIView):
-     
-     permission_classes = [AllowAny]
-     serializer_class = LandmarkSerializer
-     def post(self, request):
-         serializer = serializer_class(data=request.data)
-         if serializer.is_valid():
-             name = serializer.data.get('name')
-             latitude = serializer.data.get('latitude')
-             longitude = serializer.data.get('longitude')
-             description = serializer.data.get('description')
-
-             landmark = Landmark(name=name, latitude=latitude, longitude=longitude, description=description)
-             landmark.save()
-
-             return Response(LandmarkSerializer(landmark).data, status=status.HTTP_201_CREATED)
-             '''
 class ProjectAPIView(viewsets.ModelViewSet):
     permission_classes = [AllowAny]
     serializer_class = UserProjectsSerializer
