@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useContext} from 'react';
 import axiosInstance from '../../axios'
 import { makeStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
@@ -12,6 +12,7 @@ import TableCell from '@material-ui/core/TableCell';
 import TableContainer from '@material-ui/core/TableContainer';
 import TableRow from '@material-ui/core/TableRow';
 import EditProfileModal from './EditProfileModal'
+import { UserContext } from '../../Context';
 
 
 const useStyles = makeStyles({
@@ -27,18 +28,19 @@ const useStyles = makeStyles({
   }
 });
 
-export default function ProfileCard(props) {
+export default function ProfileCard() {
   const classes = useStyles();
+  const {userDetails, setUserDetails} = useContext(UserContext)
 
   const [open, setOpen] = useState(false);
   const [newProfile, setNewProfile] = useState({
-    newName: props.userDetails.name,
-    newEmail: props.userDetails.email,
-    newDepartment: props.userDetails.department
+    newName: userDetails.name,
+    newEmail: userDetails.email,
+    newDepartment: userDetails.department
   })
 
   const handleSubmit = () => {
-    const response = axiosInstance.put(`/user-details/${props.userDetails.profile_id}/`,
+    const response = axiosInstance.put(`/user-details/${userDetails.profile_id}/`,
       {
         user: {
           first_name: newProfile.newName,
@@ -47,8 +49,8 @@ export default function ProfileCard(props) {
         department: newProfile.newDepartment
       })
       .then(response => {
-        props.setUserDetails({
-          ...props.userDetails,
+        setUserDetails({
+          ...userDetails,
           name: response.data.user.first_name,
           email: response.data.user.email,
           department: response.data.department
@@ -61,7 +63,7 @@ export default function ProfileCard(props) {
     <React.Fragment>
         <EditProfileModal 
           open={open} 
-          userDetails={props.userDetails}
+          userDetails={userDetails}
           onClose={() => setOpen(false)} 
           onSubmit={handleSubmit} 
           newProfile={newProfile}
@@ -71,7 +73,7 @@ export default function ProfileCard(props) {
             <Card className={classes.root}>
                 <CardContent>
                     <Typography gutterBottom variant="h5" component="h2">
-                    { props.userDetails.username }
+                    { userDetails.username }
                     </Typography>
                     <TableContainer>
                         <Table size="small">
@@ -80,19 +82,19 @@ export default function ProfileCard(props) {
                                     <TableCell component="th" scope="row">
                                         Name
                                     </TableCell>
-                                    <TableCell align="right">{props.userDetails.name}</TableCell>
+                                    <TableCell align="right">{userDetails.name}</TableCell>
                                 </TableRow>
                                 <TableRow key="email">
                                     <TableCell component="th" scope="row">
                                         Email
                                     </TableCell>
-                                    <TableCell align="right">{props.userDetails.email}</TableCell>
+                                    <TableCell align="right">{userDetails.email}</TableCell>
                                 </TableRow>
                                 <TableRow key="department">
                                     <TableCell component="th" scope="row">
                                         Department
                                     </TableCell>
-                                    <TableCell align="right">{props.userDetails.department}</TableCell>
+                                    <TableCell align="right">{userDetails.department}</TableCell>
                                 </TableRow>
                             </TableBody>
                         </Table>

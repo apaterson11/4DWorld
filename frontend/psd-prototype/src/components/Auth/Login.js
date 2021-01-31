@@ -91,7 +91,7 @@ class Login extends React.Component {
       axiosInstance.defaults.headers['Authorization'] = 'JWT ' + localStorage.getItem('access_token')
 
       this.props.login()
-      this.props.history.push("/profile")  
+      this.props.history.push("/dashboard")  
     }).catch(err => {
       this.setState({
         passwordHasError: false,
