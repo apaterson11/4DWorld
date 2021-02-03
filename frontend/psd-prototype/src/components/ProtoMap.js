@@ -1,17 +1,34 @@
 import React, { useEffect, useState, useRef, useMemo, useCallback } from "react";
 import {Map, TileLayer, Marker} from 'react-leaflet';
-
-import Control from '@skyeer/react-leaflet-custom-control' 
+import Control from '@skyeer/react-leaflet-custom-control';
 import Popup from 'react-leaflet-editable-popup';
 import { v4 as uuidv4 } from 'uuid';
 import MarkerClusterGroup from 'react-leaflet-markercluster';
 import { marker } from "leaflet";
 import axiosInstance from '../axios'
 
+import {
+	blueIcon,
+	greenIcon,
+	blackIcon,
+	violetIcon,
+    redIcon,
+    knowledge,
+    battle,
+    religious
+} from './Icons';
+
+
+// defines the default co-ordinates and zoom level for when the reset view button is clicked
 const DEFAULT_VIEWPORT = {
     center: [55.86515, -4.25763],
     zoom: 13,
-  }
+}
+
+// dictionary mapping marker names to the markers themselves
+const iconRef = {"knowledge": knowledge, "battle": battle, "religious": religious};
+
+
 
 class ProtoMap extends React.Component {
     constructor(props) {
@@ -24,18 +41,40 @@ class ProtoMap extends React.Component {
             defLat: this.props.latitude,
             defLng: this.props.longitude,
             test: false,
-            viewport: DEFAULT_VIEWPORT
-
+            viewport: DEFAULT_VIEWPORT,
+            markertype: "knowledge",
         };
     }
 
-    handleClick = () => {
+    // sets the maps' zoom and position to the defaults when 'reset view' pressed
+    handleResetClick = () => {
         this.setState({ viewport: DEFAULT_VIEWPORT })
     }
     
+
+    // sets the state to the right markertype
+    handleKnowledge = () => {
+        this.setState({ markertype: "knowledge" })
+    }
+    
+    handleBattle = () => {
+        this.setState({ markertype: "battle" })
+    }
+    
+    handleReligious = () => {
+        this.setState({ markertype: "religious" })
+    }
+    
+    // updates the state to store the current position/zoom of the map
     onViewportChanged = viewport => {
         this.setState({ viewport })
     }
+
+    // getMarkerType = () => {
+    //     console.log(this.state.markertype);
+    //     return toString(this.state.markertype);
+    // }
+
 
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -97,7 +136,7 @@ class ProtoMap extends React.Component {
                   'Content-Type': 'application/json;charset=UTF-8'
               },
               body: JSON.stringify({ 
-                  name:'x',
+                  name:'marker',
                   latitude: lat,
                   longitude: lng,
                   description:'y',
@@ -153,25 +192,29 @@ class ProtoMap extends React.Component {
             autoClose: true,
         }
 
-        const {fetched, landmarks, popup} = this.state 
+        const {fetched, landmarks, markertype, popup} = this.state 
         let content = ''
         let new_content = ''
+
+        // console.log(this.state.markertype);
         if (fetched) {
             content = landmarks.map((landmark, index) =>
-                <Marker key={uuidv4()} position={[landmark.latitude, landmark.longitude]}>
+                <Marker key={uuidv4()} position={[landmark.latitude, landmark.longitude]} icon={battle}> 
                     <Popup 
                     autoClose={false} 
                     nametag={'marker'} 
                     editable removable 
                     removalCallback={ () => {this.removeMarkerFromState(index)} }
-                    saveContentCallback={ content => {this.saveContentToState(content, landmark.latitude, landmark.longitude, index)} }
+                    saveContentCallback={ content => {this.saveContentToState(content, landmark.latitude, landmark.longitude, index)}}
                     >
                         {landmark.name}
                     </Popup>
                 </Marker>)
             
+            console.log(this.state.markertype);
+            console.log(icontype);
             new_content = this.state.markers.map((position, index) =>
-                <Marker key = {uuidv4()} position={position} name={markerText.popupContent}>
+                <Marker key = {uuidv4()} position={position} name={markerText.popupContent} icon={iconRef[this.state.markertype]}>
                     <Popup
                     autoClose={false} 
                     nametag={'marker'} 
@@ -190,8 +233,6 @@ class ProtoMap extends React.Component {
             
 
             <React.Fragment>
-            {/* <button  onClick={this.resetView}>Reset view</button> */}
-
             <Map onViewportChanged={this.onViewportChanged} viewport={this.state.viewport} center={[this.props.latitude, this.props.longitude]} onClick={this.addMarker} zoom={4} maxBounds={[[90,-180],[-90, 180]]}>
             <TileLayer
                 url='http://{s}.tile.osm.org/{z}/{x}/{y}.png'
@@ -201,8 +242,23 @@ class ProtoMap extends React.Component {
             />
                 {content}
                 {new_content}
+                {this.state.markertype}
+                <Marker position={[55.87338175227069, -4.2892223596572885]} name={"Library"} icon={knowledge}>
+ 
+                </Marker>
+                <Marker position={[55.86846080125798, -4.294474124908448]} name={"Maths 2A"} icon={battle}>
+                </Marker>
+
+                <Control position="bottomleft">
+                    <div class="btn-markertypes">
+                        <button onClick={this.handleBattle}>Battle</button>
+                        <button onClick={this.handleKnowledge}>Knowledge</button>
+                        <button onClick={this.handleReligious}>Religious</button>
+                    </div>
+                </Control>
+
                 <Control position="bottomright">
-                      <button class="btn-resetview" onClick={this.handleClick}>Reset view</button>
+                      <button class="btn-resetview" onClick={this.handleResetClick}>Reset view</button>
                 </Control>
             </Map>   
             </React.Fragment>
