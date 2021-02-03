@@ -9,7 +9,7 @@ from api.models import (
 
 @admin.register(Landmark)
 class LandmarkAdmin(admin.ModelAdmin):
-    list_display = ('name', 'latitude', 'longitude', 'description')
+    list_display = ('content', 'latitude', 'longitude')
 
 
 admin.site.register(Map)

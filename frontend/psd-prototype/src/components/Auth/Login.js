@@ -9,7 +9,7 @@ import { withStyles } from '@material-ui/core/styles';
 import { Link } from 'react-router-dom';
 import { withRouter } from 'react-router-dom';
 
-import axiosInstance from '../axios';
+import axiosInstance from '../../axios';
 
 
 const styles = theme => ({

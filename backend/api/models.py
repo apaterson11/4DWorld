@@ -42,18 +42,22 @@ class Map(models.Model):
 
 
 class Landmark(models.Model):
-    name = models.TextField()
+    content = models.TextField()
     latitude = models.FloatField()
     longitude = models.FloatField()
+<<<<<<< HEAD
     description = models.TextField()
 
     
+=======
+    markertype = models.TextField(default="")
+>>>>>>> master
     map = models.ForeignKey(
         Map, on_delete=models.CASCADE, related_name='landmarks', null=True, blank=True
     )
 
     def __str__(self):
-        return self.name
+        return self.id
 
     def save(self, *args, **kwargs):
         super(Landmark, self).save(*args, **kwargs)
