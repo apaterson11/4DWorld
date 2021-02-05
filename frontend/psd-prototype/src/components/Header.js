@@ -41,7 +41,7 @@ class Header extends React.Component {
                         <Link className={classes.linkText} to="/">Home</Link>
                     </li>
                     <li>
-                        <Link className={classes.linkText} to="/profile">Dashboard</Link>
+                        <Link className={classes.linkText} to="/dashboard">Dashboard</Link>
                     </li>
                     <li>
                         <Link className={classes.linkText} to="/logout/">Logout</Link>

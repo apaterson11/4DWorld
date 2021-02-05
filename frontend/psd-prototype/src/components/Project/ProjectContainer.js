@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react'
-import axiosInstance from '../axios'
+import axiosInstance from '../../axios'
 import { makeStyles } from '@material-ui/core/styles'
 import Typography from '@material-ui/core/Typography'
 import ProjectCard from './ProjectCard'
 import AddCircleIcon from '@material-ui/icons/AddCircle'
+import { Link } from 'react-router-dom'
 
 const useStyles = makeStyles({
     root: {
@@ -57,7 +58,9 @@ function ProjectContainer(props) {
                     </Typography>
                 </div>
                 <div>
-                    <AddCircleIcon className={classes.padding} color="primary" />
+                <Link to="projects/create/">
+                    <AddCircleIcon className={classes.padding} color="primary"/>
+                </Link>
                 </div>
             </div>
 

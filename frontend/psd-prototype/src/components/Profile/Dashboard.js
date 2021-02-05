@@ -3,7 +3,7 @@ import { makeStyles } from '@material-ui/core/styles';
 import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import ProfileCard from './ProfileCard'
-import ProjectContainer from '../ProjectContainer'
+import ProjectContainer from '../Project/ProjectContainer'
 import UserGroupsCard from './UserGroupsCard'
 
 const useStyles = makeStyles({
@@ -22,16 +22,17 @@ const useStyles = makeStyles({
     },
 })
 
-function Profile(props) {
+function Dashboard(props) {
     const classes = useStyles();
+
     return (
         <Grid container component="main">
             <Grid item xs={12} sm={6} md={4} className={classes.pad} component={Paper} square>
                 <Grid item xs={12}>
-                    <ProfileCard userDetails={props.userDetails} setUserDetails={props.setUserDetails}/>
+                    <ProfileCard />
                 </Grid>
                 <Grid item xs={12}>
-                    <UserGroupsCard userDetails={props.userDetails} />
+                    <UserGroupsCard />
                 </Grid>
             </Grid>
             <Grid item wrap='wrap' xs={12} sm={6} md={8}>
@@ -41,4 +42,4 @@ function Profile(props) {
     )
 }
     
-export default Profile
+export default Dashboard

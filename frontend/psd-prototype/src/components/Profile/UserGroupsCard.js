@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useState, useContext} from 'react';
 import { makeStyles } from '@material-ui/core/styles';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
@@ -12,6 +12,7 @@ import TableContainer from '@material-ui/core/TableContainer';
 import TableRow from '@material-ui/core/TableRow';
 import axiosInstance from '../../axios'
 import EditGroupsCardModal from './EditGroupsCardModal'
+import { UserContext } from '../../Context';
 
 const useStyles = makeStyles({
   root: {
@@ -26,10 +27,11 @@ const useStyles = makeStyles({
   }
 });
 
-export default function UserGroupsCard({userDetails}) {
+export default function UserGroupsCard() {
   const classes = useStyles();
   const [groups, setGroups] = useState([])
   const [open, setOpen] = useState(false)
+  const {userDetails, setUserDetails} = useContext(UserContext)
   
   useEffect(() => {
     axiosInstance.get(`/user-details/${userDetails.user_id}`).then(response => {
