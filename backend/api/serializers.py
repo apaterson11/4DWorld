@@ -28,6 +28,13 @@ class UserProjectsSerializer(ModelSerializer):
     class Meta:
         model = Project
         fields = ('id', 'title', 'creator', 'group')
+    
+    def create(self, validated_data):
+        user = self.context.get('request').user.profile
+        project = Project(**validated_data)
+        project.creator = user
+        project.save()
+        return project
 
 
 class LandmarkSerializer(ModelSerializer):

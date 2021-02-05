@@ -8,6 +8,7 @@ import Logout from './components/Auth/Logout'
 import Register from './components/Auth/Register'
 import ProtoMap from './components/ProtoMap'
 import Dashboard from './components/Profile/Dashboard'
+import CreateProject from './components/Project/CreateProject'
 import { UserContext } from './Context'
 import axiosInstance from './axios'
 import jwt from 'jwt-decode'
@@ -60,6 +61,7 @@ function App(props) {
           <Route exact path="/dashboard/" render={() => (
             <Dashboard />
           )} />
+          <Route exact path="/projects/create/" component={CreateProject} />
           <Route exact path="/register/" component={Register}/>
           <Route exact path="/login/" render={() => (
             <Login login={login}/>
