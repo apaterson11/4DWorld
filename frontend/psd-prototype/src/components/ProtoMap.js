@@ -1,12 +1,13 @@
 import React from "react";
-import {Map, TileLayer, Marker} from 'react-leaflet';
+import {Map, TileLayer, Marker, Popup} from 'react-leaflet';
 
 import Control from '@skyeer/react-leaflet-custom-control' 
-import Popup from 'react-leaflet-editable-popup';
+// import Popup from 'react-leaflet-editable-popup';
 import { v4 as uuidv4 } from 'uuid';
 //import MarkerClusterGroup from 'react-leaflet-markercluster';
 import { marker } from "leaflet";
 import axiosInstance from '../axios'
+import EditMarker from './EditMarker';
 
 import {
 	blueIcon,
@@ -122,6 +123,10 @@ class ProtoMap extends React.Component {
         })
     };
 
+    submitCallback = (content, icontype, lat, lng, id) => {
+        this.updateLandmarks(content, icontype, lat, lng, id)
+    }
+
     render() {
         const {fetched, landmarks, popup} = this.state 
         let content = ''
@@ -131,11 +136,20 @@ class ProtoMap extends React.Component {
                     <Popup 
                     autoClose={false} 
                     nametag={'marker'} 
-                    editable removable 
-                    removalCallback={ () => {this.removeMarkerFromState(landmark.id)} }
-                    saveContentCallback={ content => {this.updateLandmarks(content, landmark.markertype, landmark.latitude, landmark.longitude, landmark.id)} }   // why +1? idk
+                    // editable removable 
+                    // removalCallback={ () => {this.removeMarkerFromState(landmark.id)} }
+                    // saveContentCallback={ content => {this.updateLandmarks(content, landmark.markertype, landmark.latitude, landmark.longitude, landmark.id)} }   // why +1? idk
                     >
-                        {landmark.content}
+                    <React.Fragment>
+                    <EditMarker 
+                        content={landmark.content} 
+                        icontype={landmark.markertype}  
+                        lat = {landmark.latitude}
+                        lng = {landmark.longitude}
+                        id = {landmark.id}
+                        markerCallback={this.submitCallback}>
+                    </EditMarker>
+                    </React.Fragment>
                     </Popup>
                 </Marker>)
         }
@@ -155,13 +169,14 @@ class ProtoMap extends React.Component {
                 />
                 {content}
 
-                <Control position="bottomleft">
+                {/* <Control position="bottomleft">
                     <div class="btn-markertypes">
                         <button onClick={this.handleBattle}>Battle</button>
                         <button onClick={this.handleKnowledge}>Knowledge</button>
                         <button onClick={this.handleReligious}>Religious</button>
                     </div>
-                </Control>
+                    
+                </Control> */}
 
                 <Control position="bottomright">
                       <button className="btn-resetview" onClick={this.handleClick}>Reset view</button>
