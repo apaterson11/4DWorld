@@ -1,29 +1,49 @@
 import React from "react";
-import {Map, TileLayer, Marker} from 'react-leaflet';
+import {Map, TileLayer, Marker, Popup} from 'react-leaflet';
 
 import Control from '@skyeer/react-leaflet-custom-control' 
-import Popup from 'react-leaflet-editable-popup';
+// import Popup from 'react-leaflet-editable-popup';
 import { v4 as uuidv4 } from 'uuid';
 //import MarkerClusterGroup from 'react-leaflet-markercluster';
 import { marker } from "leaflet";
 import axiosInstance from '../axios'
+import EditMarker from './EditMarker';
+
+import {
+	blueIcon,
+	greenIcon,
+	blackIcon,
+	violetIcon,
+    redIcon,
+    knowledge,
+    battle,
+    religious
+} from './Icons';
+
 
 const DEFAULT_VIEWPORT = {
     center: [55.86515, -4.25763],
     zoom: 13,
 }
 
+// dictionary mapping marker names to the markers themselves
+const iconRef = {"knowledge": knowledge, "battle": battle, "religious": religious};
+
+
+
 const markerText = {
     popupContent: '<h2>sample text</h2>sample text',
     open: false,
     autoClose: true,
 }
+
 class ProtoMap extends React.Component {
     state = {
         fetched: false,
         defLat: this.props.latitude,
         defLng: this.props.longitude,
-        viewport: DEFAULT_VIEWPORT
+        viewport: DEFAULT_VIEWPORT,
+        markertype: "default"
     }
 
     componentDidMount() {
@@ -34,10 +54,22 @@ class ProtoMap extends React.Component {
     handleClick = () => {
         this.setState({ viewport: DEFAULT_VIEWPORT })
     }
-    
-    onViewportChanged = viewport => {
-        this.setState({ viewport })
+
+    /* sets the state to the right markertype */
+    handleKnowledge = () => {
+        this.setState({ markertype: "knowledge" })
     }
+    handleBattle = () => {
+        this.setState({ markertype: "battle" })
+    }
+    handleReligious = () => {
+        this.setState({ markertype: "religious" })
+    }
+    
+    // updates the state to store the current position/zoom of the map
+    //onViewportChanged = viewport => {
+    //    this.setState({ viewport })
+    //}
     
     removeMarkerFromState = (landmark_id) => {
         /* Deletes the given landmark from the state, by sending a DELETE request to the API */
@@ -50,12 +82,13 @@ class ProtoMap extends React.Component {
             })
       };
     
-    updateLandmarks = (content, lat, lng, landmark_id) => {
+    updateLandmarks = (content, markertype, lat, lng, landmark_id) => {
         /* Updates the landmarks by sending a PUT request to the API,
            and updating the state in the then() callback
         */
         const response = axiosInstance.put(`/landmarks/${landmark_id}/`, {
             content: content,
+            markertype: markertype,
             latitude: lat,
             longitude: lng
         }).then(response => {
@@ -77,10 +110,12 @@ class ProtoMap extends React.Component {
     addMarker = (e) => {
         /* Adds a new landmark to the map at a given latitude and longitude, via a POST request */
         const { lat, lng } = e.latlng;
+        const type = this.state.markertype;
         const response = axiosInstance.post('/landmarks/', {
             content: 'x',
             latitude: lat,
-            longitude: lng
+            longitude: lng,
+            markertype: type
         }).then(response => {
             let newLandmarks = [...this.state.landmarks] // copy original state
             newLandmarks.push(response.data)  // add the new landmark to the copy
@@ -88,20 +123,38 @@ class ProtoMap extends React.Component {
         })
     };
 
+    submitCallback = (content, icontype, lat, lng, id) => {
+        this.updateLandmarks(content, icontype, lat, lng, id)
+    }
+
+    submitDelete = (content, icontype, lat, lng, id) => {
+        this.removeMarkerFromState(content, icontype, lat, lng, id)
+    }
+
     render() {
         const {fetched, landmarks, popup} = this.state 
         let content = ''
         if (fetched) {
             content = landmarks.map((landmark, index) =>
-                <Marker key={landmark.id} position={[landmark.latitude, landmark.longitude]}>
+                <Marker key={landmark.id} position={[landmark.latitude, landmark.longitude]} icon={(landmark.markertype in iconRef) ? iconRef[landmark.markertype] : blueIcon}>
                     <Popup 
                     autoClose={false} 
                     nametag={'marker'} 
-                    editable removable 
-                    removalCallback={ () => {this.removeMarkerFromState(landmark.id)} }
-                    saveContentCallback={ content => {this.updateLandmarks(content, landmark.latitude, landmark.longitude, landmark.id)} }   // why +1? idk
+                    // editable removable 
+                    // removalCallback={ () => {this.removeMarkerFromState(landmark.id)} }
+                    // saveContentCallback={ content => {this.updateLandmarks(content, landmark.markertype, landmark.latitude, landmark.longitude, landmark.id)} }   // why +1? idk
                     >
-                        {landmark.content}
+                    <React.Fragment>
+                    <EditMarker 
+                        content={landmark.content} 
+                        icontype={landmark.markertype}  
+                        lat = {landmark.latitude}
+                        lng = {landmark.longitude}
+                        id = {landmark.id}
+                        markerEdit={this.submitCallback}
+                        markerDelete={this.submitDelete}>
+                    </EditMarker>
+                    </React.Fragment>
                     </Popup>
                 </Marker>)
         }
@@ -120,6 +173,16 @@ class ProtoMap extends React.Component {
                     noWrap={true}
                 />
                 {content}
+
+                {/* <Control position="bottomleft">
+                    <div class="btn-markertypes">
+                        <button onClick={this.handleBattle}>Battle</button>
+                        <button onClick={this.handleKnowledge}>Knowledge</button>
+                        <button onClick={this.handleReligious}>Religious</button>
+                    </div>
+                    
+                </Control> */}
+
                 <Control position="bottomright">
                       <button className="btn-resetview" onClick={this.handleClick}>Reset view</button>
                 </Control>

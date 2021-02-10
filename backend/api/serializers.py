@@ -33,13 +33,12 @@ class UserProjectsSerializer(ModelSerializer):
 class LandmarkSerializer(ModelSerializer):
     class Meta:
         model = Landmark
-        fields = ('id', 'content', 'latitude', 'longitude')
-
+        fields = ('id', 'content', 'latitude', 'longitude', 'markertype')
 
 class CreateLandmarkSerializer(ModelSerializer):
     class Meta:
         model = Landmark
-        fields = ('id', 'content', 'latitude', 'longitude')
+        fields = ('id', 'content', 'latitude', 'longitude', 'markertype')
 
 
 class UserDetailsSerializer(ModelSerializer):
