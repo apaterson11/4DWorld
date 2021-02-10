@@ -61,9 +61,9 @@ function CreateProjectForm() {
                 getOptionLabel={(option) => option.name}
                 style={{ width: 300 }}
                 renderInput={(params) => 
-                    <TextField {...params} label="Combo box" variant="outlined" />
+                    <TextField {...params} label="Group" variant="outlined" />
                 }
-                onChange={(e, value) => setSelectedGroup(value.id)}
+                onChange={(e, value) => (value) ? setSelectedGroup(value.id) : setSelectedGroup(null)}
             />
         </FormControl>
         
