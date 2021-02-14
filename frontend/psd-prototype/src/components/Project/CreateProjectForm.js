@@ -1,21 +1,36 @@
 import { useState, useContext, useEffect } from 'react'
 import { UserContext } from '../../Context'
 import Button from '@material-ui/core/Button';
-import { FormControl } from '@material-ui/core';
 import { Autocomplete } from '@material-ui/lab';
+import Grid from '@material-ui/core/Grid'
 import TextField from '@material-ui/core/TextField';
+import Typography from '@material-ui/core/Typography'
 import { makeStyles } from '@material-ui/core/styles'
 import axiosInstance from '../../axios'
 
-const useStyles = makeStyles({
-    ml: {
-        'margin': "30px"
-    }
-})
+const useStyles = makeStyles( theme => ({
+    header: {
+        marginTop: '50px',
+        paddingLeft: '15%',
+        paddingRight: '15%'
+    },
+    form: {
+        width: '100%',
+        paddingLeft: "15%",
+        paddingRight: "15%"
+    },
+    submit: {
+        marginTop: '20px',
+        marginBottom: '20px',
+        backgroundColor: '#002e5b',
+        color: 'white'
+      },
+}))
 
 function CreateProjectForm() {
     const classes = useStyles()
     const [title, setTitle] = useState("")
+    const [description, setDescription] = useState("")
     const [selectedGroup, setSelectedGroup] = useState(null)
     const [groups, setGroups] = useState([])
     const {userDetails, setUserDetails} = useContext(UserContext)
@@ -31,47 +46,81 @@ function CreateProjectForm() {
     const handleCreateProject = async (e) => {
         let response = await axiosInstance.post('/projects/', {
             title: title,
+            description: description,
             group: selectedGroup
         })
         console.log(response.data)
     }
 
     return (
-        <form className={classes.ml}>
-        <FormControl>
-            <TextField
-                autoFocus
-                margin="dense"
-                id="project-title"
-                label="Project Title"
-                fullWidth
-                name="title"
-                value={title}
-                required
-                onChange={(e) => setTitle(e.target.value)}
-            />
-        </FormControl>
-
-        <FormControl>
-            <Autocomplete
-                id="group-combobox"
-                label="Group"
-                required
-                options={groups}
-                getOptionLabel={(option) => option.name}
-                style={{ width: 300 }}
-                renderInput={(params) => 
-                    <TextField {...params} label="Group" variant="outlined" />
-                }
-                onChange={(e, value) => (value) ? setSelectedGroup(value.id) : setSelectedGroup(null)}
-            />
-        </FormControl>
-        
-        <Button onClick={handleCreateProject} color="primary">
-            Create Project
-        </Button>
-        
-        </form>
+        <>
+        <Grid container>
+            <Grid item xs={12}>
+                <Typography gutterBottom variant="h5" component="h2" className={classes.header}>
+                    Project Details
+                </Typography>
+            </Grid>
+            <Grid container item xs={12}>
+                <form className={classes.form} noValidate>
+                    <Grid item xs={12}>
+                        <TextField
+                            autoFocus
+                            margin="dense"
+                            id="project-title"
+                            label="Project Title"
+                            variant='outlined'
+                            size='small'
+                            name="title"
+                            value={title}
+                            required
+                            fullWidth
+                            onChange={(e) => setTitle(e.target.value)}
+                        />
+                    </Grid>
+                    <Grid item xs={12}>
+                        <TextField
+                            margin="dense"
+                            id="project-description"
+                            label="Project Description"
+                            variant='outlined'
+                            multiline
+                            rows={1}
+                            rowsMax={6}
+                            size='small'
+                            name="Description"
+                            value={description}
+                            fullWidth
+                            onChange={(e) => setDescription(e.target.value)}
+                        />
+                    </Grid>
+                    <Grid item xs={12}>
+                        <Autocomplete
+                            margin="normal"
+                            id="group-combobox"
+                            label="Group"
+                            required
+                            options={groups}
+                            getOptionLabel={(option) => option.name}
+                            size='small'
+                            fullWidth
+                            renderInput={(params) => 
+                                <TextField {...params} label="Group" variant='outlined' margin='dense'/>
+                            }
+                            onChange={(e, value) => (value) ? setSelectedGroup(value.id) : setSelectedGroup(null)}
+                        />
+                    </Grid>
+                <Button 
+                    fullWidth
+                    variant="contained"
+                    className={classes.submit}
+                    onClick={handleCreateProject} 
+                >
+                    Create Project
+                </Button>
+                </form>
+            </Grid>
+        </Grid>
+        </>
     )
 }
 

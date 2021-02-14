@@ -27,7 +27,7 @@ class GroupSerializer(ModelSerializer):
 class UserProjectsSerializer(ModelSerializer):
     class Meta:
         model = Project
-        fields = ('id', 'title', 'creator', 'group')
+        fields = ('id', 'title', 'description', 'creator', 'group')
     
     def create(self, validated_data):
         user = self.context.get('request').user.profile

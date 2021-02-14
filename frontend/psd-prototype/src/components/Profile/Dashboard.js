@@ -18,7 +18,8 @@ const useStyles = makeStyles({
     },
     pad: {
         paddingLeft: '20px',
-        paddingRight: '20px'
+        paddingRight: '20px',
+        height: '93vh'
     },
 })
 
@@ -27,7 +28,7 @@ function Dashboard(props) {
 
     return (
         <Grid container component="main">
-            <Grid item xs={12} sm={6} md={4} className={classes.pad} component={Paper} square>
+            <Grid item xs={12} sm={6} md={4} className={classes.pad} component={Paper} elevation={3} square>
                 <Grid item xs={12}>
                     <ProfileCard />
                 </Grid>

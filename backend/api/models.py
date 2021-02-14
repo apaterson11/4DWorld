@@ -14,6 +14,7 @@ class Profile(models.Model):
 
 class Project(models.Model):
     title = models.CharField(max_length=64)
+    description = models.TextField()
     creator = models.ForeignKey(
         Profile, on_delete=models.SET_NULL, related_name='projects', null=True
     )
@@ -54,3 +55,47 @@ class Landmark(models.Model):
 
     def save(self, *args, **kwargs):
         super(Landmark, self).save(*args, **kwargs)
+
+
+class Country(models.Model):
+    name = models.CharField(max_length=64)
+    country_code = models.CharField(max_length=2, db_index=True)
+    latitude = models.FloatField(null=True)
+    longitude = models.FloatField(null=True)
+
+    class Meta:
+        verbose_name_plural = 'Countries'
+
+    def __str__(self):
+        return self.name
+
+
+class State(models.Model):
+    name = models.CharField(max_length=64)
+    country = models.ForeignKey(
+        Country, on_delete=models.SET_NULL, related_name='states', null=True
+    )
+    state_code = models.CharField(max_length=3, db_index=True)
+    latitude = models.FloatField(null=True)
+    longitude = models.FloatField(null=True)
+
+    def __str__(self):
+        return self.name
+
+
+class City(models.Model):
+    name = models.CharField(max_length=64)
+    country = models.ForeignKey(
+        Country, on_delete=models.SET_NULL, related_name='cities', null=True
+    )
+    state = models.ForeignKey(
+        State, on_delete=models.SET_NULL, related_name='cities', null=True
+    )
+    latitude = models.FloatField(null=True)
+    longitude = models.FloatField(null=True)
+
+    class Meta:
+        verbose_name_plural = 'Cities'
+
+    def __str__(self):
+        return self.name
