@@ -32,7 +32,6 @@ class Command(BaseCommand):
         states_data = requests.get(states_url, headers=header).json()
         states = []
         for state in states_data:
-            # State.objects.create(
             states.append(State(
                 name=state['name'], 
                 country=Country.objects.get(country_code=state['country_code']),
@@ -63,5 +62,4 @@ class Command(BaseCommand):
             )
             cities.append(city)
         City.objects.bulk_create(cities, batch_size=1250)
-
         self.stdout.write(self.style.SUCCESS('Cities fetched. Done.'))

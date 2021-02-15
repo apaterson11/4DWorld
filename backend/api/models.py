@@ -71,7 +71,7 @@ class Country(models.Model):
 
 
 class State(models.Model):
-    name = models.CharField(max_length=64)
+    name = models.CharField(max_length=64, db_index=True)
     country = models.ForeignKey(
         Country, on_delete=models.SET_NULL, related_name='states', null=True
     )
@@ -84,7 +84,7 @@ class State(models.Model):
 
 
 class City(models.Model):
-    name = models.CharField(max_length=64)
+    name = models.CharField(max_length=64, db_index=True)
     country = models.ForeignKey(
         Country, on_delete=models.SET_NULL, related_name='cities', null=True
     )

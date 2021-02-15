@@ -1,7 +1,7 @@
 from django.contrib.auth.models import Group, User
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
-from api.models import Landmark, Profile, Project
+from api.models import City, Country, Landmark, Profile, Project, State
 
 
 class RegisterUserSerializer(ModelSerializer):
@@ -80,3 +80,21 @@ class ProfileDetailsSerializer(ModelSerializer):
         instance.user.email = user.get('email', instance.user.email)
         instance.user.save()
         return instance
+
+
+class CountrySerializer(ModelSerializer):
+    class Meta:
+        model = Country
+        fields = ('id', 'name', 'country_code', 'latitude', 'longitude')
+
+
+class StateSerializer(ModelSerializer):
+    class Meta:
+        model = State
+        fields = ('id', 'name', 'country', 'state_code', 'latitude', 'longitude')
+
+
+class CitySerializer(ModelSerializer):
+    class Meta:
+        model = City
+        fields = ('id', 'name', 'country', 'state', 'latitude', 'longitude')

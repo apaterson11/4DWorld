@@ -5,14 +5,17 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from api.models import Landmark, Project, Profile
+from api.models import City, Country, Landmark, Project, Profile, State
 from api.serializers import (
     RegisterUserSerializer, 
     LandmarkSerializer, 
     CreateLandmarkSerializer,
     GroupSerializer,
     UserProjectsSerializer, 
-    ProfileDetailsSerializer
+    ProfileDetailsSerializer,
+    CountrySerializer,
+    StateSerializer,
+    CitySerializer,
 )
 
 from rest_framework_simplejwt.views import TokenVerifyView
@@ -28,6 +31,7 @@ class UserRegisterView(APIView):
             if new_user:
                 return Response(status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class UserDetailsAPIView(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated]
@@ -64,6 +68,41 @@ class ProjectAPIView(viewsets.ModelViewSet):
         user_groups = user.groups.all()
         return Project.objects.filter(group__in=user_groups)
         
+
+class CityAPIView(viewsets.ModelViewSet):
+    permission_classes = [AllowAny]
+    serializer_class = CitySerializer
+    model = City
+
+    def get_queryset(self):
+        country_id = self.request.GET.get('country_id')
+        state_id = self.request.GET.get('state_id')
+        if country_id is None:
+            return City.objects.none()
+        qs = City.objects.filter(country__id=country_id)
+        if state_id is not None:
+            return qs.filter(state__id=state_id)
+        return qs
+
+
+class CountryAPIView(viewsets.ModelViewSet):
+    permission_classes = [AllowAny]
+    serializer_class = CountrySerializer
+    model = Country
+    queryset = Country.objects.all()
+
+
+class StateAPIView(viewsets.ModelViewSet):
+    permission_classes = [AllowAny]
+    serializer_class = StateSerializer
+    model = State
+    
+    def get_queryset(self):
+        country_id = self.request.GET.get('country_id')
+        if country_id is None:
+            return State.objects.none()
+        return State.objects.filter(country__id=country_id)
+
 
 class BlacklistTokenUpdateView(APIView):
     permission_classes = [AllowAny]
