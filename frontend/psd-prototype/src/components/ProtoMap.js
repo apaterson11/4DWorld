@@ -10,14 +10,18 @@ import axiosInstance from '../axios'
 import EditMarker from './EditMarker';
 
 import {
-	blueIcon,
-	greenIcon,
-	blackIcon,
-	violetIcon,
-    redIcon,
-    knowledge,
+    army,
     battle,
-    religious
+	blueIcon,
+    city,
+    disease,
+    fortress,
+    individual,
+    industry,
+    knowledge,
+    religious,
+    trading,
+    village
 } from './Icons';
 
 
@@ -26,8 +30,18 @@ const DEFAULT_VIEWPORT = {
     zoom: 13,
 }
 
-// dictionary mapping marker names to the markers themselves
-const iconRef = {"knowledge": knowledge, "battle": battle, "religious": religious};
+const iconRef = {"army": army, 
+                 "battle": battle, 
+                 "city": city, 
+                 "disease": disease,
+                 "fortress": fortress, 
+                 "individual": individual,
+                 "industry": industry, 
+                 "knowledge": knowledge,
+                 "religious": religious, 
+                 "trading": trading, 
+                 "village": village
+                 };
 
 
 
@@ -55,17 +69,6 @@ class ProtoMap extends React.Component {
         this.setState({ viewport: DEFAULT_VIEWPORT })
     }
 
-    /* sets the state to the right markertype */
-    handleKnowledge = () => {
-        this.setState({ markertype: "knowledge" })
-    }
-    handleBattle = () => {
-        this.setState({ markertype: "battle" })
-    }
-    handleReligious = () => {
-        this.setState({ markertype: "religious" })
-    }
-    
     // updates the state to store the current position/zoom of the map
     //onViewportChanged = viewport => {
     //    this.setState({ viewport })

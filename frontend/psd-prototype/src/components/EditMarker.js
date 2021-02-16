@@ -55,9 +55,18 @@ export default class EditMarker extends React.Component{
                             onChange={e => this.setState({icontype: e.target.value})}
                         >
                             <MenuItem value={"default"}>Select:</MenuItem>
-                            <MenuItem value={"battle"}>Battle</MenuItem>
-                            <MenuItem value={"knowledge"}>Knowledge</MenuItem>
-                            <MenuItem value={"religious"}>Religious</MenuItem>
+                            <MenuItem value={"individual"}>Significant Individual</MenuItem>
+                            <MenuItem value={"army"}>Army</MenuItem>
+                            <MenuItem value={"knowledge"}>Knowledge Site</MenuItem>
+                            <MenuItem value={"trading"}>Trading Site</MenuItem>
+                            <MenuItem value={"religious"}>Religious Site</MenuItem>
+                            <MenuItem value={"battle"}>Battle Site</MenuItem>
+                            <MenuItem value={"industry"}>Industry Site</MenuItem>
+                            <MenuItem value={"disease"}>Disease/Disaster</MenuItem>
+                            <MenuItem value={"village"}>Small Settlement</MenuItem>
+                            <MenuItem value={"city"}>Major Settlement</MenuItem>
+                            <MenuItem value={"fortress"}>Fortress</MenuItem>
+                            
                         </Select>
                     </Grid>
                     <Grid item>   
