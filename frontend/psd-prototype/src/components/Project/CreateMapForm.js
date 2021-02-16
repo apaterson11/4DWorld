@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { makeStyles } from '@material-ui/core/styles'
 import { Grid } from '@material-ui/core'
 import { Autocomplete } from '@material-ui/lab'
@@ -31,6 +31,10 @@ const useStyles = makeStyles({
 })
 
 function CreateMapForm() {
+    const DEFAULT_ZOOM = 13
+    const DEFAULT_CENTER = [55.86515, -4.25763]
+    
+    const mapRef = useRef(null)
     const classes = useStyles()
     const [countries, setCountries] = useState([])
     const [selectedCountry, setSelectedCountry] = useState(null)
@@ -38,6 +42,8 @@ function CreateMapForm() {
     const [selectedState, setSelectedState] = useState(null)
     const [cities, setCities] = useState([])
     const [selectedCity, setSelectedCity] = useState(null)
+    const [center, setCenter] = useState(DEFAULT_CENTER)
+    const [zoom, setZoom] = useState(DEFAULT_ZOOM)
 
     useEffect(() => {
         axiosInstance.get('/countries')
@@ -63,14 +69,41 @@ function CreateMapForm() {
     }, [selectedCountry, selectedState])
 
     useEffect(() => {
-        // Clears out the state and city values if the country is unselected
-        if (selectedCountry == null) {
-            setSelectedState(null)
-            setStates([])
-            setSelectedCity(null)
-            setCities([])
+        if (selectedState !== null) { 
+            setCenter([selectedState.latitude, selectedState.longitude])
+            setZoom(9)
         }
+    }, [selectedState])
+
+    useEffect(() => {
+        if (selectedCity !== null) { 
+            setCenter([selectedCity.latitude, selectedCity.longitude])
+            setZoom(12)
+        }
+    }, [selectedCity])
+
+    useEffect(() => {
+        // Sets the map centre when user selects country
+        // Also clears out the state and city values if the country is changed
+        if (selectedCountry !== null) {
+            setCenter([selectedCountry.latitude, selectedCountry.longitude])
+            setZoom(6)
+        }
+        setSelectedState(null)
+        setStates([])
+        setSelectedCity(null)
+        setCities([])
     }, [selectedCountry])
+
+    const setMapOptions = (e) => {
+        setCenter(e.center)
+        setZoom(e.zoom)
+    }
+
+    const setMapCenter = (e) => {
+        const {lat, lng} = mapRef.current.leafletElement.getCenter()
+        setCenter([lat, lng])
+    }
 
     return (
         <>
@@ -133,9 +166,12 @@ function CreateMapForm() {
                 </Grid>
                 <Grid item xs={12} className={classes.padMap}>
                     <Map
+                        ref={mapRef}
                         className={classes.map}
-                        center={[55.86515, -4.25763]} 
-                        zoom={13} 
+                        center={center}
+                        zoom={zoom} 
+                        onzoomend={(e) => setZoom(mapRef.current.leafletElement.getZoom())}
+                        ondragend={(e) => setMapCenter(e)}
                         maxBounds={[[90,-180],[-90, 180]]}>
                         <TileLayer
                             url='http://{s}.tile.osm.org/{z}/{x}/{y}.png'
