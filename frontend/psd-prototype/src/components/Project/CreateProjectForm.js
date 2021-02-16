@@ -7,27 +7,31 @@ import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography'
 import { makeStyles } from '@material-ui/core/styles'
 import axiosInstance from '../../axios'
+import { MAP_OPTIONS } from '../../MapOptions'
 
 const useStyles = makeStyles( theme => ({
     header: {
-        marginTop: '50px',
-        paddingLeft: '15%',
-        paddingRight: '15%'
+        marginTop: '10px',
+        paddingLeft: '10px',
+        paddingRight: '10px'
     },
     form: {
         width: '100%',
-        paddingLeft: "15%",
-        paddingRight: "15%"
+        paddingLeft: "10px",
+        paddingRight: "10px"
     },
     submit: {
-        marginTop: '20px',
-        marginBottom: '20px',
+        marginTop: '30px',
+        marginBottom: '10px',
         backgroundColor: '#002e5b',
         color: 'white'
-      },
+    },
+    pad: {
+        marginTop: '30px',
+    },
 }))
 
-function CreateProjectForm() {
+function CreateProjectForm(props) {
     const classes = useStyles()
     const [title, setTitle] = useState("")
     const [description, setDescription] = useState("")
@@ -109,14 +113,37 @@ function CreateProjectForm() {
                             onChange={(e, value) => (value) ? setSelectedGroup(value.id) : setSelectedGroup(null)}
                         />
                     </Grid>
-                <Button 
-                    fullWidth
-                    variant="contained"
-                    className={classes.submit}
-                    onClick={handleCreateProject} 
-                >
-                    Create Project
-                </Button>
+                    
+                    <Grid item xs={12}>
+                        <Typography gutterBottom variant="h5" component="h2" className={classes.pad}>
+                            Map Customization
+                        </Typography>
+                    </Grid>
+                    <Grid item xs={12}>
+                        <Autocomplete
+                            margin="normal"
+                            id="style-combobox"
+                            label="Style"
+                            required
+                            options={MAP_OPTIONS}
+                            getOptionLabel={(option) => option.name}
+                            size='small'
+                            fullWidth
+                            renderInput={(params) => 
+                                <TextField {...params} label="Style" variant='outlined' margin='dense'/>
+                            }
+                            onChange={(e, value) => (value) ? props.setMapOption(value) : props.setMapOption(MAP_OPTIONS[0])}
+                        />
+                    </Grid>
+                    
+                    <Button 
+                        fullWidth
+                        variant="contained"
+                        className={classes.submit}
+                        onClick={handleCreateProject} 
+                    >
+                        Create Project
+                    </Button>
                 </form>
             </Grid>
         </Grid>

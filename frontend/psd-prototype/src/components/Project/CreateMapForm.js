@@ -5,18 +5,16 @@ import { Autocomplete } from '@material-ui/lab'
 import TextField from '@material-ui/core/TextField'
 import Typography from '@material-ui/core/Typography'
 import axiosInstance from '../../axios'
-import {Map, TileLayer} from 'react-leaflet';
+import {Map, TileLayer} from 'react-leaflet'
+import Chip from '@material-ui/core/Chip'
+import ZoomOutMapIcon from '@material-ui/icons/ZoomOutMap';
+import GpsFixedIcon from '@material-ui/icons/GpsFixed'
 
 const useStyles = makeStyles({
     header: {
-        marginTop: '50px',
-        paddingLeft: '40px',
-        paddingRight: '40px'
-    },
-    padDropdowns: {
-        paddingLeft: '30px',
-        paddingRight: '30px',
-        paddingBottom: '40px'
+        marginTop: '10px',
+        paddingLeft: '10px',
+        paddingRight: '10px'
     },
     spaceBetween: {
         paddingLeft: '10px',
@@ -26,11 +24,14 @@ const useStyles = makeStyles({
         padding: '10px',
     },
     map: {
-        height: '60vh',
+        maxHeight: '65vh'
+    },
+    chip: {
+        margin: '5px',
     }
 })
 
-function CreateMapForm() {
+function CreateMapForm(props) {
     const DEFAULT_ZOOM = 13
     const DEFAULT_CENTER = [55.86515, -4.25763]
     
@@ -73,6 +74,7 @@ function CreateMapForm() {
             setCenter([selectedState.latitude, selectedState.longitude])
             setZoom(9)
         }
+        setSelectedCity(null)
     }, [selectedState])
 
     useEffect(() => {
@@ -108,12 +110,24 @@ function CreateMapForm() {
     return (
         <>
         <Grid container>
-            <Grid item xs={12}>
-                <Typography gutterBottom variant="h5" component="h2" className={classes.header}>
-                    Default Map
-                </Typography>
+            <Grid container item xs={12} className={classes.header}>
+                <Grid item xs={12} md={4}>
+                    <Typography gutterBottom variant="h5" component="h2">
+                        Map Settings
+                    </Typography>
+                </Grid>
+                <Grid item xs={12} md={8} align="right">
+                    <Chip 
+                        label={`Centre: ${center[0]}, ${center[1]}`} 
+                        className={classes.chip} 
+                        icon={<GpsFixedIcon />}/>
+                    <Chip 
+                        label={`Zoom: ${zoom}`} 
+                        className={classes.chip}
+                        icon={<ZoomOutMapIcon />}/>
+                </Grid>
             </Grid>
-            <Grid container item xs={12} className={classes.padDropdowns}>
+            <Grid container item xs={12}>
                 <Grid item xs={12} md={4} className={classes.spaceBetween}>
                     <Autocomplete
                         margin="normal"
@@ -174,9 +188,9 @@ function CreateMapForm() {
                         ondragend={(e) => setMapCenter(e)}
                         maxBounds={[[90,-180],[-90, 180]]}>
                         <TileLayer
-                            url='http://{s}.tile.osm.org/{z}/{x}/{y}.png'
-                            minZoom = {1}
-                            maxZoom = {18}
+                            url={props.mapOption.url}
+                            minZoom = {props.mapOption.minZoom}
+                            maxZoom = {props.mapOption.maxZoom}
                             noWrap={true}
                         />
                     </Map> 
