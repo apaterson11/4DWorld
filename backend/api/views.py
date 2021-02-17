@@ -5,10 +5,11 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from api.models import Landmark, Project, Profile
+from api.models import Landmark, LandmarkImage, Project, Profile
 from api.serializers import (
     RegisterUserSerializer, 
     LandmarkSerializer, 
+    LandmarkImageSerializer,
     CreateLandmarkSerializer,
     GroupSerializer,
     UserProjectsSerializer, 
@@ -53,6 +54,11 @@ class LandmarkAPIView(viewsets.ModelViewSet):
     model = Landmark
     queryset = Landmark.objects.all()
 
+class LandmarkImageAPIView(viewsets.ModelViewSet):
+    permission_classes = [AllowAny]
+    serializer_class = LandmarkImageSerializer
+    model = LandmarkImage
+    queryset = LandmarkImage.objects.all()
 
 class ProjectAPIView(viewsets.ModelViewSet):
     permission_classes = [AllowAny]

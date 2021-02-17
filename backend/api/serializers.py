@@ -1,7 +1,7 @@
 from django.contrib.auth.models import Group, User
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
-from api.models import Landmark, Profile, Project
+from api.models import Landmark, LandmarkImage, Profile, Project
 
 
 class RegisterUserSerializer(ModelSerializer):
@@ -34,6 +34,11 @@ class LandmarkSerializer(ModelSerializer):
     class Meta:
         model = Landmark
         fields = ('id', 'content', 'latitude', 'longitude', 'markertype')
+
+class LandmarkImageSerializer(ModelSerializer):
+    class Meta:
+        model = LandmarkImage
+        fields = ('id', 'landmark', 'image')
 
 class CreateLandmarkSerializer(ModelSerializer):
     class Meta:

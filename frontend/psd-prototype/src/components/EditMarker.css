@@ -1,0 +1,9 @@
+@import "~react-image-gallery/styles/css/image-gallery.css";
+
+.image-gallery {
+    width: 400px;
+}
+
+.image-gallery-slide img {
+    width: 200px;
+}
