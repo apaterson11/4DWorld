@@ -6,4 +6,5 @@ build:
     - apt-get update -qy
     - apt-get install -y python-dev python-pip
     - pip install -r backend/requirements.txt
+    - python backend/manage.py migrate
     - python backend/manage.py test
