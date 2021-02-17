@@ -4,6 +4,7 @@ from api.views import (
     BlacklistTokenUpdateView, 
     GroupAPIView, 
     LandmarkAPIView,
+    LandmarkImageAPIView,
     ProjectAPIView,
     UserDetailsAPIView,
     UserRegisterView
@@ -12,6 +13,7 @@ from api.views_ajax import check_email, check_username
 
 router = DefaultRouter()
 router.register('landmarks', LandmarkAPIView, basename='landmarks')
+router.register('landmark-images', LandmarkImageAPIView, basename='landmark-images')
 router.register('projects', ProjectAPIView, basename='projects')
 router.register('user-details', UserDetailsAPIView, basename='user-details')
 router.register('groups', GroupAPIView, basename='groups')
