@@ -1,5 +1,5 @@
 import React from "react";
-import {Map, TileLayer, Marker, Popup, Polyline} from 'react-leaflet';
+import {Map, TileLayer, Marker, Popup, Polyline, LayersControl, LayerGroup, Circle} from 'react-leaflet';
 
 import Control from '@skyeer/react-leaflet-custom-control' 
 // import Popup from 'react-leaflet-editable-popup';
@@ -10,6 +10,7 @@ import axiosInstance from '../axios'
 import EditMarker from './EditMarker';
 // import { Polyline } from 'react-leaflet-polyline';
 import {getImages} from './EditMarker'
+import {LayerContent, getLandmarks, addMarker} from './LayerContent';
 
 import {
     army,
@@ -59,12 +60,15 @@ class ProtoMap extends React.Component {
         defLat: this.props.latitude,
         defLng: this.props.longitude,
         viewport: DEFAULT_VIEWPORT,
-        markertype: "default"
+        markertype: "default",
+        landmarks: [],
+        layers: [],
     }
 
     componentDidMount() {
         /* Fetch the list of landmarks on component loading */
         axiosInstance.get('/landmarks/').then(response => this.setState({landmarks: response.data, fetched: true}))
+        axiosInstance.get('/layers/').then(response => this.setState({layers: response.data, fetched: true}))
     }
 
     handleClick = () => {
@@ -76,56 +80,21 @@ class ProtoMap extends React.Component {
     //    this.setState({ viewport })
     //}
     
-    removeMarkerFromState = (landmark_id) => {
-        /* Deletes the given landmark from the state, by sending a DELETE request to the API */
-        const response = axiosInstance.delete(`/landmarks/${landmark_id}/`)
-            .then(response => {
-                // filter out the landmark that's been deleted from the state
-                this.setState({
-                    landmarks: this.state.landmarks.filter(landmark => landmark.id !== landmark_id)
-                })
-            })
-      };
-    
-    updateLandmarks = (content, markertype, lat, lng, landmark_id) => {
-        /* Updates the landmarks by sending a PUT request to the API,
-           and updating the state in the then() callback
-        */
-        console.log(lat)
-        console.log(lng)
-        console.log(content)
-        console.log(markertype)
-        console.log(landmark_id)
-        const response = axiosInstance.put(`/landmarks/${landmark_id}/`, {
-            content: content,
-            markertype: markertype,
-            latitude: lat,
-            longitude: lng
-        }).then(response => {
-            let updatedLandmarks = [...this.state.landmarks]  // copy original state
-            
-            // find the index of the landmark we need to change
-            let idx = updatedLandmarks.findIndex(landmark => landmark.id === landmark_id)
-            
-            // splice out the landmark to be changed, replacing it with the data from the API response
-            updatedLandmarks.splice(idx, 1, response.data)
-
-            // set the state with the newly updated landmark
-            this.setState({
-                landmarks: updatedLandmarks
-            })
-        })
-      };
-
     addMarker = (e) => {
+        // console.log(this.state.landmarks);
+        // console.log(this.state.landmarks.length);
         /* Adds a new landmark to the map at a given latitude and longitude, via a POST request */
         const { lat, lng } = e.latlng;
-        const type = this.state.markertype;
+        const pos = this.state.landmarks.length;
+
+        console.log(pos);
         const response = axiosInstance.post('/landmarks/', {
+            layer: '1',
             content: 'sample text',
             latitude: lat,
             longitude: lng,
-            markertype: type
+            markertype: 'default',
+            position: pos,
         }).then(response => {
             let newLandmarks = [...this.state.landmarks] // copy original state
             newLandmarks.push(response.data)  // add the new landmark to the copy
@@ -136,14 +105,6 @@ class ProtoMap extends React.Component {
  
 
 
-    submitCallback = (content, icontype, lat, lng, id) => {
-        this.updateLandmarks(content, icontype, lat, lng, id)
-    }
-
-    submitDelete = (content, icontype, lat, lng, id) => {
-        this.removeMarkerFromState(content, icontype, lat, lng, id)
-    }
-
     render() {
         const {fetched, landmarks, popup} = this.state 
         let content = ''
@@ -151,54 +112,95 @@ class ProtoMap extends React.Component {
         // 
 
 
-        if (fetched) {
-            content = landmarks.map((landmark, index) =>
-                <Marker key={landmark.id} position={[landmark.latitude, landmark.longitude]} icon={(landmark.markertype in iconRef) ? iconRef[landmark.markertype] : blueIcon} >
-                    <Popup 
-                    autoClose={false} 
-                    nametag={'marker'}
-                    minWidth={400} 
-                    maxWidth={2000}
-                    // editable removable 
-                    // removalCallback={ () => {this.removeMarkerFromState(landmark.id)} }
-                    // saveContentCallback={ content => {this.updateLandmarks(content, landmark.markertype, landmark.latitude, landmark.longitude, landmark.id)} }   // why +1? idk
-                    >
-                    <React.Fragment>
-                    <EditMarker 
-                        content={landmark.content} 
-                        icontype={landmark.markertype}  
-                        lat = {landmark.latitude}
-                        lng = {landmark.longitude}
-                        id = {landmark.id}
-                        markerEdit={this.submitCallback}
-                        markerDelete={this.submitDelete}>
-                    </EditMarker>
-                    </React.Fragment>
+        // if (fetched) {
+        //     content = landmarks.map((landmark, index) =>
+        //         <Marker key={landmark.id} position={[landmark.latitude, landmark.longitude]} icon={(landmark.markertype in iconRef) ? iconRef[landmark.markertype] : blueIcon} >
+        //             <Popup 
+        //             autoClose={false} 
+        //             nametag={'marker'}
+        //             minWidth={400} 
+        //             maxWidth={2000}
+        //             // editable removable 
+        //             // removalCallback={ () => {this.removeMarkerFromState(landmark.id)} }
+        //             // saveContentCallback={ content => {this.updateLandmarks(content, landmark.markertype, landmark.latitude, landmark.longitude, landmark.id)} }   // why +1? idk
+        //             >
+        //             <React.Fragment>
+        //             <EditMarker 
+        //                 content={landmark.content} 
+        //                 position={landmark.position}
+        //                 icontype={landmark.markertype}  
+        //                 lat = {landmark.latitude}
+        //                 lng = {landmark.longitude}
+        //                 id = {landmark.id}
+        //                 markerEdit={this.submitCallback}
+        //                 markerDelete={this.submitDelete}>
+        //             </EditMarker>
+        //             </React.Fragment>
                     
-                    </Popup>
-                </Marker>)
+        //             </Popup>
+        //         </Marker>)
          
-            let fromLandmarks = [...this.state.landmarks];
-            let toLandmarks = [...this.state.landmarks]; 
-            // make copies of landmarks array
 
-            fromLandmarks.pop()
-            toLandmarks = toLandmarks.slice(1)
-            // two new arrays, from = [1st marker ... 2nd last] and to = [2nd marker ... last]
+        //     let fromLandmarks = [...this.state.landmarks];
+        //     let toLandmarks = [...this.state.landmarks]; 
+        //     // make copies of landmarks array
 
-            // console.log("fromLandmarks = ", fromLandmarks[5].latitude);
+        //     fromLandmarks.pop()
+        //     fromLandmarks.sort((a, b) => a.position > b.position ? 1 : -1);
+        //     toLandmarks = toLandmarks.slice(1)
+        //     toLandmarks.sort((a, b) => a.position > b.position ? 1 : -1);
 
-            let range = Array(fromLandmarks.length).fill().map((x,i)=>i)
-            // range(length of fromLandmarks)
 
-            lines = range.map((i) => 
-                <Polyline 
-                        key={fromLandmarks.id} 
-                        positions={[[fromLandmarks[i].latitude, fromLandmarks[i].longitude], [toLandmarks[i].latitude, toLandmarks[i].longitude]]} 
-                        color={'red'} />)
-            // creates one line between each pair of markers
+        //     console.log("from = ",fromLandmarks);
+        //     console.log("to = ",toLandmarks);
+        //     // two new arrays, from = [1st marker ... 2nd last] and to = [2nd marker ... last]
 
-        }
+        //     // console.log("fromLandmarks = ", fromLandmarks[5].latitude);
+
+        //     let range = Array(fromLandmarks.length).fill().map((x,i)=>i)
+        //     // range(length of fromLandmarks)
+
+        //     lines = range.map((i) => 
+        //         <Polyline 
+        //                 key={fromLandmarks.position} 
+        //                 positions={[[fromLandmarks[i].latitude, fromLandmarks[i].longitude], [toLandmarks[i].latitude, toLandmarks[i].longitude]]} 
+        //                 color={'red'} />)
+        //     // creates one line between each pair of markers
+
+
+            // MOVE EVERYTHING ABOVE TO LAYERCONTENT!!!!
+
+
+            console.log("thisstate layers = ", this.state.layers);
+
+            let newlayers = [...this.state.layers];
+            console.log("newlayers = ",newlayers);
+
+            let layerrange = Array(newlayers.length).fill().map((x,i)=>i+1);
+            
+            console.log("layerrange  = ", layerrange);
+
+            // console.log(newlayers[0].name);
+            let renderlayers = ''
+            renderlayers = layerrange.map((i) =>
+
+            <LayersControl.Overlay name={"Layer "+i}>
+                <LayerGroup>
+                    <LayerContent edit={this.submitCallback} delete={this.submitDelete} layer={i} landmarks={this.state.landmarks}>thing in here</LayerContent>
+                </LayerGroup>
+            </LayersControl.Overlay>)
+
+            console.log(renderlayers);
+            // <Polyline 
+            //         key={fromLandmarks.position} 
+            //         positions={[[fromLandmarks[i].latitude, fromLandmarks[i].longitude], [toLandmarks[i].latitude, toLandmarks[i].longitude]]} 
+            //         color={'red'} />)
+
+
+
+    
+
+        // }
 
         return (
             <Map onViewportChanged={this.onViewportChanged} 
@@ -213,9 +215,27 @@ class ProtoMap extends React.Component {
                     maxZoom = {18}
                     noWrap={true}
                 />
-                {content}
-                
-                {lines}
+
+                <LayersControl position="topright">
+
+                    {renderlayers}  
+
+
+                    <LayersControl.Overlay name="Marker with popup">
+                        <LayerGroup>
+                        <Marker position={[54, 78]}>
+                        <Popup>
+                            A pretty CSS3 popup. <br /> Easily customizable.
+                        </Popup>
+                        </Marker>
+                        </LayerGroup>
+                    </LayersControl.Overlay>
+
+
+
+                    </LayersControl>
+                {/* {content}
+                {lines} */}
                 {/* {landmarks.map((fromLandmarks, toLandmarks) => 
                     {return <Polyline key={fromLandmarks.id} positions={[[fromLandmarks.latitude, fromLandmarks.longitude], [toLandmarks.latitude, toLandmarks.longitude],]} color={'red'} />})}
                 <Polyline color={'red'} positions={[[2, 5], [3, 6]]}/> */}

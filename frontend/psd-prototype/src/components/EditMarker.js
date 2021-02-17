@@ -10,38 +10,13 @@ import { Link } from 'react-router-dom';
 import { withRouter } from 'react-router-dom';
 import RichTextEditor from 'react-rte';
 import axiosInstance from '../axios';
-import ImageUploader from 'react-images-upload';
 import ImageGallery from 'react-image-gallery';
 require("./EditMarker.css");
 
-// const images = [
-//     {
-//       original: 'https://picsum.photos/id/1018/1000/600/',
-//       thumbnail: 'https://picsum.photos/id/1018/1000/600/'
-//     },
-//     {
-//       original: 'https://picsum.photos/id/1015/1000/600/',
-//       thumbnail: 'https://picsum.photos/id/1015/1000/600/'
-//     },
-//     {
-//       original: 'https://picsum.photos/id/1019/1000/600/',
-//       thumbnail: 'https://picsum.photos/id/1019/1000/600/'
-//     },
-//   ];
-
 export default class EditMarker extends React.Component{
-
-    /*static propTypes = {
-        onChange: PropTypes.func
-    }*/
-
-    // constructor(props) {
-    //     super(props);
-    //     this.onDrop = this.onDrop.bind(this);
-    // }
-
     state = {
         content: this.props.content,
+        position: this.props.position,
         icontype: this.props.icontype,
         lat: this.props.lat,
         lng: this.props.lng,
@@ -49,14 +24,25 @@ export default class EditMarker extends React.Component{
         selectedFile: null,
         images: [],
         imagesEmptyText: null,
+        schemas: [],
     }
 
     componentDidMount() {
         this.getImages()
+        // this.getLayers()
     }
 
+    // getLayers = () => {
+    //     axiosInstance.get('/layers/')
+    //     .then(response => {
+    //         console.log(response)
+    //         this.setState({schemas: response});
+    //     })
+    //     .catch(error => console.log(error.response));
+    // }
+
     handleEdit = () => {
-        this.props.markerEdit(this.state.content, this.state.icontype, this.state.lat, this.state.lng, this.props.id);
+        this.props.markerEdit(this.state.content, this.state.icontype, this.state.lat, this.state.lng, this.props.id, this.state.position, this.state.layer);
     }
 
     handleDelete = () => {
@@ -142,9 +128,9 @@ export default class EditMarker extends React.Component{
                     {/* <Grid item>
                         <div dangerouslySetInnerHTML={{__html: this.props.content}}></div>
                     </Grid> */}
-                    {/* <Grid item>
-                        {"icon type = " + this.props.icontype}
-                    </Grid> */}
+                    <Grid item>
+                        {"position = " + this.props.position}
+                    </Grid>
                     <Grid item>
                         <InputLabel id="label">Content</InputLabel>
                         <RichTextEditor toolbarConfig={toolbarConfig}
@@ -210,14 +196,26 @@ export default class EditMarker extends React.Component{
                                 Longitude
                                 <input type="number" name="lng" value={this.state.lng} onChange={e => this.setState({lng: e.target.value})}/> 
                             </label>
+                            <label>
+                                Position (ordering)
+                                <input type="number" name="pos" value={this.state.position} onChange={e => this.setState({position: e.target.value})} />
+
+                            </label>
                         </form>
                     </Grid>
-                    {/* <Grid item>
-                        <Button
-                            onClick={this.props.landmark.dragging.enable()}
-                            >Toggle drag
-                        </Button>
-                    </Grid> */}
+
+                    <Grid item>
+                    <InputLabel id="label">Choose Layer</InputLabel>
+                        <Select
+                            id="simple-select"
+                            value={this.state.layer}
+                            onChange={e => this.setState({layer: e.target.value})}
+                        >
+                            <MenuItem value={"1"}>1</MenuItem>
+                            <MenuItem value={"2"}>2</MenuItem>
+                        </Select>
+                    </Grid>
+
                     <Grid item>   
                         <Button
                             onClick={this.handleDelete}
