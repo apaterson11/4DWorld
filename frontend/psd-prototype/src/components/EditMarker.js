@@ -8,7 +8,7 @@ import Typography from '@material-ui/core/Typography';
 import { withStyles } from '@material-ui/core/styles';
 import { Link } from 'react-router-dom';
 import { withRouter } from 'react-router-dom';
-import RichTextEditor from 'react-rte'
+import RichTextEditor from 'react-rte';
 
 export default class EditMarker extends React.Component{
 
@@ -32,9 +32,9 @@ export default class EditMarker extends React.Component{
         this.props.markerDelete(this.props.id);
     }
 
-    handleChange = (event) => {
-        this.setState({icontype: event.target.value})
-    }
+    // handleChange = (event) => {
+    //     this.setState({icontype: event.target.value})
+    // }
 
     onChange = (value) => {
         console.log('on change');
