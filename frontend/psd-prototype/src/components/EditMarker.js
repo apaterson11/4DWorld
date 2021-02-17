@@ -1,44 +1,12 @@
-import React, {Component, PropTypes} from "react";
+import React from "react";
 import { Button, MenuItem, InputLabel, Select } from '@material-ui/core/';
-import CssBaseline from '@material-ui/core/CssBaseline';
-import TextField from '@material-ui/core/TextField';
-import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
-import Typography from '@material-ui/core/Typography';
-import { withStyles } from '@material-ui/core/styles';
-import { Link } from 'react-router-dom';
-import { withRouter } from 'react-router-dom';
 import RichTextEditor from 'react-rte';
 import axiosInstance from '../axios';
-import ImageUploader from 'react-images-upload';
 import ImageGallery from 'react-image-gallery';
 require("./EditMarker.css");
 
-// const images = [
-//     {
-//       original: 'https://picsum.photos/id/1018/1000/600/',
-//       thumbnail: 'https://picsum.photos/id/1018/1000/600/'
-//     },
-//     {
-//       original: 'https://picsum.photos/id/1015/1000/600/',
-//       thumbnail: 'https://picsum.photos/id/1015/1000/600/'
-//     },
-//     {
-//       original: 'https://picsum.photos/id/1019/1000/600/',
-//       thumbnail: 'https://picsum.photos/id/1019/1000/600/'
-//     },
-//   ];
-
 export default class EditMarker extends React.Component{
-
-    /*static propTypes = {
-        onChange: PropTypes.func
-    }*/
-
-    // constructor(props) {
-    //     super(props);
-    //     this.onDrop = this.onDrop.bind(this);
-    // }
 
     state = {
         content: this.props.content,
@@ -55,29 +23,29 @@ export default class EditMarker extends React.Component{
         this.getImages()
     }
 
+    // calls updateLandmarks in ProtoMap.js
     handleEdit = () => {
         this.props.markerEdit(this.state.content, this.state.icontype, this.state.lat, this.state.lng, this.props.id);
     }
 
+    // calls removeMarkerFromState in ProtoMap.js
     handleDelete = () => {
         this.props.markerDelete(this.props.id);
     }
-
-    // handleChange = (event) => {
-    //     this.setState({icontype: event.target.value})
-    // }
 
     onChange = (value) => {
         this.setState({value})
         this.setState({content: value.toString('html')})
     };
 
+    // first part of image uploading process, allows user to choose file to upload
     fileSelectedHandler = (e) => {
         this.setState({
             selectedFile: e.target.files[0]
         })
     }
 
+    // function uploads images to corresponding marker
     uploadImage = (e) => {
         const formData = new FormData();
         formData.append('image', this.state.selectedFile, this.state.selectedFile.name);
@@ -92,22 +60,23 @@ export default class EditMarker extends React.Component{
         axiosInstance.post('/landmark-images/', formData, config)
         .then(res => {
             console.log(res);
-            this.getImages();
+            this.getImages();       // updates images in state
         })
     }
 
+    // function gets images for each marker and displays on component mount and when uploading new images
     getImages = (e) => {
         const results = [];
         const response = axiosInstance.get('/landmark-images/', {
 
-        }).then(response => response.data.forEach(item => {
-            if (item.landmark == this.props.id) {
+        }).then(response => response.data.forEach(item => {     // for each statement only selects images for corresponding marker
+            if (item.landmark === this.props.id) {
                 results.push({
                     image: item.image,
                 });
             }
             // console.log(results)
-            this.setState({images: results.map(obj => ({
+            this.setState({images: results.map(obj => ({        // set state to corresponding images and pass to image gallery
                 original: `${obj.image}`,
                 thumbnail: `${obj.image}`,
             }))})
@@ -117,7 +86,7 @@ export default class EditMarker extends React.Component{
 
     render() {
         const toolbarConfig = {
-            // Optionally specify the groups to display (displayed in the order listed).
+            // specifies the groups to be displayed on the rte
             display: ['INLINE_STYLE_BUTTONS', 'BLOCK_TYPE_BUTTONS', 'BLOCK_TYPE_DROPDOWN', 'HISTORY_BUTTONS'],
             INLINE_STYLE_BUTTONS: [
                 {label: 'Bold', style: 'BOLD', className: 'custom-css-class'},
@@ -145,6 +114,8 @@ export default class EditMarker extends React.Component{
                     {/* <Grid item>
                         {"icon type = " + this.props.icontype}
                     </Grid> */}
+
+                    {/* rte for editing of marker content */}
                     <Grid item>
                         <InputLabel id="label">Content</InputLabel>
                         <RichTextEditor toolbarConfig={toolbarConfig}
@@ -153,6 +124,8 @@ export default class EditMarker extends React.Component{
                             placeholder = 'Enter text here...' 
                         />
                     </Grid>
+
+                    {/* image gallery that displays marker images */}
                     <Grid item>
                         <InputLabel id="label">Images</InputLabel>
                         <ImageGallery items = {this.state.images}
@@ -172,6 +145,8 @@ export default class EditMarker extends React.Component{
                         slideOnThumbnailOver = {false}
                         useWindowKeyDown = {true}/>
                     </Grid>
+
+                    {/* upload new image functionality */}
                     <Grid item>
                         <InputLabel id="label">Upload new image</InputLabel>
                         <input type="file" onChange={this.fileSelectedHandler}/>
@@ -199,6 +174,8 @@ export default class EditMarker extends React.Component{
                             
                         </Select>
                     </Grid>
+
+                    {/* edit location functionality */}
                     <Grid item>
                         <InputLabel id="label">Location</InputLabel>
                         <form>
@@ -218,6 +195,8 @@ export default class EditMarker extends React.Component{
                             >Toggle drag
                         </Button>
                     </Grid> */}
+
+                    {/* delete and save functionality */}
                     <Grid item>   
                         <Button
                             onClick={this.handleDelete}
