@@ -32,19 +32,11 @@ const useStyles = makeStyles({
 })
 
 function CreateMapForm(props) {
-    const DEFAULT_ZOOM = 13
-    const DEFAULT_CENTER = [55.86515, -4.25763]
-    
     const mapRef = useRef(null)
     const classes = useStyles()
     const [countries, setCountries] = useState([])
-    const [selectedCountry, setSelectedCountry] = useState(null)
     const [states, setStates] = useState([])
-    const [selectedState, setSelectedState] = useState(null)
     const [cities, setCities] = useState([])
-    const [selectedCity, setSelectedCity] = useState(null)
-    const [center, setCenter] = useState(DEFAULT_CENTER)
-    const [zoom, setZoom] = useState(DEFAULT_ZOOM)
 
     useEffect(() => {
         const map = mapRef.current.leafletElement
@@ -58,54 +50,54 @@ function CreateMapForm(props) {
     }, [])
 
     useEffect(() => {
-        if (selectedCountry !== null) {
-            axiosInstance.get(`/states?country_id=${selectedCountry.id}`)
+        if (props.selectedCountry !== null) {
+            axiosInstance.get(`/states?country_id=${props.selectedCountry.id}`)
                 .then(response => setStates(response.data))
         }
-    }, [selectedCountry])
+    }, [props.selectedCountry])
 
     useEffect(() => {
-        if (selectedCountry !== null) {
-            let url = `/cities?country_id=${selectedCountry.id}`
-            if (selectedState !== null) {
-                url = `${url}&state_id=${selectedState.id}`
+        if (props.selectedCountry !== null) {
+            let url = `/cities?country_id=${props.selectedCountry.id}`
+            if (props.selectedState !== null) {
+                url = `${url}&state_id=${props.selectedState.id}`
             }
             axiosInstance.get(url)
                 .then(response => setCities(response.data))
         }
-    }, [selectedCountry, selectedState])
+    }, [props.selectedCountry, props.selectedState])
 
     useEffect(() => {
-        if (selectedState !== null) { 
-            setCenter([selectedState.latitude, selectedState.longitude])
-            setZoom(9)
+        if (props.selectedState !== null) { 
+            props.setCenter([props.selectedState.latitude, props.selectedState.longitude])
+            props.setZoom(9)
         }
-        setSelectedCity(null)
-    }, [selectedState])
+        props.setSelectedCity(null)
+    }, [props.selectedState])
 
     useEffect(() => {
-        if (selectedCity !== null) { 
-            setCenter([selectedCity.latitude, selectedCity.longitude])
-            setZoom(12)
+        if (props.selectedCity !== null) { 
+            props.setCenter([props.selectedCity.latitude, props.selectedCity.longitude])
+            props.setZoom(12)
         }
-    }, [selectedCity])
+    }, [props.selectedCity])
 
     useEffect(() => {
         // Sets the map centre when user selects country
         // Also clears out the state and city values if the country is changed
-        if (selectedCountry !== null) {
-            setCenter([selectedCountry.latitude, selectedCountry.longitude])
-            setZoom(6)
+        if (props.selectedCountry !== null) {
+            props.setCenter([props.selectedCountry.latitude, props.selectedCountry.longitude])
+            props.setZoom(6)
         }
-        setSelectedState(null)
+        props.setSelectedState(null)
         setStates([])
-        setSelectedCity(null)
+        props.setSelectedCity(null)
         setCities([])
-    }, [selectedCountry])
+    }, [props.selectedCountry])
 
     const setMapCenter = (e) => {
         const {lat, lng} = mapRef.current.leafletElement.getCenter()
-        setCenter([lat, lng])
+        props.setCenter([lat, lng])
     }
 
     return (
@@ -119,11 +111,11 @@ function CreateMapForm(props) {
                 </Grid>
                 <Grid item xs={12} md={8} align="right">
                     <Chip 
-                        label={`Centre: ${center[0]}, ${center[1]}`} 
+                        label={`Centre: ${props.center[0]}, ${props.center[1]}`} 
                         className={classes.chip} 
                         icon={<GpsFixedIcon />}/>
                     <Chip 
-                        label={`Zoom: ${zoom}`} 
+                        label={`Zoom: ${props.zoom}`} 
                         className={classes.chip}
                         icon={<ZoomOutMapIcon />}/>
                 </Grid>
@@ -142,7 +134,7 @@ function CreateMapForm(props) {
                         renderInput={(params) => 
                             <TextField {...params} label="Country" variant='outlined' margin='dense' />
                         }
-                        onChange={(e, value) => (value) ? setSelectedCountry(value) : setSelectedCountry(null)}
+                        onChange={(e, value) => (value) ? props.setSelectedCountry(value) : props.setSelectedCountry(null)}
                     />
                 </Grid>
                 <Grid item xs={12} md={4} className={classes.spaceBetween}>
@@ -155,11 +147,11 @@ function CreateMapForm(props) {
                         getOptionLabel={(option) => option.name}
                         size='small'
                         fullWidth
-                        value={selectedState}
+                        value={props.selectedState}
                         renderInput={(params) => 
                             <TextField {...params} label="State" variant='outlined' margin='dense'/>
                         }
-                        onChange={(e, value) => (value) ? setSelectedState(value) : setSelectedState(null)}
+                        onChange={(e, value) => (value) ? props.setSelectedState(value) : props.setSelectedState(null)}
                     />
                 </Grid>
                 <Grid item xs={12} md={4} className={classes.spaceBetween}>
@@ -172,20 +164,20 @@ function CreateMapForm(props) {
                         getOptionLabel={(option) => option.name}
                         size='small'
                         fullWidth
-                        value={selectedCity}
+                        value={props.selectedCity}
                         renderInput={(params) => 
                             <TextField {...params} label="City" variant='outlined' margin='dense'/>
                         }
-                        onChange={(e, value) => (value) ? setSelectedCity(value) : setSelectedCity(null)}
+                        onChange={(e, value) => (value) ? props.setSelectedCity(value) : props.setSelectedCity(null)}
                     />
                 </Grid>
                 <Grid item xs={12} className={classes.padMap}>
                     <Map
                         ref={mapRef}
                         className={classes.map}
-                        center={center}
-                        zoom={zoom} 
-                        onzoomend={(e) => setZoom(mapRef.current.leafletElement.getZoom())}
+                        center={props.center}
+                        zoom={props.zoom} 
+                        onzoomend={(e) => props.setZoom(mapRef.current.leafletElement.getZoom())}
                         ondragend={(e) => setMapCenter(e)}
                         zoomDelta = {0.5}
                         zoomSnap = {0.5}

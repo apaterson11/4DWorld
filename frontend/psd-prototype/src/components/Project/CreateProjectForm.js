@@ -7,7 +7,6 @@ import TextField from '@material-ui/core/TextField';
 import Typography from '@material-ui/core/Typography'
 import { makeStyles } from '@material-ui/core/styles'
 import axiosInstance from '../../axios'
-import { MAP_OPTIONS } from '../../MapOptions'
 
 const useStyles = makeStyles( theme => ({
     header: {
@@ -33,9 +32,6 @@ const useStyles = makeStyles( theme => ({
 
 function CreateProjectForm(props) {
     const classes = useStyles()
-    const [title, setTitle] = useState("")
-    const [description, setDescription] = useState("")
-    const [selectedGroup, setSelectedGroup] = useState(null)
     const [groups, setGroups] = useState([])
     const {userDetails, setUserDetails} = useContext(UserContext)
 
@@ -46,15 +42,6 @@ function CreateProjectForm(props) {
             )
         })
     }, [])
-
-    const handleCreateProject = async (e) => {
-        let response = await axiosInstance.post('/projects/', {
-            title: title,
-            description: description,
-            group: selectedGroup
-        })
-        console.log(response.data)
-    }
 
     return (
         <>
@@ -75,10 +62,9 @@ function CreateProjectForm(props) {
                             variant='outlined'
                             size='small'
                             name="title"
-                            value={title}
                             required
                             fullWidth
-                            onChange={(e) => setTitle(e.target.value)}
+                            onChange={(e) => props.setTitle(e.target.value)}
                         />
                     </Grid>
                     <Grid item xs={12}>
@@ -92,9 +78,8 @@ function CreateProjectForm(props) {
                             rowsMax={6}
                             size='small'
                             name="Description"
-                            value={description}
                             fullWidth
-                            onChange={(e) => setDescription(e.target.value)}
+                            onChange={(e) => props.setDescription(e.target.value)}
                         />
                     </Grid>
                     <Grid item xs={12}>
@@ -110,7 +95,7 @@ function CreateProjectForm(props) {
                             renderInput={(params) => 
                                 <TextField {...params} label="Group" variant='outlined' margin='dense'/>
                             }
-                            onChange={(e, value) => (value) ? setSelectedGroup(value.id) : setSelectedGroup(null)}
+                            onChange={(e, value) => (value) ? props.setSelectedGroup(value.id) : props.setSelectedGroup(null)}
                         />
                     </Grid>
                     
@@ -132,7 +117,7 @@ function CreateProjectForm(props) {
                             renderInput={(params) => 
                                 <TextField {...params} label="Style" variant='outlined' margin='dense'/>
                             }
-                            onChange={(e, value) => (value) ? props.setMapOption(value) : props.setMapOption(MAP_OPTIONS[0])}
+                            onChange={(e, value) => (value) ? props.setMapOption(value) : props.setMapOption(props.mapOptions[0])}
                         />
                     </Grid>
                     
@@ -140,7 +125,7 @@ function CreateProjectForm(props) {
                         fullWidth
                         variant="contained"
                         className={classes.submit}
-                        onClick={handleCreateProject} 
+                        onClick={props.handleCreateProject} 
                     >
                         Create Project
                     </Button>
