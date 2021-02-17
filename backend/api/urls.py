@@ -6,6 +6,7 @@ from api.views import (
     CountryAPIView,
     GroupAPIView, 
     LandmarkAPIView,
+    MapAPIView,
     MapStylesAPIView,
     ProjectAPIView,
     StateAPIView,
@@ -23,6 +24,7 @@ router.register('countries', CountryAPIView, basename='countries')
 router.register('states', StateAPIView, basename='states')
 router.register('cities', CityAPIView, basename='cities')
 router.register('map-styles', MapStylesAPIView, basename='map-styles')
+router.register('maps', MapAPIView, basename='maps')
 
 urlpatterns = [
     path('register/', UserRegisterView.as_view(), name='register'),

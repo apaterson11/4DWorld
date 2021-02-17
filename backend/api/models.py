@@ -44,16 +44,16 @@ class Map(models.Model):
     project = models.OneToOneField(
         Project, related_name='map', on_delete=models.CASCADE
     )
-    centre_latitude = models.FloatField()
-    centre_longitude = models.FloatField()
-    zoom_level = models.IntegerField()
+    latitude = models.FloatField()
+    longitude = models.FloatField()
+    zoom = models.FloatField()
     style = models.ForeignKey(
-        MapStyle, on_delete=models.SET(get_default_style), related_name='maps', null=True
+        MapStyle, on_delete=models.SET(get_default_style), related_name='maps'
     )
 
     @property
     def centre(self):
-        return (self.centre_latitude, self.centre_longitude)
+        return (self.latitude, self.longitude)
 
     def __str__(self):
         return f"Map for project {self.project.title} centred at {self.centre}"

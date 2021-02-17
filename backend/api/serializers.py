@@ -1,7 +1,7 @@
 from django.contrib.auth.models import Group, User
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
-from api.models import City, Country, Landmark, MapStyle, Profile, Project, State
+from api.models import City, Country, Landmark, Map, MapStyle, Profile, Project, State
 
 
 class RegisterUserSerializer(ModelSerializer):
@@ -104,3 +104,9 @@ class MapStyleSerializer(ModelSerializer):
     class Meta:
         model = MapStyle
         fields = ('id', 'name', 'url', 'min_zoom', 'max_zoom', 'attribution')
+
+
+class MapSerializer(ModelSerializer):
+    class Meta:
+        model = Map
+        fields = ('id', 'project', 'latitude', 'longitude', 'zoom', 'style')

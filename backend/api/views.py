@@ -5,7 +5,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from api.models import City, Country, Landmark, MapStyle, Project, Profile, State
+from api.models import City, Country, Landmark, Map, MapStyle, Project, Profile, State
 from api.serializers import (
     RegisterUserSerializer, 
     LandmarkSerializer, 
@@ -16,6 +16,7 @@ from api.serializers import (
     CountrySerializer,
     StateSerializer,
     CitySerializer,
+    MapSerializer,
     MapStyleSerializer,
 )
 
@@ -111,6 +112,13 @@ class MapStylesAPIView(viewsets.ModelViewSet):
     model = MapStyle
     queryset = MapStyle.objects.all()
     
+
+class MapAPIView(viewsets.ModelViewSet):
+    permission_classes = [AllowAny]
+    serializer_class = MapSerializer
+    queryset = Map.objects.all()
+    model = Map
+
 
 class BlacklistTokenUpdateView(APIView):
     permission_classes = [AllowAny]
