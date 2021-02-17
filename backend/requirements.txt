@@ -3,3 +3,4 @@ django-cors-headers==3.5.0
 djangorestframework==3.12.1
 djangorestframework-simplejwt==4.4.0
 Pillow==7.0.0
+PyJWT==1.7.1
