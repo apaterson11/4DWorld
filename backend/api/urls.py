@@ -1,11 +1,16 @@
 from django.urls import path
 from rest_framework.routers import DefaultRouter
 from api.views import (
-    BlacklistTokenUpdateView, 
+    BlacklistTokenUpdateView,
+    CityAPIView,
+    CountryAPIView,
     GroupAPIView, 
     LandmarkAPIView,
     LandmarkImageAPIView,
+    MapAPIView,
+    MapStylesAPIView,
     ProjectAPIView,
+    StateAPIView,
     UserDetailsAPIView,
     UserRegisterView
 )
@@ -17,6 +22,11 @@ router.register('landmark-images', LandmarkImageAPIView, basename='landmark-imag
 router.register('projects', ProjectAPIView, basename='projects')
 router.register('user-details', UserDetailsAPIView, basename='user-details')
 router.register('groups', GroupAPIView, basename='groups')
+router.register('countries', CountryAPIView, basename='countries')
+router.register('states', StateAPIView, basename='states')
+router.register('cities', CityAPIView, basename='cities')
+router.register('map-styles', MapStylesAPIView, basename='map-styles')
+router.register('maps', MapAPIView, basename='maps')
 
 urlpatterns = [
     path('register/', UserRegisterView.as_view(), name='register'),

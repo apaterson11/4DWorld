@@ -14,7 +14,7 @@ import axiosInstance from '../../axios';
 
 const styles = theme => ({
   root: {
-    height: '100vh',
+    height: '93vh',
   },
   image: {
     backgroundImage: 'url(https://source.unsplash.com/random)',

@@ -7,22 +7,14 @@ import ProjectContainer from '../Project/ProjectContainer'
 import UserGroupsCard from './UserGroupsCard'
 
 const useStyles = makeStyles({
-    root: {
-      height: '100vh',
-    },
-    image: {
-        backgroundImage: 'url(https://source.unsplash.com/random)',
-        backgroundRepeat: 'no-repeat',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-    },
     pad: {
         paddingLeft: '20px',
-        paddingRight: '20px'
+        paddingRight: '20px',
+        height: '93vh'
     },
 })
 
-function Dashboard(props) {
+function Dashboard() {
     const classes = useStyles();
 
     return (
@@ -35,7 +27,7 @@ function Dashboard(props) {
                     <UserGroupsCard />
                 </Grid>
             </Grid>
-            <Grid item wrap='wrap' xs={12} sm={6} md={8}>
+            <Grid item wrap='wrap' xs={12} sm={6} md={8} className={classes.pad}>
                 <ProjectContainer />
             </Grid>
         </Grid>

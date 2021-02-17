@@ -1,11 +1,11 @@
 from django.shortcuts import render
 from django.contrib.auth.models import Group
 from rest_framework import status, viewsets
-from rest_framework.permissions import AllowAny
+from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from api.models import Landmark, LandmarkImage, Project, Profile
+from api.models import City, Country, Landmark, LandmarkImage, Map, MapStyle, Project, Profile, State
 from api.serializers import (
     RegisterUserSerializer, 
     LandmarkSerializer, 
@@ -13,7 +13,12 @@ from api.serializers import (
     CreateLandmarkSerializer,
     GroupSerializer,
     UserProjectsSerializer, 
-    ProfileDetailsSerializer
+    ProfileDetailsSerializer,
+    CountrySerializer,
+    StateSerializer,
+    CitySerializer,
+    MapSerializer,
+    MapStyleSerializer,
 )
 
 from rest_framework_simplejwt.views import TokenVerifyView
@@ -30,8 +35,9 @@ class UserRegisterView(APIView):
                 return Response(status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class UserDetailsAPIView(viewsets.ModelViewSet):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     serializer_class = ProfileDetailsSerializer
     model = Profile
     queryset = Profile.objects.all()
@@ -70,6 +76,55 @@ class ProjectAPIView(viewsets.ModelViewSet):
         user_groups = user.groups.all()
         return Project.objects.filter(group__in=user_groups)
         
+
+class CityAPIView(viewsets.ModelViewSet):
+    permission_classes = [AllowAny]
+    serializer_class = CitySerializer
+    model = City
+
+    def get_queryset(self):
+        country_id = self.request.GET.get('country_id')
+        state_id = self.request.GET.get('state_id')
+        if country_id is None:
+            return City.objects.none()
+        qs = City.objects.filter(country__id=country_id)
+        if state_id is not None:
+            return qs.filter(state__id=state_id)
+        return qs
+
+
+class CountryAPIView(viewsets.ModelViewSet):
+    permission_classes = [AllowAny]
+    serializer_class = CountrySerializer
+    model = Country
+    queryset = Country.objects.all()
+
+
+class StateAPIView(viewsets.ModelViewSet):
+    permission_classes = [AllowAny]
+    serializer_class = StateSerializer
+    model = State
+    
+    def get_queryset(self):
+        country_id = self.request.GET.get('country_id')
+        if country_id is None:
+            return State.objects.none()
+        return State.objects.filter(country__id=country_id)
+
+
+class MapStylesAPIView(viewsets.ModelViewSet):
+    permission_classes = [AllowAny]
+    serializer_class = MapStyleSerializer
+    model = MapStyle
+    queryset = MapStyle.objects.all()
+    
+
+class MapAPIView(viewsets.ModelViewSet):
+    permission_classes = [AllowAny]
+    serializer_class = MapSerializer
+    queryset = Map.objects.all()
+    model = Map
+
 
 class BlacklistTokenUpdateView(APIView):
     permission_classes = [AllowAny]
