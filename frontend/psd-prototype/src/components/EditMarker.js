@@ -56,7 +56,7 @@ export default class EditMarker extends React.Component{
     }
 
     handleEdit = () => {
-        this.props.markerEdit(this.state.content, this.state.icontype, this.props.lat, this.props.lng, this.props.id);
+        this.props.markerEdit(this.state.content, this.state.icontype, this.state.lat, this.state.lng, this.props.id);
     }
 
     handleDelete = () => {
