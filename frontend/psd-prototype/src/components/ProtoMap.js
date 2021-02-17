@@ -1,13 +1,14 @@
 import React from "react";
-import {Map, TileLayer, Marker, Popup} from 'react-leaflet';
+import {Map, TileLayer, Marker, Popup, Polyline} from 'react-leaflet';
 
 import Control from '@skyeer/react-leaflet-custom-control' 
 // import Popup from 'react-leaflet-editable-popup';
 import { v4 as uuidv4 } from 'uuid';
 //import MarkerClusterGroup from 'react-leaflet-markercluster';
-import { marker } from "leaflet";
+import { LineUtil, marker } from "leaflet";
 import axiosInstance from '../axios'
 import EditMarker from './EditMarker';
+// import { Polyline } from 'react-leaflet-polyline';
 import {getImages} from './EditMarker'
 
 import {
@@ -132,6 +133,9 @@ class ProtoMap extends React.Component {
         })
     };
 
+ 
+
+
     submitCallback = (content, icontype, lat, lng, id) => {
         this.updateLandmarks(content, icontype, lat, lng, id)
     }
@@ -143,6 +147,10 @@ class ProtoMap extends React.Component {
     render() {
         const {fetched, landmarks, popup} = this.state 
         let content = ''
+        let lines = ''
+        // 
+
+
         if (fetched) {
             content = landmarks.map((landmark, index) =>
                 <Marker key={landmark.id} position={[landmark.latitude, landmark.longitude]} icon={(landmark.markertype in iconRef) ? iconRef[landmark.markertype] : blueIcon} >
@@ -166,8 +174,30 @@ class ProtoMap extends React.Component {
                         markerDelete={this.submitDelete}>
                     </EditMarker>
                     </React.Fragment>
+                    
                     </Popup>
                 </Marker>)
+         
+            let fromLandmarks = [...this.state.landmarks];
+            let toLandmarks = [...this.state.landmarks]; 
+            // make copies of landmarks array
+
+            fromLandmarks.pop()
+            toLandmarks = toLandmarks.slice(1)
+            // two new arrays, from = [1st marker ... 2nd last] and to = [2nd marker ... last]
+
+            // console.log("fromLandmarks = ", fromLandmarks[5].latitude);
+
+            let range = Array(fromLandmarks.length).fill().map((x,i)=>i)
+            // range(length of fromLandmarks)
+
+            lines = range.map((i) => 
+                <Polyline 
+                        key={fromLandmarks.id} 
+                        positions={[[fromLandmarks[i].latitude, fromLandmarks[i].longitude], [toLandmarks[i].latitude, toLandmarks[i].longitude]]} 
+                        color={'red'} />)
+            // creates one line between each pair of markers
+
         }
 
         return (
@@ -184,7 +214,11 @@ class ProtoMap extends React.Component {
                     noWrap={true}
                 />
                 {content}
-
+                
+                {lines}
+                {/* {landmarks.map((fromLandmarks, toLandmarks) => 
+                    {return <Polyline key={fromLandmarks.id} positions={[[fromLandmarks.latitude, fromLandmarks.longitude], [toLandmarks.latitude, toLandmarks.longitude],]} color={'red'} />})}
+                <Polyline color={'red'} positions={[[2, 5], [3, 6]]}/> */}
                 {/* <Control position="bottomleft">
                     <div class="btn-markertypes">
                         <button onClick={this.handleBattle}>Battle</button>
@@ -195,7 +229,7 @@ class ProtoMap extends React.Component {
                 </Control> */}
 
                 <Control position="bottomright">
-                      <button className="btn-resetview" onClick={this.handleClick}>Reset view</button>
+                      <button className="btn-resetview" onClick={this.createLines}>Reset view</button>
                 </Control>
             </Map>   
         )
