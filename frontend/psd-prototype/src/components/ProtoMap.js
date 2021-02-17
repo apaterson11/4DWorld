@@ -9,6 +9,7 @@ import { LineUtil, marker } from "leaflet";
 import axiosInstance from '../axios'
 import EditMarker from './EditMarker';
 // import { Polyline } from 'react-leaflet-polyline';
+import {getImages} from './EditMarker'
 
 import {
     army,
@@ -90,6 +91,11 @@ class ProtoMap extends React.Component {
         /* Updates the landmarks by sending a PUT request to the API,
            and updating the state in the then() callback
         */
+        console.log(lat)
+        console.log(lng)
+        console.log(content)
+        console.log(markertype)
+        console.log(landmark_id)
         const response = axiosInstance.put(`/landmarks/${landmark_id}/`, {
             content: content,
             markertype: markertype,
@@ -116,7 +122,7 @@ class ProtoMap extends React.Component {
         const { lat, lng } = e.latlng;
         const type = this.state.markertype;
         const response = axiosInstance.post('/landmarks/', {
-            content: 'x',
+            content: 'sample text',
             latitude: lat,
             longitude: lng,
             markertype: type
@@ -147,10 +153,12 @@ class ProtoMap extends React.Component {
 
         if (fetched) {
             content = landmarks.map((landmark, index) =>
-                <Marker key={landmark.id} position={[landmark.latitude, landmark.longitude]} icon={(landmark.markertype in iconRef) ? iconRef[landmark.markertype] : blueIcon}>
+                <Marker key={landmark.id} position={[landmark.latitude, landmark.longitude]} icon={(landmark.markertype in iconRef) ? iconRef[landmark.markertype] : blueIcon} >
                     <Popup 
                     autoClose={false} 
-                    nametag={'marker'} 
+                    nametag={'marker'}
+                    minWidth={400} 
+                    maxWidth={2000}
                     // editable removable 
                     // removalCallback={ () => {this.removeMarkerFromState(landmark.id)} }
                     // saveContentCallback={ content => {this.updateLandmarks(content, landmark.markertype, landmark.latitude, landmark.longitude, landmark.id)} }   // why +1? idk

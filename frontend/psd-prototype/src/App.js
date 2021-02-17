@@ -3,6 +3,7 @@ import './App.css';
 import {Route, BrowserRouter as Router, Switch} from 'react-router-dom';
 import About from './components/About'
 import Header from './components/Header'
+import Footer from './components/Footer'
 import Login from './components/Auth/Login'
 import Logout from './components/Auth/Logout'
 import Register from './components/Auth/Register'
@@ -70,6 +71,7 @@ function App(props) {
             <Logout logout={logout}/>
           )} />
         </Switch>
+        <Footer isAuthenticated={isAuthenticated}/>
       </UserContext.Provider>
     </Router>
   )

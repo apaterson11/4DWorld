@@ -51,7 +51,15 @@ class Landmark(models.Model):
     )
 
     def __str__(self):
-        return self.id
+        return str(self.id)
 
     def save(self, *args, **kwargs):
         super(Landmark, self).save(*args, **kwargs)
+
+class LandmarkImage(models.Model):
+    landmark = models.ForeignKey(Landmark, on_delete=models.CASCADE, related_name="landmark", parent_link = True, null=False, default=None)
+    image = models.ImageField(upload_to='images/', null=False, default=None)
+
+    def __str__(self):
+        return str(self.landmark.id)
+
