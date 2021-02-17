@@ -4,6 +4,7 @@ from api.models import (
     Country,
     Landmark,
     Map,
+    MapStyle,
     Profile,
     Project,
     State
@@ -21,3 +22,4 @@ admin.site.register(Map)
 admin.site.register(Project)
 admin.site.register(Profile)
 admin.site.register(State)
+admin.site.register(MapStyle)

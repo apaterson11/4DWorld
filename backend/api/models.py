@@ -26,6 +26,20 @@ class Project(models.Model):
         return self.title
 
 
+class MapStyle(models.Model):
+    name = models.CharField(max_length=64, db_index=True)
+    url = models.CharField(max_length=128)
+    min_zoom = models.IntegerField()
+    max_zoom = models.IntegerField()
+    attribution = models.CharField(max_length=128)
+
+    def __str__(self):
+        return self.name
+
+def get_default_style():
+    return MapStyle.objects.get(name='OpenStreetMap: Mapnik (Default)')
+
+
 class Map(models.Model):
     project = models.OneToOneField(
         Project, related_name='map', on_delete=models.CASCADE
@@ -33,6 +47,9 @@ class Map(models.Model):
     centre_latitude = models.FloatField()
     centre_longitude = models.FloatField()
     zoom_level = models.IntegerField()
+    style = models.ForeignKey(
+        MapStyle, on_delete=models.SET(get_default_style), related_name='maps', null=True
+    )
 
     @property
     def centre(self):

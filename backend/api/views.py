@@ -5,7 +5,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from api.models import City, Country, Landmark, Project, Profile, State
+from api.models import City, Country, Landmark, MapStyle, Project, Profile, State
 from api.serializers import (
     RegisterUserSerializer, 
     LandmarkSerializer, 
@@ -16,6 +16,7 @@ from api.serializers import (
     CountrySerializer,
     StateSerializer,
     CitySerializer,
+    MapStyleSerializer,
 )
 
 from rest_framework_simplejwt.views import TokenVerifyView
@@ -103,6 +104,13 @@ class StateAPIView(viewsets.ModelViewSet):
             return State.objects.none()
         return State.objects.filter(country__id=country_id)
 
+
+class MapStylesAPIView(viewsets.ModelViewSet):
+    permission_classes = [AllowAny]
+    serializer_class = MapStyleSerializer
+    model = MapStyle
+    queryset = MapStyle.objects.all()
+    
 
 class BlacklistTokenUpdateView(APIView):
     permission_classes = [AllowAny]

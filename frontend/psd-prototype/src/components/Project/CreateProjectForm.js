@@ -125,7 +125,7 @@ function CreateProjectForm(props) {
                             id="style-combobox"
                             label="Style"
                             required
-                            options={MAP_OPTIONS}
+                            options={props.mapOptions}
                             getOptionLabel={(option) => option.name}
                             size='small'
                             fullWidth

@@ -47,6 +47,12 @@ function CreateMapForm(props) {
     const [zoom, setZoom] = useState(DEFAULT_ZOOM)
 
     useEffect(() => {
+        const map = mapRef.current.leafletElement
+        map.setMaxZoom(props.mapOption.max_zoom)
+        map.setMinZoom(props.mapOption.min_zoom)
+    }, [props.mapOption])
+
+    useEffect(() => {
         axiosInstance.get('/countries')
             .then(response => setCountries(response.data))
     }, [])
@@ -96,11 +102,6 @@ function CreateMapForm(props) {
         setSelectedCity(null)
         setCities([])
     }, [selectedCountry])
-
-    const setMapOptions = (e) => {
-        setCenter(e.center)
-        setZoom(e.zoom)
-    }
 
     const setMapCenter = (e) => {
         const {lat, lng} = mapRef.current.leafletElement.getCenter()
@@ -186,12 +187,15 @@ function CreateMapForm(props) {
                         zoom={zoom} 
                         onzoomend={(e) => setZoom(mapRef.current.leafletElement.getZoom())}
                         ondragend={(e) => setMapCenter(e)}
+                        zoomDelta = {0.5}
+                        zoomSnap = {0.5}
                         maxBounds={[[90,-180],[-90, 180]]}>
                         <TileLayer
                             url={props.mapOption.url}
-                            minZoom = {props.mapOption.minZoom}
-                            maxZoom = {props.mapOption.maxZoom}
+                            attribution = {props.mapOption.attribution}
                             noWrap={true}
+                            minZoom = {props.mapOption.min_zoom}
+                            maxZoom = {props.mapOption.ma_zoom}
                         />
                     </Map> 
                 </Grid>

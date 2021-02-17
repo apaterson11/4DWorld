@@ -1,10 +1,10 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Grid from '@material-ui/core/Grid';
 import { makeStyles } from '@material-ui/core/styles'
-import Paper from '@material-ui/core/Paper';
 import CreateProjectForm from './CreateProjectForm'
 import CreateMapForm from './CreateMapForm'
 import { MAP_OPTIONS } from '../../MapOptions'
+import axiosInstance from '../../axios'
 
 const useStyles = makeStyles({
     pad: {
@@ -17,18 +17,31 @@ const useStyles = makeStyles({
 
 function CreateProject() {
     const classes = useStyles()
-    const [mapOption, setMapOption] = useState(MAP_OPTIONS[0])
+    const [mapOptions, setMapOptions] = useState([])
+    const [mapOption, setMapOption] = useState(null)
+
+    useEffect(() => {
+        axiosInstance.get('/map-styles')
+            .then(response => {
+                setMapOptions(response.data)
+                setMapOption(response.data[0])
+            })
+    }, [])
 
     return (
-        <> 
-        <Grid container component="main" className={classes.pad}>
+        <>
+        {(mapOptions.length === 0 || mapOption == null) ? 
+            (<h2>Fetching...</h2>) 
+        : 
+        (<Grid container component="main" className={classes.pad}>
             <Grid item xs={12} md={8} >
                 <CreateMapForm mapOption={mapOption}/>
             </Grid>
             <Grid item xs={12} md={4} >
-                <CreateProjectForm mapOption={mapOption} setMapOption={setMapOption}/>
+                <CreateProjectForm mapOptions={mapOptions} mapOption={mapOption} setMapOption={setMapOption}/>
             </Grid>
-        </Grid>
+        </Grid>)                     
+        }
         </>
     )
 
