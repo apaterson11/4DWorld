@@ -41,16 +41,33 @@ export class LayerContent extends React.Component {
                 layerlandmarks: [],
             }
 
+    // shouldComponentUpdate(Props, nextProps, nextState) {
+    //     if (Props != nextProps.landmarks) {
+    //         return true;
+    //     }
+    // }
+
     componentDidMount() {
         this.getLandmarks()
+        console.log("lc state landmarks", this.state.landmarks);
+    }
+
+    componentDidUpdate(prevProps, prevState) {
+        console.log("prevProps length", prevProps.landmarks.length)
+        console.log("thisProps length", this.props.landmarks.length)
+        if (prevProps.landmarks.length !== this.props.landmarks.length) {
+            this.getLandmarks()
+        }
+        //console.log("lc state landmarks didupdate", this.state.landmarks);
+        //this.getLandmarks();
     }
 
     submitEdit = (layer, content, icontype, lat, lng, id, pos) => {
         this.updateLandmarks(layer, content, icontype, lat, lng, id, pos)
     }
 
-    submitDelete = (layer, content, icontype, lat, lng, id) => {
-        this.removeMarkerFromState(layer, content, icontype, lat, lng, id)
+    submitDelete = (id) => {
+        this.removeMarkerFromState(id)
     }
 
     getLandmarks = async() => {
@@ -58,17 +75,32 @@ export class LayerContent extends React.Component {
         const results = [];
         const response = await axiosInstance.get('/landmarks/', {
 
+
+        // this.props.landmarks.forEach(landmark => {
+        //     if (landmark.layer == this.props.layer) {
+        //         results.push(landmark);
+                
+        //     }
+        // });
+        // console.log("getlandmarks() results:", results)
+        // this.setState({layerlandmarks: results})
+
+
         }).then(response => response.data.forEach(item => {
-            console.log("1", item.layer)
-            console.log("2", this.props.layer)
+            // console.log("1", item.layer)
+            // console.log("2", this.props.layer)
             if (item.layer == this.props.layer) {
                 results.push(item);
-                console.log("results", results)
+                //console.log("results", results)
             }
         }))
         console.log("about to set state now")
+        //console.log("layerlandmarks", this.state.layerlandmarks)
+        console.log("results", results)
         this.setState({layerlandmarks: results})
         console.log("layer landmarks:", this.state.layerlandmarks)
+
+
     }
 
     removeMarkerFromState = (landmark_id) => {
@@ -79,23 +111,25 @@ export class LayerContent extends React.Component {
                 this.setState({
                     landmarks: this.state.landmarks.filter(landmark => landmark.id !== landmark_id)
                 })
+                this.getLandmarks()
             })
       };
     
-    updateLandmarks = (content, markertype, lat, lng, landmark_id) => {
+    updateLandmarks = (layer, content, markertype, lat, lng, landmark_id) => {
         /* Updates the landmarks by sending a PUT request to the API,
            and updating the state in the then() callback
         */
-        console.log(lat)
-        console.log(lng)
-        console.log(content)
-        console.log(markertype)
-        console.log(landmark_id)
+        // console.log(lat)
+        // console.log(lng)
+        // console.log(content)
+        // console.log(markertype)
+        // console.log(landmark_id)
         const response = axiosInstance.put(`/landmarks/${landmark_id}/`, {
             content: content,
             markertype: markertype,
             latitude: lat,
-            longitude: lng
+            longitude: lng,
+            layer: layer,
         }).then(response => {
             let updatedLandmarks = [...this.state.landmarks]  // copy original state
             
@@ -109,6 +143,7 @@ export class LayerContent extends React.Component {
             this.setState({
                 landmarks: updatedLandmarks
             })
+            this.getLandmarks()
         })
       };
 
@@ -128,6 +163,8 @@ export class LayerContent extends React.Component {
                 >
                 <React.Fragment>
                 <EditMarker 
+                    landmarks={this.state.landmarks}
+                    layerlandmarks={this.state.layerlandmarks}
                     content={landmark.content} 
                     position={landmark.position}
                     icontype={landmark.markertype}  
@@ -164,7 +201,7 @@ export class LayerContent extends React.Component {
 
             lines = range.map((i) => 
                 <Polyline 
-                        key={fromLandmarks.position} 
+                        key={fromLandmarks.id} 
                         positions={[[fromLandmarks[i].latitude, fromLandmarks[i].longitude], [toLandmarks[i].latitude, toLandmarks[i].longitude]]} 
                         color={'red'} />)
             // creates one line between each pair of markers

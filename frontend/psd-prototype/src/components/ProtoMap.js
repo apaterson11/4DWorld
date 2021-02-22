@@ -1,6 +1,6 @@
 import React from "react";
 import {Map, TileLayer, Marker, Popup, Polyline, LayersControl, LayerGroup, Circle} from 'react-leaflet';
-
+import {MenuItem, Select} from '@material-ui/core/';
 import Control from '@skyeer/react-leaflet-custom-control' 
 // import Popup from 'react-leaflet-editable-popup';
 import { v4 as uuidv4 } from 'uuid';
@@ -54,7 +54,17 @@ const markerText = {
     autoClose: true,
 }
 
+
 class ProtoMap extends React.Component {
+
+    constructor(props) {
+        super(props)
+        this.handleLayer = this.handleLayer.bind(this);
+    }
+
+
+    
+
     state = {
         fetched: false,
         defLat: this.props.latitude,
@@ -63,6 +73,7 @@ class ProtoMap extends React.Component {
         markertype: "default",
         landmarks: [],
         layers: [],
+        currentlayer: "1"
     }
 
     componentDidMount() {
@@ -86,7 +97,7 @@ class ProtoMap extends React.Component {
         /* Adds a new landmark to the map at a given latitude and longitude, via a POST request */
         const { lat, lng } = e.latlng;
         const pos = this.state.landmarks.length;
-
+        console.log("statelandmarks ",this.state.landmarks);
         console.log(pos);
         const response = axiosInstance.post('/landmarks/', {
             layer: '1',
@@ -99,9 +110,14 @@ class ProtoMap extends React.Component {
             let newLandmarks = [...this.state.landmarks] // copy original state
             newLandmarks.push(response.data)  // add the new landmark to the copy
             this.setState({landmarks: newLandmarks}) // update the state with the new landmark
+            console.log("statelandmarks 2 ",newLandmarks);
         })
+        
     };
 
+    handleLayer(event) {
+        this.setState({currentlayer: event.target.value});
+    }
  
 
 
@@ -184,11 +200,17 @@ class ProtoMap extends React.Component {
             let renderlayers = ''
             renderlayers = layerrange.map((i) =>
 
-            <LayersControl.Overlay name={"Layer "+i}>
+            <LayersControl.Overlay key={i} checked name={"Layer "+i}>
                 <LayerGroup>
-                    <LayerContent edit={this.submitCallback} delete={this.submitDelete} layer={i} landmarks={this.state.landmarks}>thing in here</LayerContent>
+                    <LayerContent layer={i} landmarks={this.state.landmarks}>thing in here</LayerContent>
                 </LayerGroup>
             </LayersControl.Overlay>)
+
+
+            layerrange = Array(newlayers.length).fill().map((x,i)=>i+1);
+            let layerselect = ''
+            layerselect = layerrange.map((i) =>
+            <option key={i} value={i}>{"Layer "+i}</option>)
 
             console.log(renderlayers);
             // <Polyline 
@@ -216,12 +238,24 @@ class ProtoMap extends React.Component {
                     noWrap={true}
                 />
 
+
+                <Control position="topright">
+                    <React.Fragment>
+                        <select value={this.state.currentlayer} onChange={this.handleLayer}>
+                            {/* <option value={1}>Layer 1</option>
+                            <option value={2}>Layer 2</option> */}
+                            {layerselect}
+                        </select>
+                    </React.Fragment>
+                </Control>
+
+
                 <LayersControl position="topright">
 
                     {renderlayers}  
+                    {/* dynamically maps each layer to a layer in the control, and the LayerContent for each layer */}
 
-
-                    <LayersControl.Overlay name="Marker with popup">
+                    {/* <LayersControl.Overlay name={this.state.currentlayer}>
                         <LayerGroup>
                         <Marker position={[54, 78]}>
                         <Popup>
@@ -229,11 +263,11 @@ class ProtoMap extends React.Component {
                         </Popup>
                         </Marker>
                         </LayerGroup>
-                    </LayersControl.Overlay>
+                    </LayersControl.Overlay> */}
 
 
 
-                    </LayersControl>
+                </LayersControl>
                 {/* {content}
                 {lines} */}
                 {/* {landmarks.map((fromLandmarks, toLandmarks) => 
@@ -248,8 +282,9 @@ class ProtoMap extends React.Component {
                     
                 </Control> */}
 
+
                 <Control position="bottomright">
-                      <button className="btn-resetview" onClick={this.createLines}>Reset view</button>
+                      <button className="btn-resetview" onClick={this.createLines}>{this.state.currentlayer}</button>
                 </Control>
             </Map>   
         )
