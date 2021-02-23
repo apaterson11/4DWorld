@@ -28,20 +28,24 @@ function App(props) {
     // On the App component mounting, check to see if user logged in already
     const token = localStorage.getItem('access_token')
     if (token) {
+      const userDetails = jwt(localStorage.getItem('access_token'))
       // verify token is correct
       axiosInstance.post('token/refresh/', {refresh: localStorage.getItem('refresh_token')}).then((res) => {
           axiosInstance.defaults.headers['Authorization'] = 'JWT ' + res.data.access
           setIsAuthenticated(true)
+          setUserDetails(userDetails)
       }).catch((err) => {
         console.log(err)
         localStorage.removeItem('access_token')
         localStorage.removeItem('refresh_token')
+        localStorage.removeItem('user')
       })
     }
   }, [])
   
   const login = () => {
     const userData = jwt(localStorage.getItem('access_token'))
+    localStorage.setItem('userDetails', JSON.stringify(userData))
     setIsAuthenticated(true)
     setUserDetails(userData)
   }

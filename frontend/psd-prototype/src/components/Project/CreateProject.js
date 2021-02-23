@@ -36,6 +36,13 @@ function CreateProject() {
     const [zoom, setZoom] = useState(DEFAULT_ZOOM)
 
     useEffect(() => {
+        if (userDetails === undefined) {
+          const details = JSON.parse(localStorage.getItem('userDetails'))
+          setUserDetails(details)
+        }
+      }, [userDetails])
+
+    useEffect(() => {
         axiosInstance.get('/map-styles')
             .then(response => {
                 setMapOptions(response.data)
@@ -44,7 +51,16 @@ function CreateProject() {
     }, [])
 
     useEffect(() => {
-        axiosInstance.get(`/user-details/${userDetails.user_id}`).then(response => {
+        const details = JSON.parse(localStorage.getItem('userDetails'))
+        if (userDetails === undefined) {
+            if (details === null) {
+                // if it can't be recovered from localStorage, user needs to login again
+                console.log("Redirect to login")
+            }
+            setUserDetails(details)
+        }
+    
+        axiosInstance.get(`/user-details/${details.profile_id}`).then(response => {
             setGroups(response.data.user.groups.sort(
                 (g1, g2) => (g1.name > g2.name) ? 1 : -1)
             )
@@ -78,7 +94,7 @@ function CreateProject() {
 
     return (
         <>
-        {(mapOptions.length === 0 || mapOption == null) ? 
+        {(mapOptions.length === 0 || mapOption == null || userDetails == undefined) ? 
             (<Spinner /> )
         : 
             (<Grid container component="main" className={classes.pad}>
