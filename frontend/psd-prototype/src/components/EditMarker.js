@@ -15,6 +15,8 @@ require("./EditMarker.css");
 
 export default class EditMarker extends React.Component{
     state = {
+        landmarks: this.props.landmarks,
+        layerlandmarks:this.props.layerlandmarks,
         content: this.props.content,
         position: this.props.position,
         icontype: this.props.icontype,
@@ -42,7 +44,7 @@ export default class EditMarker extends React.Component{
     // }
 
     handleEdit = () => {
-        this.props.markerEdit(this.state.content, this.state.icontype, this.state.lat, this.state.lng, this.props.id, this.state.position, this.state.layer);
+        this.props.markerEdit(this.state.layer, this.state.content, this.state.icontype, this.state.lat, this.state.lng, this.props.id, this.state.position);
     }
 
     handleDelete = () => {
@@ -211,8 +213,8 @@ export default class EditMarker extends React.Component{
                             value={this.state.layer}
                             onChange={e => this.setState({layer: e.target.value})}
                         >
-                            <MenuItem value={"1"}>1</MenuItem>
-                            <MenuItem value={"2"}>2</MenuItem>
+                            <MenuItem value={"1"}>Layer 1</MenuItem>
+                            <MenuItem value={"2"}>Layer 2</MenuItem>
                         </Select>
                     </Grid>
 
