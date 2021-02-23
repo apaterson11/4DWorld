@@ -1,14 +1,11 @@
-import { useState, useContext, useEffect } from 'react'
-import { UserContext } from '../../Context'
-import Button from '@material-ui/core/Button';
-import { Autocomplete } from '@material-ui/lab';
+import Button from '@material-ui/core/Button'
+import { Autocomplete } from '@material-ui/lab'
 import Grid from '@material-ui/core/Grid'
-import TextField from '@material-ui/core/TextField';
+import TextField from '@material-ui/core/TextField'
 import Typography from '@material-ui/core/Typography'
 import { makeStyles } from '@material-ui/core/styles'
-import axiosInstance from '../../axios'
 
-const useStyles = makeStyles( theme => ({
+const useStyles = makeStyles( (theme) => ({
     header: {
         marginTop: '10px',
         paddingLeft: '10px',
@@ -32,16 +29,6 @@ const useStyles = makeStyles( theme => ({
 
 function CreateProjectForm(props) {
     const classes = useStyles()
-    const [groups, setGroups] = useState([])
-    const {userDetails, setUserDetails} = useContext(UserContext)
-
-    useEffect(() => {
-        axiosInstance.get(`/user-details/${userDetails.user_id}`).then(response => {
-            setGroups(response.data.user.groups.sort(
-                (g1, g2) => (g1.name > g2.name) ? 1 : -1)
-            )
-        })
-    }, [])
 
     return (
         <>
@@ -62,6 +49,8 @@ function CreateProjectForm(props) {
                             variant='outlined'
                             size='small'
                             name="title"
+                            error={props.titleHasError}
+                            helperText={props.titleHelpText}
                             required
                             fullWidth
                             onChange={(e) => props.setTitle(e.target.value)}
@@ -87,8 +76,7 @@ function CreateProjectForm(props) {
                             margin="normal"
                             id="group-combobox"
                             label="Group"
-                            required
-                            options={groups}
+                            options={props.groups}
                             getOptionLabel={(option) => option.name}
                             size='small'
                             fullWidth
@@ -125,7 +113,8 @@ function CreateProjectForm(props) {
                         fullWidth
                         variant="contained"
                         className={classes.submit}
-                        onClick={props.handleCreateProject} 
+                        onClick={props.handleSubmit} 
+                        disabled={props.title.length === 0}
                     >
                         Create Project
                     </Button>

@@ -34,7 +34,7 @@ export default function UserGroupsCard() {
   const {userDetails, setUserDetails} = useContext(UserContext)
   
   useEffect(() => {
-    axiosInstance.get(`/user-details/${userDetails.user_id}`).then(response => {
+    axiosInstance.get(`/user-details/${userDetails.profile_id}`).then(response => {
         setGroups(response.data.user.groups)
     })
   }, [])
