@@ -39,6 +39,8 @@ export class LayerContent extends React.Component {
     state = {
                 landmarks: this.props.landmarks,
                 layerlandmarks: [],
+                layers: this.props.layers,
+                layer: this.props.layer,
             }
 
     // shouldComponentUpdate(Props, nextProps, nextState) {
@@ -49,12 +51,12 @@ export class LayerContent extends React.Component {
 
     componentDidMount() {
         this.getLandmarks()
-        console.log("lc state landmarks", this.state.landmarks);
+        // console.log("lc state landmarks", this.state.landmarks);
     }
 
     componentDidUpdate(prevProps, prevState) {
-        console.log("prevProps length", prevProps.landmarks.length)
-        console.log("thisProps length", this.props.landmarks.length)
+        // console.log("prevProps length", prevProps.landmarks.length)
+        // console.log("thisProps length", this.props.landmarks.length)
         if (prevProps.landmarks.length !== this.props.landmarks.length) {
             this.getLandmarks()
         }
@@ -71,7 +73,8 @@ export class LayerContent extends React.Component {
     }
 
     getLandmarks = async() => {
-        console.log("hfhfhf");
+        // console.log("this.props.layer: ", this.props.layer, "#####################")
+        // console.log("this.props.layer: ", this.props.layer, ", getLandmarks called");
         const results = [];
         const response = await axiosInstance.get('/landmarks/', {
 
@@ -94,13 +97,12 @@ export class LayerContent extends React.Component {
                 //console.log("results", results)
             }
         }))
-        console.log("about to set state now")
-        //console.log("layerlandmarks", this.state.layerlandmarks)
-        console.log("results", results)
+        // console.log("this.props.layer: ", this.props.layer, ", about to set state now")
+        // //console.log("layerlandmarks", this.state.layerlandmarks)
+        // console.log("this.props.layer: ", this.props.layer, ", results", results)
         this.setState({layerlandmarks: results})
-        console.log("layer landmarks:", this.state.layerlandmarks)
-
-
+        // console.log("this.props.layer: ", this.props.layer, ", layer landmarks:", this.state.layerlandmarks)
+        // console.log("this.props.layer: ", this.props.layer, "#####################")
     }
 
     removeMarkerFromState = (landmark_id) => {
@@ -115,7 +117,7 @@ export class LayerContent extends React.Component {
             })
       };
     
-    updateLandmarks = (layer, content, markertype, lat, lng, landmark_id) => {
+    updateLandmarks = (layer, content, markertype, lat, lng, landmark_id, position) => {
         /* Updates the landmarks by sending a PUT request to the API,
            and updating the state in the then() callback
         */
@@ -130,6 +132,7 @@ export class LayerContent extends React.Component {
             latitude: lat,
             longitude: lng,
             layer: layer,
+            position: position
         }).then(response => {
             let updatedLandmarks = [...this.state.landmarks]  // copy original state
             
@@ -171,6 +174,8 @@ export class LayerContent extends React.Component {
                     lat = {landmark.latitude}
                     lng = {landmark.longitude}
                     id = {landmark.id}
+                    layer = {this.state.layer}
+                    layers = {this.state.layers}
                     markerEdit={this.submitEdit}
                     markerDelete={this.submitDelete}>
                 </EditMarker>

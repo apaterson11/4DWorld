@@ -27,12 +27,28 @@ export default class EditMarker extends React.Component{
         images: [],
         imagesEmptyText: null,
         schemas: [],
+        layers: this.props.layers,
+        layer: this.props.layer
     }
 
     componentDidMount() {
         this.getImages()
+        console.log(this.state.layers)
+        console.log(this.state.layer)
+        console.log(this.state.icontype)
         // this.getLayers()
     }
+
+    createSelectItems() {
+        let items = [];         
+        for (let i = 0; i <= this.props.layer; i++) { 
+             console.log(i);            
+             items.push(<option key={i} value={i}>{i}</option>);   
+             //here I will be creating my options dynamically based on
+             //what props are currently passed to the parent component
+        }
+        return items;
+    } 
 
     // getLayers = () => {
     //     axiosInstance.get('/layers/')
@@ -172,7 +188,7 @@ export default class EditMarker extends React.Component{
                             value={this.state.icontype}
                             onChange={e => this.setState({icontype: e.target.value})}
                         >
-                            <MenuItem value={"default"}>Select:</MenuItem>
+                            <MenuItem value={"default"}>Default</MenuItem>
                             <MenuItem value={"individual"}>Significant Individual</MenuItem>
                             <MenuItem value={"army"}>Army</MenuItem>
                             <MenuItem value={"knowledge"}>Knowledge Site</MenuItem>
@@ -213,8 +229,12 @@ export default class EditMarker extends React.Component{
                             value={this.state.layer}
                             onChange={e => this.setState({layer: e.target.value})}
                         >
-                            <MenuItem value={"1"}>Layer 1</MenuItem>
-                            <MenuItem value={"2"}>Layer 2</MenuItem>
+                        {this.state.layers.map((e, key) => {
+                            return <MenuItem value={e.id}>{e.name}</MenuItem>;
+                        })}
+                        
+                        {/* <MenuItem value={"1"}>Layer 1</MenuItem>
+                        <MenuItem value={"2"}>Layer 2</MenuItem> */}
                         </Select>
                     </Grid>
 

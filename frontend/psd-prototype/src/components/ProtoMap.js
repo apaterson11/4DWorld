@@ -97,8 +97,8 @@ class ProtoMap extends React.Component {
         /* Adds a new landmark to the map at a given latitude and longitude, via a POST request */
         const { lat, lng } = e.latlng;
         const pos = this.state.landmarks.length;
-        console.log("statelandmarks ",this.state.landmarks);
-        console.log(pos);
+        // console.log("statelandmarks ",this.state.landmarks);
+        // console.log(pos);
         const response = axiosInstance.post('/landmarks/', {
             layer: '1',
             content: 'sample text',
@@ -110,7 +110,7 @@ class ProtoMap extends React.Component {
             let newLandmarks = [...this.state.landmarks] // copy original state
             newLandmarks.push(response.data)  // add the new landmark to the copy
             this.setState({landmarks: newLandmarks}) // update the state with the new landmark
-            console.log("statelandmarks 2 ",newLandmarks);
+            // console.log("statelandmarks 2 ",newLandmarks);
         })
         
     };
@@ -187,32 +187,22 @@ class ProtoMap extends React.Component {
             // MOVE EVERYTHING ABOVE TO LAYERCONTENT!!!!
 
 
-            console.log("thisstate layers = ", this.state.layers);
+            // console.log("thisstate layers = ", this.state.layers);
 
-            let newlayers = [...this.state.layers];
-            console.log("newlayers = ",newlayers);
-
-            let layerrange = Array(newlayers.length).fill().map((x,i)=>i+1);
-            
-            console.log("layerrange  = ", layerrange);
-
-            // console.log(newlayers[0].name);
             let renderlayers = ''
-            renderlayers = layerrange.map((i) =>
+            renderlayers = this.state.layers.map((e, key) =>
 
-            <LayersControl.Overlay key={i} checked name={"Layer "+i}>
+            <LayersControl.Overlay key={e.id} checked name={e.name}>
                 <LayerGroup>
-                    <LayerContent layer={i} landmarks={this.state.landmarks}>thing in here</LayerContent>
+                    <LayerContent layer={e.id} layers={this.state.layers} landmarks={this.state.landmarks}></LayerContent>
                 </LayerGroup>
             </LayersControl.Overlay>)
 
-
-            layerrange = Array(newlayers.length).fill().map((x,i)=>i+1);
             let layerselect = ''
-            layerselect = layerrange.map((i) =>
-            <option key={i} value={i}>{"Layer "+i}</option>)
+            layerselect = this.state.layers.map((e, key) =>
+            <option key={e.id} value={e.name}>{e.name}</option>)
 
-            console.log(renderlayers);
+            // console.log(renderlayers);
             // <Polyline 
             //         key={fromLandmarks.position} 
             //         positions={[[fromLandmarks[i].latitude, fromLandmarks[i].longitude], [toLandmarks[i].latitude, toLandmarks[i].longitude]]} 
@@ -242,8 +232,6 @@ class ProtoMap extends React.Component {
                 <Control position="topright">
                     <React.Fragment>
                         <select value={this.state.currentlayer} onChange={this.handleLayer}>
-                            {/* <option value={1}>Layer 1</option>
-                            <option value={2}>Layer 2</option> */}
                             {layerselect}
                         </select>
                     </React.Fragment>
@@ -251,38 +239,8 @@ class ProtoMap extends React.Component {
 
 
                 <LayersControl position="topright">
-
                     {renderlayers}  
-                    {/* dynamically maps each layer to a layer in the control, and the LayerContent for each layer */}
-
-                    {/* <LayersControl.Overlay name={this.state.currentlayer}>
-                        <LayerGroup>
-                        <Marker position={[54, 78]}>
-                        <Popup>
-                            A pretty CSS3 popup. <br /> Easily customizable.
-                        </Popup>
-                        </Marker>
-                        </LayerGroup>
-                    </LayersControl.Overlay> */}
-
-
-
                 </LayersControl>
-                {/* {content}
-                {lines} */}
-                {/* {landmarks.map((fromLandmarks, toLandmarks) => 
-                    {return <Polyline key={fromLandmarks.id} positions={[[fromLandmarks.latitude, fromLandmarks.longitude], [toLandmarks.latitude, toLandmarks.longitude],]} color={'red'} />})}
-                <Polyline color={'red'} positions={[[2, 5], [3, 6]]}/> */}
-                {/* <Control position="bottomleft">
-                    <div class="btn-markertypes">
-                        <button onClick={this.handleBattle}>Battle</button>
-                        <button onClick={this.handleKnowledge}>Knowledge</button>
-                        <button onClick={this.handleReligious}>Religious</button>
-                    </div>
-                    
-                </Control> */}
-
-
                 <Control position="bottomright">
                       <button className="btn-resetview" onClick={this.createLines}>{this.state.currentlayer}</button>
                 </Control>
