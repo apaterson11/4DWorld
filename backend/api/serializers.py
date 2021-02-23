@@ -69,10 +69,11 @@ class UserSerializer(ModelSerializer):
 
 class ProfileDetailsSerializer(ModelSerializer):
     user = UserSerializer()
+    default_group = GroupSerializer()
 
     class Meta:
         model = Profile
-        fields = ('id', 'department', 'user')
+        fields = ('id', 'department', 'user', 'default_group')
 
     def update(self, instance, validated_data):
         user = validated_data.pop('user')

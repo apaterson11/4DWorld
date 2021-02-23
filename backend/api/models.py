@@ -7,6 +7,7 @@ class Profile(models.Model):
         User, on_delete=models.CASCADE, related_name='profile'
     )
     department = models.CharField(max_length=64)
+    default_group = models.ForeignKey(Group, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.user.username
@@ -14,7 +15,7 @@ class Profile(models.Model):
 
 class Project(models.Model):
     title = models.CharField(max_length=64)
-    description = models.TextField()
+    description = models.TextField(blank=True, default='')
     creator = models.ForeignKey(
         Profile, on_delete=models.SET_NULL, related_name='projects', null=True
     )
