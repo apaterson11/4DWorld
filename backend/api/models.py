@@ -7,6 +7,7 @@ class Profile(models.Model):
         User, on_delete=models.CASCADE, related_name='profile'
     )
     department = models.CharField(max_length=64)
+    default_group = models.ForeignKey(Group, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.user.username
@@ -14,6 +15,7 @@ class Profile(models.Model):
 
 class Project(models.Model):
     title = models.CharField(max_length=64)
+    description = models.TextField(blank=True, default='')
     creator = models.ForeignKey(
         Profile, on_delete=models.SET_NULL, related_name='projects', null=True
     )
@@ -25,17 +27,34 @@ class Project(models.Model):
         return self.title
 
 
+class MapStyle(models.Model):
+    name = models.CharField(max_length=64, db_index=True)
+    url = models.CharField(max_length=128)
+    min_zoom = models.IntegerField()
+    max_zoom = models.IntegerField()
+    attribution = models.CharField(max_length=128)
+
+    def __str__(self):
+        return self.name
+
+def get_default_style():
+    return MapStyle.objects.get(name='OpenStreetMap: Mapnik (Default)')
+
+
 class Map(models.Model):
     project = models.OneToOneField(
         Project, related_name='map', on_delete=models.CASCADE
     )
-    centre_latitude = models.FloatField()
-    centre_longitude = models.FloatField()
-    zoom_level = models.IntegerField()
+    latitude = models.FloatField()
+    longitude = models.FloatField()
+    zoom = models.FloatField()
+    style = models.ForeignKey(
+        MapStyle, on_delete=models.SET(get_default_style), related_name='maps'
+    )
 
     @property
     def centre(self):
-        return (self.centre_latitude, self.centre_longitude)
+        return (self.latitude, self.longitude)
 
     def __str__(self):
         return f"Map for project {self.project.title} centred at {self.centre}"
@@ -77,4 +96,45 @@ class LandmarkImage(models.Model):
         return str(self.landmark.id)
 
 
-# layer = [name, desc, other settings, [landmarks]]
+class Country(models.Model):
+    name = models.CharField(max_length=64)
+    country_code = models.CharField(max_length=2, db_index=True)
+    latitude = models.FloatField(null=True)
+    longitude = models.FloatField(null=True)
+
+    class Meta:
+        verbose_name_plural = 'Countries'
+
+    def __str__(self):
+        return self.name
+
+
+class State(models.Model):
+    name = models.CharField(max_length=64, db_index=True)
+    country = models.ForeignKey(
+        Country, on_delete=models.SET_NULL, related_name='states', null=True
+    )
+    state_code = models.CharField(max_length=3, db_index=True)
+    latitude = models.FloatField(null=True)
+    longitude = models.FloatField(null=True)
+
+    def __str__(self):
+        return self.name
+
+
+class City(models.Model):
+    name = models.CharField(max_length=64, db_index=True)
+    country = models.ForeignKey(
+        Country, on_delete=models.SET_NULL, related_name='cities', null=True
+    )
+    state = models.ForeignKey(
+        State, on_delete=models.SET_NULL, related_name='cities', null=True
+    )
+    latitude = models.FloatField(null=True)
+    longitude = models.FloatField(null=True)
+
+    class Meta:
+        verbose_name_plural = 'Cities'
+
+    def __str__(self):
+        return self.name

@@ -1,7 +1,8 @@
 from django.contrib.auth.models import Group, User
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
-from api.models import Landmark, LandmarkImage, Profile, Project, Layer
+from api.models import City, Country, Landmark, LandmarkImage, Map, MapStyle, Profile, Project, State, Layer
+
 
 
 class RegisterUserSerializer(ModelSerializer):
@@ -27,8 +28,8 @@ class GroupSerializer(ModelSerializer):
 class UserProjectsSerializer(ModelSerializer):
     class Meta:
         model = Project
-        fields = ('id', 'title', 'creator', 'group')
-
+        fields = ('id', 'title', 'description', 'creator', 'group')
+    
     def create(self, validated_data):
         user = self.context.get('request').user.profile
         project = Project(**validated_data)
@@ -79,10 +80,11 @@ class UserSerializer(ModelSerializer):
 
 class ProfileDetailsSerializer(ModelSerializer):
     user = UserSerializer()
+    default_group = GroupSerializer()
 
     class Meta:
         model = Profile
-        fields = ('id', 'department', 'user')
+        fields = ('id', 'department', 'user', 'default_group')
 
     def update(self, instance, validated_data):
         user = validated_data.pop('user')
@@ -96,3 +98,33 @@ class ProfileDetailsSerializer(ModelSerializer):
         instance.user.email = user.get('email', instance.user.email)
         instance.user.save()
         return instance
+
+
+class CountrySerializer(ModelSerializer):
+    class Meta:
+        model = Country
+        fields = ('id', 'name', 'country_code', 'latitude', 'longitude')
+
+
+class StateSerializer(ModelSerializer):
+    class Meta:
+        model = State
+        fields = ('id', 'name', 'country', 'state_code', 'latitude', 'longitude')
+
+
+class CitySerializer(ModelSerializer):
+    class Meta:
+        model = City
+        fields = ('id', 'name', 'country', 'state', 'latitude', 'longitude')
+
+
+class MapStyleSerializer(ModelSerializer):
+    class Meta:
+        model = MapStyle
+        fields = ('id', 'name', 'url', 'min_zoom', 'max_zoom', 'attribution')
+
+
+class MapSerializer(ModelSerializer):
+    class Meta:
+        model = Map
+        fields = ('id', 'project', 'latitude', 'longitude', 'zoom', 'style')

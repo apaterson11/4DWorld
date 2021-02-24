@@ -1,0 +1,9 @@
+image: python:3.8.6-buster
+build:
+  tags:
+    - docker
+  script:
+    - apt-get update -qy
+    - pip3 install -r backend/requirements.txt
+    - python3 backend/manage.py migrate
+    - cd backend && python3 manage.py test

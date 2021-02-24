@@ -15,7 +15,6 @@ const useStyles = makeStyles({
       margin: '20px 40px 50px 40px',
       display: 'flex',
       flexDirection: 'row',
-      justifyContent: 'space-between',
       flexWrap: 'wrap'
     },
     header: {
@@ -24,10 +23,14 @@ const useStyles = makeStyles({
     },
     row: {
         display: 'flex',
-        justifyContent: 'space-between'
+        verticalAlign: 'middle'
     },
     padding: {
-        margin: '50px 50px 0px 10px',
+        margin: '40px 50px 10px 50px',
+    },
+    largeIcon: {
+        width: 45,
+        height: 45,
     }
 });
 
@@ -57,10 +60,10 @@ function ProjectContainer(props) {
                         My Projects
                     </Typography>
                 </div>
-                <div>
-                <Link to="projects/create/">
-                    <AddCircleIcon className={classes.padding} color="primary"/>
-                </Link>
+                <div className={classes.padding}>
+                    <Link to="projects/create/">
+                        <AddCircleIcon className={classes.largeIcon} color="primary"/>
+                    </Link>
                 </div>
             </div>
 
