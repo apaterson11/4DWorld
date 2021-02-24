@@ -6,7 +6,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from api.models import City, Country, Landmark, LandmarkImage, Map, MapStyle, Project, Profile, State, Layer
->>>>>>> backend/api/views.pyfrom api.serializers import (
+from api.serializers import (
     RegisterUserSerializer,
     LandmarkSerializer,
     LandmarkImageSerializer,
