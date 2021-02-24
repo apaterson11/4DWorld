@@ -49,12 +49,14 @@ export default function ProfileCard() {
         department: newProfile.newDepartment
       })
       .then(response => {
-        setUserDetails({
+        const details = {
           ...userDetails,
           name: response.data.user.first_name,
           email: response.data.user.email,
           department: response.data.department
-        })
+        }
+        localStorage.setItem('userDetails', JSON.stringify(details))
+        setUserDetails(details)
         setOpen(false);
       })
   }
