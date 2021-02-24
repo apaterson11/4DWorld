@@ -5,13 +5,14 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from api.models import City, Country, Landmark, LandmarkImage, Map, MapStyle, Project, Profile, State
+from api.models import City, Country, Landmark, LandmarkImage, Map, MapStyle, Project, Profile, State, Layer
 from api.serializers import (
-    RegisterUserSerializer, 
-    LandmarkSerializer, 
+    RegisterUserSerializer,
+    LandmarkSerializer,
     LandmarkImageSerializer,
     CreateLandmarkSerializer,
     GroupSerializer,
+    LayerSerializer,
     UserProjectsSerializer, 
     ProfileDetailsSerializer,
     CountrySerializer,
@@ -30,7 +31,7 @@ class UserRegisterView(APIView):
     def post(self, request):
         serializer = RegisterUserSerializer(data=request.data)
         if serializer.is_valid():
-            new_user = serializer.save()    #.create()?
+            new_user = serializer.save()  # .create()?
             if new_user:
                 return Response(status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -60,11 +61,20 @@ class LandmarkAPIView(viewsets.ModelViewSet):
     model = Landmark
     queryset = Landmark.objects.all()
 
+
 class LandmarkImageAPIView(viewsets.ModelViewSet):
     permission_classes = [AllowAny]
     serializer_class = LandmarkImageSerializer
     model = LandmarkImage
     queryset = LandmarkImage.objects.all()
+
+
+class LayerAPIView(viewsets.ModelViewSet):
+    permission_classes = [AllowAny]
+    serializer_class = LayerSerializer
+    model = Layer
+    queryset = Layer.objects.all()
+
 
 class ProjectAPIView(viewsets.ModelViewSet):
     permission_classes = [AllowAny]
@@ -75,7 +85,7 @@ class ProjectAPIView(viewsets.ModelViewSet):
         user = self.request.user
         user_groups = user.groups.all()
         return Project.objects.filter(group__in=user_groups)
-        
+
 
 class CityAPIView(viewsets.ModelViewSet):
     permission_classes = [AllowAny]

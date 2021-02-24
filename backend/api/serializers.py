@@ -1,7 +1,8 @@
 from django.contrib.auth.models import Group, User
 from rest_framework import serializers
 from rest_framework.serializers import ModelSerializer
-from api.models import City, Country, Landmark, LandmarkImage, Map, MapStyle, Profile, Project, State
+from api.models import City, Country, Landmark, LandmarkImage, Map, MapStyle, Profile, Project, State, Layer
+
 
 
 class RegisterUserSerializer(ModelSerializer):
@@ -40,17 +41,27 @@ class UserProjectsSerializer(ModelSerializer):
 class LandmarkSerializer(ModelSerializer):
     class Meta:
         model = Landmark
-        fields = ('id', 'content', 'latitude', 'longitude', 'markertype')
+        fields = ('id', 'content', 'latitude',
+                  'longitude', 'markertype', 'position', 'layer')
+
 
 class LandmarkImageSerializer(ModelSerializer):
     class Meta:
         model = LandmarkImage
         fields = ('id', 'landmark', 'image')
 
+
 class CreateLandmarkSerializer(ModelSerializer):
     class Meta:
         model = Landmark
-        fields = ('id', 'content', 'latitude', 'longitude', 'markertype')
+        fields = ('id', 'content', 'latitude',
+                  'longitude', 'markertype', 'position', 'layer')
+
+
+class LayerSerializer(ModelSerializer):
+    class Meta:
+        model = Layer
+        fields = ('id', 'name', 'description')
 
 
 class UserDetailsSerializer(ModelSerializer):
@@ -77,11 +88,13 @@ class ProfileDetailsSerializer(ModelSerializer):
 
     def update(self, instance, validated_data):
         user = validated_data.pop('user')
-        instance.department = validated_data.get('department', instance.department)
+        instance.department = validated_data.get(
+            'department', instance.department)
         instance.save()
 
         # update associated user
-        instance.user.first_name = user.get('first_name', instance.user.first_name)
+        instance.user.first_name = user.get(
+            'first_name', instance.user.first_name)
         instance.user.email = user.get('email', instance.user.email)
         instance.user.save()
         return instance

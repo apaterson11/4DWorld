@@ -60,11 +60,22 @@ class Map(models.Model):
         return f"Map for project {self.project.title} centred at {self.centre}"
 
 
+class Layer(models.Model):
+    name = models.TextField()
+    description = models.TextField()
+
+    def __str__(self):
+        return str(self.id)
+
+
 class Landmark(models.Model):
     content = models.TextField()
     latitude = models.FloatField()
     longitude = models.FloatField()
     markertype = models.TextField(default="")
+    position = models.IntegerField(default=-1)
+    layer = models.ForeignKey(Layer, on_delete=models.CASCADE,
+                              related_name="layer", null=True, default=1)
     map = models.ForeignKey(
         Map, on_delete=models.CASCADE, related_name='landmarks', null=True, blank=True
     )
@@ -77,7 +88,8 @@ class Landmark(models.Model):
 
 
 class LandmarkImage(models.Model):
-    landmark = models.ForeignKey(Landmark, on_delete=models.CASCADE, related_name="landmark", parent_link = True, null=False, default=None)
+    landmark = models.ForeignKey(Landmark, on_delete=models.CASCADE,
+                                 related_name="landmark", parent_link=True, null=False, default=None)
     image = models.ImageField(upload_to='images/', null=False, default=None)
 
     def __str__(self):

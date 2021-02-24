@@ -1,15 +1,24 @@
-import React from "react";
+import React, {Component, PropTypes} from "react";
 import { Button, MenuItem, InputLabel, Select } from '@material-ui/core/';
+import CssBaseline from '@material-ui/core/CssBaseline';
+import TextField from '@material-ui/core/TextField';
+import Paper from '@material-ui/core/Paper';
 import Grid from '@material-ui/core/Grid';
+import Typography from '@material-ui/core/Typography';
+import { withStyles } from '@material-ui/core/styles';
+import { Link } from 'react-router-dom';
+import { withRouter } from 'react-router-dom';
 import RichTextEditor from 'react-rte';
 import axiosInstance from '../axios';
 import ImageGallery from 'react-image-gallery';
 require("./EditMarker.css");
 
 export default class EditMarker extends React.Component{
-
     state = {
+        landmarks: this.props.landmarks,
+        layerlandmarks:this.props.layerlandmarks,
         content: this.props.content,
+        position: this.props.position,
         icontype: this.props.icontype,
         lat: this.props.lat,
         lng: this.props.lng,
@@ -17,35 +26,59 @@ export default class EditMarker extends React.Component{
         selectedFile: null,
         images: [],
         imagesEmptyText: null,
+        schemas: [],
+        layers: this.props.layers,
+        layer: this.props.layer
     }
 
     componentDidMount() {
         this.getImages()
+        // this.getLayers()
     }
 
-    // calls updateLandmarks in ProtoMap.js
+    createSelectItems() {
+        let items = [];         
+        for (let i = 0; i <= this.props.layer; i++) { 
+             console.log(i);            
+             items.push(<option key={i} value={i}>{i}</option>);   
+             //here I will be creating my options dynamically based on
+             //what props are currently passed to the parent component
+        }
+        return items;
+    } 
+
+    // getLayers = () => {
+    //     axiosInstance.get('/layers/')
+    //     .then(response => {
+    //         console.log(response)
+    //         this.setState({schemas: response});
+    //     })
+    //     .catch(error => console.log(error.response));
+    // }
+
     handleEdit = () => {
-        this.props.markerEdit(this.state.content, this.state.icontype, this.state.lat, this.state.lng, this.props.id);
+        this.props.markerEdit(this.state.layer, this.state.content, this.state.icontype, this.state.lat, this.state.lng, this.props.id, this.state.position, this.state.layerlandmarks);
     }
 
-    // calls removeMarkerFromState in ProtoMap.js
     handleDelete = () => {
         this.props.markerDelete(this.props.id);
     }
+
+    // handleChange = (event) => {
+    //     this.setState({icontype: event.target.value})
+    // }
 
     onChange = (value) => {
         this.setState({value})
         this.setState({content: value.toString('html')})
     };
 
-    // first part of image uploading process, allows user to choose file to upload
     fileSelectedHandler = (e) => {
         this.setState({
             selectedFile: e.target.files[0]
         })
     }
 
-    // function uploads images to corresponding marker
     uploadImage = (e) => {
         const formData = new FormData();
         formData.append('image', this.state.selectedFile, this.state.selectedFile.name);
@@ -60,23 +93,22 @@ export default class EditMarker extends React.Component{
         axiosInstance.post('/landmark-images/', formData, config)
         .then(res => {
             console.log(res);
-            this.getImages();       // updates images in state
+            this.getImages();
         })
     }
 
-    // function gets images for each marker and displays on component mount and when uploading new images
     getImages = (e) => {
         const results = [];
         const response = axiosInstance.get('/landmark-images/', {
 
-        }).then(response => response.data.forEach(item => {     // for each statement only selects images for corresponding marker
-            if (item.landmark === this.props.id) {
+        }).then(response => response.data.forEach(item => {
+            if (item.landmark == this.props.id) {
                 results.push({
                     image: item.image,
                 });
             }
             // console.log(results)
-            this.setState({images: results.map(obj => ({        // set state to corresponding images and pass to image gallery
+            this.setState({images: results.map(obj => ({
                 original: `${obj.image}`,
                 thumbnail: `${obj.image}`,
             }))})
@@ -86,7 +118,7 @@ export default class EditMarker extends React.Component{
 
     render() {
         const toolbarConfig = {
-            // specifies the groups to be displayed on the rte
+            // Optionally specify the groups to display (displayed in the order listed).
             display: ['INLINE_STYLE_BUTTONS', 'BLOCK_TYPE_BUTTONS', 'BLOCK_TYPE_DROPDOWN', 'HISTORY_BUTTONS'],
             INLINE_STYLE_BUTTONS: [
                 {label: 'Bold', style: 'BOLD', className: 'custom-css-class'},
@@ -108,14 +140,9 @@ export default class EditMarker extends React.Component{
         return(
             <React.Fragment>
                 <Grid container spacing={2} direction="column">
-                    {/* <Grid item>
-                        <div dangerouslySetInnerHTML={{__html: this.props.content}}></div>
-                    </Grid> */}
-                    {/* <Grid item>
-                        {"icon type = " + this.props.icontype}
-                    </Grid> */}
-
-                    {/* rte for editing of marker content */}
+                    <Grid item>
+                        {"position = " + this.props.position}
+                    </Grid>
                     <Grid item>
                         <InputLabel id="label">Content</InputLabel>
                         <RichTextEditor toolbarConfig={toolbarConfig}
@@ -124,8 +151,6 @@ export default class EditMarker extends React.Component{
                             placeholder = 'Enter text here...' 
                         />
                     </Grid>
-
-                    {/* image gallery that displays marker images */}
                     <Grid item>
                         <InputLabel id="label">Images</InputLabel>
                         <ImageGallery items = {this.state.images}
@@ -145,8 +170,6 @@ export default class EditMarker extends React.Component{
                         slideOnThumbnailOver = {false}
                         useWindowKeyDown = {true}/>
                     </Grid>
-
-                    {/* upload new image functionality */}
                     <Grid item>
                         <InputLabel id="label">Upload new image</InputLabel>
                         <input type="file" onChange={this.fileSelectedHandler}/>
@@ -159,7 +182,7 @@ export default class EditMarker extends React.Component{
                             value={this.state.icontype}
                             onChange={e => this.setState({icontype: e.target.value})}
                         >
-                            <MenuItem value={"default"}>Select:</MenuItem>
+                            <MenuItem value={"default"}>Default</MenuItem>
                             <MenuItem value={"individual"}>Significant Individual</MenuItem>
                             <MenuItem value={"army"}>Army</MenuItem>
                             <MenuItem value={"knowledge"}>Knowledge Site</MenuItem>
@@ -174,8 +197,6 @@ export default class EditMarker extends React.Component{
                             
                         </Select>
                     </Grid>
-
-                    {/* edit location functionality */}
                     <Grid item>
                         <InputLabel id="label">Location</InputLabel>
                         <form>
@@ -187,16 +208,26 @@ export default class EditMarker extends React.Component{
                                 Longitude
                                 <input type="number" name="lng" value={this.state.lng} onChange={e => this.setState({lng: e.target.value})}/> 
                             </label>
+                            <label>
+                                Position (ordering)
+                                <input type="number" name="pos" value={this.state.position} onChange={e => this.setState({position: e.target.value})} />
+                            </label>
                         </form>
                     </Grid>
-                    {/* <Grid item>
-                        <Button
-                            onClick={this.props.landmark.dragging.enable()}
-                            >Toggle drag
-                        </Button>
-                    </Grid> */}
 
-                    {/* delete and save functionality */}
+                    <Grid item>
+                    <InputLabel id="label">Choose Layer</InputLabel>
+                        <Select
+                            id="simple-select"
+                            value={this.state.layer}
+                            onChange={e => this.setState({layer: e.target.value})}
+                        >
+                        {this.state.layers.map((e, key) => {
+                            return <MenuItem value={e.id}>{e.name}</MenuItem>;
+                        })}
+                        </Select>
+                    </Grid>
+
                     <Grid item>   
                         <Button
                             onClick={this.handleDelete}
