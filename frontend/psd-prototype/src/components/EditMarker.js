@@ -33,9 +33,6 @@ export default class EditMarker extends React.Component{
 
     componentDidMount() {
         this.getImages()
-        console.log(this.state.layers)
-        console.log(this.state.layer)
-        console.log(this.state.icontype)
         // this.getLayers()
     }
 
@@ -60,7 +57,7 @@ export default class EditMarker extends React.Component{
     // }
 
     handleEdit = () => {
-        this.props.markerEdit(this.state.layer, this.state.content, this.state.icontype, this.state.lat, this.state.lng, this.props.id, this.state.position);
+        this.props.markerEdit(this.state.layer, this.state.content, this.state.icontype, this.state.lat, this.state.lng, this.props.id, this.state.position, this.state.layerlandmarks);
     }
 
     handleDelete = () => {
@@ -143,9 +140,6 @@ export default class EditMarker extends React.Component{
         return(
             <React.Fragment>
                 <Grid container spacing={2} direction="column">
-                    {/* <Grid item>
-                        <div dangerouslySetInnerHTML={{__html: this.props.content}}></div>
-                    </Grid> */}
                     <Grid item>
                         {"position = " + this.props.position}
                     </Grid>
@@ -217,7 +211,6 @@ export default class EditMarker extends React.Component{
                             <label>
                                 Position (ordering)
                                 <input type="number" name="pos" value={this.state.position} onChange={e => this.setState({position: e.target.value})} />
-
                             </label>
                         </form>
                     </Grid>
@@ -232,9 +225,6 @@ export default class EditMarker extends React.Component{
                         {this.state.layers.map((e, key) => {
                             return <MenuItem value={e.id}>{e.name}</MenuItem>;
                         })}
-                        
-                        {/* <MenuItem value={"1"}>Layer 1</MenuItem>
-                        <MenuItem value={"2"}>Layer 2</MenuItem> */}
                         </Select>
                     </Grid>
 

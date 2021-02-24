@@ -18,7 +18,6 @@ import {
     village
 } from './Icons';
 
-
 const iconRef = {"army": army, 
                  "battle": battle, 
                  "city": city, 
@@ -32,25 +31,25 @@ const iconRef = {"army": army,
                  "village": village
                  };
 
-
-
 export class LayerContent extends React.Component {
 
     state = {
                 landmarks: this.props.landmarks,
-                layerlandmarks: [],
+                layerlandmarks: this.props.layerlandmarks,
                 layers: this.props.layers,
                 layer: this.props.layer,
+                landmark_id: this.props.landmark_id,
+                content: this.props.content,
+                lat: this.props.latitude,
+                lng: this.props.longitude,
+                icontype: this.props.markertype,
+                position: this.props.position,
             }
 
-    // shouldComponentUpdate(Props, nextProps, nextState) {
-    //     if (Props != nextProps.landmarks) {
-    //         return true;
-    //     }
-    // }
-
     componentDidMount() {
-        this.getLandmarks()
+        console.log("calling getLandmarks, layer = ", this.state.layer, ", layerlandmarks = ", this.state.layerlandmarks)
+        //this.setState({layerlandmarks: []})
+        this.getLandmarks(this.state.layer, this.state.layerlandmarks)
         // console.log("lc state landmarks", this.state.landmarks);
     }
 
@@ -58,74 +57,32 @@ export class LayerContent extends React.Component {
         // console.log("prevProps length", prevProps.landmarks.length)
         // console.log("thisProps length", this.props.landmarks.length)
         if (prevProps.landmarks.length !== this.props.landmarks.length) {
-            this.getLandmarks()
+            console.log("calling getLandmarks, layer = ", this.state.layer, ", layerlandmarks = ", this.state.layerlandmarks)
+            //this.setState({layerlandmarks: []})
+            this.getLandmarks(this.state.layer, this.state.layerlandmarks)
         }
-        //console.log("lc state landmarks didupdate", this.state.landmarks);
-        //this.getLandmarks();
     }
 
-    submitEdit = (layer, content, icontype, lat, lng, id, pos) => {
-        this.updateLandmarks(layer, content, icontype, lat, lng, id, pos)
+    submitEdit = (layer, content, icontype, lat, lng, id, pos, layerlandmarks) => {
+        //console.log(this.state.layer)
+        console.log(layer)
+        this.updateLandmarks(layer, content, icontype, lat, lng, id, pos, layerlandmarks)
     }
 
-    submitDelete = (id) => {
-        this.removeMarkerFromState(id)
-    }
+    // updateLayer = (layer, layerlandmarks) => {
+    //     const response = axiosInstance.put(`/layers/${layer.id}/`, {
+    //         name: layer.name,
+    //         description: "lol",
+    //         layerlandmarks: layerlandmarks,
+    //     }).then(response => {
+    //        console.log(response)
+    //     })
+    // }
 
-    getLandmarks = async() => {
-        // console.log("this.props.layer: ", this.props.layer, "#####################")
-        // console.log("this.props.layer: ", this.props.layer, ", getLandmarks called");
-        const results = [];
-        const response = await axiosInstance.get('/landmarks/', {
-
-
-        // this.props.landmarks.forEach(landmark => {
-        //     if (landmark.layer == this.props.layer) {
-        //         results.push(landmark);
-                
-        //     }
-        // });
-        // console.log("getlandmarks() results:", results)
-        // this.setState({layerlandmarks: results})
-
-
-        }).then(response => response.data.forEach(item => {
-            // console.log("1", item.layer)
-            // console.log("2", this.props.layer)
-            if (item.layer == this.props.layer) {
-                results.push(item);
-                //console.log("results", results)
-            }
-        }))
-        // console.log("this.props.layer: ", this.props.layer, ", about to set state now")
-        // //console.log("layerlandmarks", this.state.layerlandmarks)
-        // console.log("this.props.layer: ", this.props.layer, ", results", results)
-        this.setState({layerlandmarks: results})
-        // console.log("this.props.layer: ", this.props.layer, ", layer landmarks:", this.state.layerlandmarks)
-        // console.log("this.props.layer: ", this.props.layer, "#####################")
-    }
-
-    removeMarkerFromState = (landmark_id) => {
-        /* Deletes the given landmark from the state, by sending a DELETE request to the API */
-        const response = axiosInstance.delete(`/landmarks/${landmark_id}/`)
-            .then(response => {
-                // filter out the landmark that's been deleted from the state
-                this.setState({
-                    landmarks: this.state.landmarks.filter(landmark => landmark.id !== landmark_id)
-                })
-                this.getLandmarks()
-            })
-      };
-    
-    updateLandmarks = (layer, content, markertype, lat, lng, landmark_id, position) => {
+    updateLandmarks = (layer, content, markertype, lat, lng, landmark_id, position, layerlandmarks) => {
         /* Updates the landmarks by sending a PUT request to the API,
            and updating the state in the then() callback
         */
-        // console.log(lat)
-        // console.log(lng)
-        // console.log(content)
-        // console.log(markertype)
-        // console.log(landmark_id)
         const response = axiosInstance.put(`/landmarks/${landmark_id}/`, {
             content: content,
             markertype: markertype,
@@ -146,8 +103,46 @@ export class LayerContent extends React.Component {
             this.setState({
                 landmarks: updatedLandmarks
             })
-            this.getLandmarks()
+            console.log("calling getLandmarks, layer = ", this.state.layer, ", layerlandmarks = ", this.state.layerlandmarks)
+            //this.setState({layerlandmarks: []})
+            this.getLandmarks(layer, layerlandmarks)
         })
+    };
+
+    getLandmarks = async(layer, layerlandmarks) => {
+        // console.log("layer: ", layer, "#####################")
+        // console.log("layer: ", layer, ", getLandmarks called");
+        const results = [];
+        const response = await axiosInstance.get('/landmarks/', {
+        }).then(response => response.data.forEach(item => {
+            if (item.layer === layer) {
+                results.push(item);
+            }
+        }))
+        this.setState({layerlandmarks: results})
+        // console.log("layer: ", layer, ", about to set state now")
+        console.log("layer: ", layer, ", results", results)
+        console.log("layer: ", layer, ", layer landmarks:", layerlandmarks)
+
+        // console.log("layer: ", layer, "#####################")
+    }
+
+    submitDelete = (id) => {
+        this.removeMarkerFromState(id)
+    }
+
+    removeMarkerFromState = (landmark_id) => {
+        /* Deletes the given landmark from the state, by sending a DELETE request to the API */
+        const response = axiosInstance.delete(`/landmarks/${landmark_id}/`)
+            .then(response => {
+                // filter out the landmark that's been deleted from the state
+                this.setState({
+                    landmarks: this.state.landmarks.filter(landmark => landmark.id !== landmark_id)
+                })
+                console.log("calling getLandmarks, layer = ", this.state.layer, ", layerlandmarks = ", this.state.layerlandmarks)
+                //this.setState({layerlandmarks: []})
+                this.getLandmarks(this.state.layer, this.state.layerlandmarks)
+            })
       };
 
     render() {
