@@ -92,7 +92,6 @@ class ProtoMap extends React.Component {
             let newLandmarks = [...this.state.landmarks] // copy original state
             newLandmarks.push(response.data)  // add the new landmark to the copy
             this.setState({landmarks: newLandmarks}) // update the state with the new landmark
-            
         })
         
     };

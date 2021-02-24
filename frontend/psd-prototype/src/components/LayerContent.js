@@ -47,37 +47,30 @@ export class LayerContent extends React.Component {
             }
 
     componentDidMount() {
+        this.fetchData()
+    }
+
+    fetchData() {
+        console.log("data being fetched...")
         console.log("calling getLandmarks, layer = ", this.state.layer, ", layerlandmarks = ", this.state.layerlandmarks)
-        //this.setState({layerlandmarks: []})
-        this.getLandmarks(this.state.layer, this.state.layerlandmarks)
-        // console.log("lc state landmarks", this.state.landmarks);
+        this.setState({layerlandmarks: []})
+        this.getLandmarks()
     }
 
     componentDidUpdate(prevProps, prevState) {
         // console.log("prevProps length", prevProps.landmarks.length)
         // console.log("thisProps length", this.props.landmarks.length)
         if (prevProps.landmarks.length !== this.props.landmarks.length) {
-            console.log("calling getLandmarks, layer = ", this.state.layer, ", layerlandmarks = ", this.state.layerlandmarks)
-            //this.setState({layerlandmarks: []})
-            this.getLandmarks(this.state.layer, this.state.layerlandmarks)
+            this.fetchData()
         }
     }
 
     submitEdit = (layer, content, icontype, lat, lng, id, pos, layerlandmarks) => {
-        //console.log(this.state.layer)
-        console.log(layer)
+        //console.log(layer, layerlandmarks)  // layer it is changing to
+        //console.log(this.state.layer, this.props.layerlandmarks)   // layer it used to be
         this.updateLandmarks(layer, content, icontype, lat, lng, id, pos, layerlandmarks)
+        window.location.reload();
     }
-
-    // updateLayer = (layer, layerlandmarks) => {
-    //     const response = axiosInstance.put(`/layers/${layer.id}/`, {
-    //         name: layer.name,
-    //         description: "lol",
-    //         layerlandmarks: layerlandmarks,
-    //     }).then(response => {
-    //        console.log(response)
-    //     })
-    // }
 
     updateLandmarks = (layer, content, markertype, lat, lng, landmark_id, position, layerlandmarks) => {
         /* Updates the landmarks by sending a PUT request to the API,
@@ -103,26 +96,23 @@ export class LayerContent extends React.Component {
             this.setState({
                 landmarks: updatedLandmarks
             })
-            console.log("calling getLandmarks, layer = ", this.state.layer, ", layerlandmarks = ", this.state.layerlandmarks)
-            //this.setState({layerlandmarks: []})
-            this.getLandmarks(layer, layerlandmarks)
         })
     };
 
-    getLandmarks = async(layer, layerlandmarks) => {
+    getLandmarks = async() => {
         // console.log("layer: ", layer, "#####################")
         // console.log("layer: ", layer, ", getLandmarks called");
         const results = [];
         const response = await axiosInstance.get('/landmarks/', {
         }).then(response => response.data.forEach(item => {
-            if (item.layer === layer) {
+            if (item.layer === this.state.layer) {
                 results.push(item);
             }
         }))
         this.setState({layerlandmarks: results})
         // console.log("layer: ", layer, ", about to set state now")
-        console.log("layer: ", layer, ", results", results)
-        console.log("layer: ", layer, ", layer landmarks:", layerlandmarks)
+        // console.log("layer: ", layer, ", results", results)
+        // console.log("layer: ", layer, ", layer landmarks:", layerlandmarks)
 
         // console.log("layer: ", layer, "#####################")
     }
@@ -141,7 +131,7 @@ export class LayerContent extends React.Component {
                 })
                 console.log("calling getLandmarks, layer = ", this.state.layer, ", layerlandmarks = ", this.state.layerlandmarks)
                 //this.setState({layerlandmarks: []})
-                this.getLandmarks(this.state.layer, this.state.layerlandmarks)
+                this.getLandmarks()
             })
       };
 
