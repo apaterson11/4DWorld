@@ -61,8 +61,8 @@ class Map(models.Model):
 
 
 class Layer(models.Model):
-    name = models.TextField()
-    description = models.TextField()
+    name = models.TextField(default="")
+    description = models.TextField(default="")
 
     def __str__(self):
         return str(self.id)
