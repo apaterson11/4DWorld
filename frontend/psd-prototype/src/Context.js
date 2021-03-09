@@ -2,4 +2,4 @@ import { createContext } from 'react'
 
 export const UserContext = createContext(null)
 
-export const isAuthenticated = createContext(false)
+export const IsAuthenticated = createContext(false)

@@ -80,7 +80,7 @@ class UserSerializer(ModelSerializer):
 
 class ProfileDetailsSerializer(ModelSerializer):
     user = UserSerializer()
-    default_group = GroupSerializer()
+    default_group = GroupSerializer(required=False)
 
     class Meta:
         model = Profile
