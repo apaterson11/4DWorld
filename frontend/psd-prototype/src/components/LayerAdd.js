@@ -3,7 +3,7 @@ import Grid from '@material-ui/core/Grid';
 import axiosInstance from '../axios'
 require("./LayerControl.css");
 
-// the UI component for filtering the subway entrances by subway line
+// for adding layers
 export default class EditMarker extends React.Component{
 
     state = {
@@ -12,34 +12,31 @@ export default class EditMarker extends React.Component{
         layer_desc: '',
     }
 
-  // this is the JSX that will become the Filter UI in the DOM, notice it looks pretty similar to HTML
-  // notice in the select element onChange is set to the updateFilter method
-  // thus when a user selects a new subway line to view, the component passes the new filter value
-  // to the parent component, Map, which reloads the GeoJSON data with the current filter value
-
     handleLayer = (e) => {
         this.setState({currentlayer: e.target.value.id});
     }
 
+    // adds layer via POST request
     addLayer = () => {
         const response = axiosInstance.post(`/layers/`, {
             name: this.state.layer_name,
             description: this.state.layer_desc,
         }).then(response => {
             let newLayers = [...this.state.layers] // copy original state
-            newLayers.push(response.data)  // add the new landmark to the copy
-            this.setState({layers: newLayers}) // update the state with the new landmark
+            newLayers.push(response.data)  // add the new layer to the copy
+            this.setState({layers: newLayers}) // update the state with the new layer
         })
     }; 
 
     render(
-       
     ){
         return (
         <div className="layerControlPopup">
             <h3>Layer Add</h3>
             <hr/>
                 <Grid container spacing={2} direction="column">
+
+                {/* form for entering data to be sent in POST request and for submitting POST request*/}
                 <Grid item>
                     <form> 
                         <label>

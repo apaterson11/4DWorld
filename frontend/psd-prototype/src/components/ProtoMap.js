@@ -28,10 +28,11 @@ require("./LayerControl.css");
 require("./ProtoMap.css");
 
 const DEFAULT_VIEWPORT = {
-    center: [55.86515, -4.25763],
+    center: [55.86515, -4.25763],   // needs to be changed to values defined in project creation
     zoom: 13,
 }
 
+// icons for markers
 const iconRef = {"army": army, 
                  "battle": battle, 
                  "city": city, 
@@ -45,19 +46,13 @@ const iconRef = {"army": army,
                  "village": village
                  };
 
-const markerText = {
-    popupContent: '<h2>sample text</h2>sample text',
-    open: false,
-    autoClose: true,
-}
-
 class ProtoMap extends React.Component {
 
     constructor(props) {
         super(props)
         this.handleLayer = this.handleLayer.bind(this);
-        this.refLayerSelect = React.createRef();
-        this.refAddMarkerButton = React.createRef();
+        this.refLayerSelect = React.createRef();    // reference used to set current layer
+        this.refAddMarkerButton = React.createRef();    // reference used to control add marker button
     }
 
     state = {
@@ -72,7 +67,7 @@ class ProtoMap extends React.Component {
         currentlayer: "",
         layer_name: "",
         layer_desc: "",
-        canClick: false,
+        canClick: false,    // add marker functionality, changes when "add marker" button is clicked
     }
 
     componentDidMount() {
@@ -81,25 +76,23 @@ class ProtoMap extends React.Component {
         axiosInstance.get('/layers/').then(response => this.setState({layers: response.data, fetched: true}))
     }
 
-    handleClick = () => {
-        this.setState({ viewport: DEFAULT_VIEWPORT })
-    }
+    // handleClick = () => {
+    //     this.setState({ viewport: DEFAULT_VIEWPORT })
+    // }
 
+    // function to enter into the "add marker" state and indicate to user that button is active
     prepAddMarker = (e) => {
-        console.log(e)
         this.setState({ canClick: !this.state.canClick})
         e.target.style.background = this.state.canClick ? '#b8bfba' : 'white'
     }
     
+    // function adds marker to map on click via post request
     addMarker = (e) => {
-        this.refLayerSelect.current.focus()
-        // console.log(this.state.landmarks);
-        // console.log(this.state.landmarks.length);
+        this.refLayerSelect.current.focus() // get current layer
+
         /* Adds a new landmark to the map at a given latitude and longitude, via a POST request */
         const { lat, lng } = e.latlng;
         const pos = this.state.landmarks.length;
-        // console.log("statelandmarks ",this.state.landmarks);
-        // console.log(pos);
         const response = axiosInstance.post('/landmarks/', {
             layer: this.state.currentlayer,
             content: 'sample text',
@@ -115,6 +108,7 @@ class ProtoMap extends React.Component {
         })
     };
 
+    // function adds new layer through "add layer" button
     addLayer = (layer_id) => {
         const response = axiosInstance.post(`/layers/`, {
             name: this.state.layer_name,
@@ -126,6 +120,7 @@ class ProtoMap extends React.Component {
         })
     }; 
 
+    // function deletes layer through "edit layer" function
     removeLayerFromState = (layer_id) => {
         /* Deletes the given landmark from the state, by sending a DELETE request to the API */
         const response = axiosInstance.delete(`/layers/${layer_id}/`)
@@ -136,10 +131,10 @@ class ProtoMap extends React.Component {
                 })
             })
       };
-
+    
+    // displays correct layers in dropdown layer select menu
     handleLayer(e) {
         this.setState({currentlayer: e.target.value});
-        console.log(this.state.currentlayer)
     }
  
     render() {
@@ -147,6 +142,7 @@ class ProtoMap extends React.Component {
         let content = ''
         let lines = ''
 
+            // toggle layer visibility menu
             let renderlayers = ''
             renderlayers = this.state.layers.map((e, key) =>
 
@@ -156,6 +152,7 @@ class ProtoMap extends React.Component {
                 </LayerGroup>
             </LayersControl.Overlay>);
 
+            // layer select dropdown menu
             let layerselect = ''
             layerselect = this.state.layers.map((e, key) =>
             <option key={e.id} value={e.id}>{e.name}</option>);
@@ -177,10 +174,12 @@ class ProtoMap extends React.Component {
                     noWrap={true}
                 />
 
+                {/* toggle layer visibility menu */}
                 <LayersControl position="topright">
                     {renderlayers}  
                 </LayersControl>
 
+                {/* select layer dropdown menu */}
                 <Control position="topright">
                     <React.Fragment>
                         <select value={this.state.currentlayer} onFocus={this.handleLayer} onChange={this.handleLayer} ref={this.refLayerSelect}>
@@ -192,36 +191,34 @@ class ProtoMap extends React.Component {
                 {/* edit layer button */}
                 <Popup
                     trigger={open => (
-                    <button onClick={this.doNothing} className="layerControl">Edit Layer</button>
+                    <button className="layerControl">Edit Layer</button>
                     )}
                     position="bottom right"
                     closeOnDocumentClick
                 >
                     <span>
-                        <LayerControl
-                        layers = {this.state.layers}
-                        currentlayer = {this.state.currentlayer}/>
+                        <LayerControl layers = {this.state.layers} currentlayer = {this.state.currentlayer}/>
                     </span>
                 </Popup>
                 
                 {/* add layer button */}
                 <Popup
                     trigger={open => (
-                    <button className="layerControl">Add Layer</button>
-                    )}
+                    <button className="layerControl">Add Layer</button>)}
                     position="bottom right"
                     // on={'hover'}
                 >
                     <span>
-                        <LayerAdd
-                        layers = {this.state.layers}/>
+                        <LayerAdd layers = {this.state.layers}/>
                     </span>
                 </Popup>
-
+                
+                {/* add marker button */}
                 <Control position="topright">
                       <button className="btn-addMarker" onClick={this.prepAddMarker} ref={button => this.refAddMarkerButton = button}>Add Marker</button>
                 </Control>
-
+                
+                {/* reset view button - will this ever be fixed? only time will tell */}
                 <Control position="bottomright">
                       <button className="btn-resetview" onClick={this.createLines}>Reset View</button>
                 </Control>
