@@ -25,6 +25,7 @@ import {
 } from './Icons';
 
 require("./LayerControl.css");
+require("./ProtoMap.css");
 
 const DEFAULT_VIEWPORT = {
     center: [55.86515, -4.25763],
@@ -56,6 +57,7 @@ class ProtoMap extends React.Component {
         super(props)
         this.handleLayer = this.handleLayer.bind(this);
         this.refLayerSelect = React.createRef();
+        this.refAddMarkerButton = React.createRef();
     }
 
     state = {
@@ -83,8 +85,10 @@ class ProtoMap extends React.Component {
         this.setState({ viewport: DEFAULT_VIEWPORT })
     }
 
-    prepAddMarker = () => {
-        this.setState({ canClick: true})
+    prepAddMarker = (e) => {
+        console.log(e)
+        this.setState({ canClick: !this.state.canClick})
+        e.target.style.background = this.state.canClick ? '#b8bfba' : 'white'
     }
     
     addMarker = (e) => {
@@ -107,13 +111,9 @@ class ProtoMap extends React.Component {
             let newLandmarks = [...this.state.landmarks] // copy original state
             newLandmarks.push(response.data)  // add the new landmark to the copy
             this.setState({landmarks: newLandmarks}) // update the state with the new landmark
-            this.setState({ canClick: false})
+            this.refAddMarkerButton.click();    // reset add marker button
         })
     };
-
-    doNothing = () => {
-        console.log("do nothing")
-    }
 
     addLayer = (layer_id) => {
         const response = axiosInstance.post(`/layers/`, {
@@ -210,8 +210,7 @@ class ProtoMap extends React.Component {
                     <button className="layerControl">Add Layer</button>
                     )}
                     position="bottom right"
-                    closeOnDocumentClick
-                    on={'hover'}
+                    // on={'hover'}
                 >
                     <span>
                         <LayerAdd
@@ -220,7 +219,7 @@ class ProtoMap extends React.Component {
                 </Popup>
 
                 <Control position="topright">
-                      <button className="btn-addMarker" onClick={this.prepAddMarker}>Add Marker</button>
+                      <button className="btn-addMarker" onClick={this.prepAddMarker} ref={button => this.refAddMarkerButton = button}>Add Marker</button>
                 </Control>
 
                 <Control position="bottomright">
