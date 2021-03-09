@@ -70,6 +70,7 @@ class ProtoMap extends React.Component {
         currentlayer: "",
         layer_name: "",
         layer_desc: "",
+        canClick: false,
     }
 
     componentDidMount() {
@@ -80,6 +81,10 @@ class ProtoMap extends React.Component {
 
     handleClick = () => {
         this.setState({ viewport: DEFAULT_VIEWPORT })
+    }
+
+    prepAddMarker = () => {
+        this.setState({ canClick: true})
     }
     
     addMarker = (e) => {
@@ -102,9 +107,13 @@ class ProtoMap extends React.Component {
             let newLandmarks = [...this.state.landmarks] // copy original state
             newLandmarks.push(response.data)  // add the new landmark to the copy
             this.setState({landmarks: newLandmarks}) // update the state with the new landmark
+            this.setState({ canClick: false})
         })
-        
     };
+
+    doNothing = () => {
+        console.log("do nothing")
+    }
 
     addLayer = (layer_id) => {
         const response = axiosInstance.post(`/layers/`, {
@@ -150,35 +159,6 @@ class ProtoMap extends React.Component {
             let layerselect = ''
             layerselect = this.state.layers.map((e, key) =>
             <option key={e.id} value={e.id}>{e.name}</option>);
-
-
-            let editlayer = ''
-            editlayer = <Popup
-                            trigger={<button className="button">Edit Layer</button>}
-                            position="left top"
-                            on="hover"
-                        >
-                        <React.Fragment>
-                        <form> 
-                            {/* <label>
-                                Name
-                                <input type="string" name="name" value={this.state.layer_name} onChange={e => this.setState({layer_name: e.target.value})}/>
-                            </label>
-                            <label>
-                                Description
-                                <input type="string" name="description" value={this.state.layer_desc} onChange={e => this.setState({layer_desc: e.target.value})}/>
-                            </label>
-                            <button
-                                onClick={this.addLayer(this.state.currentlayer)}
-                            > Submit changes
-                            </button>
-                            <button
-                                onClick={this.removeLayerFromState(this.state.currentlayer)}
-                            > Delete layer
-                            </button> */}
-                        </form>
-                        </React.Fragment>
-                        </Popup>
             
 
             
@@ -187,7 +167,7 @@ class ProtoMap extends React.Component {
             <Map onViewportChanged={this.onViewportChanged} 
                 viewport={this.state.viewport} 
                 center={[this.props.latitude, this.props.longitude]} 
-                onClick={this.addMarker} 
+                onClick={this.state.canClick ? this.addMarker : undefined} 
                 zoom={4} 
                 maxBounds={[[90,-180],[-90, 180]]}>
                 <TileLayer
@@ -212,17 +192,15 @@ class ProtoMap extends React.Component {
                 {/* edit layer button */}
                 <Popup
                     trigger={open => (
-                    <button className="layerControl">Edit Layer</button>
+                    <button onClick={this.doNothing} className="layerControl">Edit Layer</button>
                     )}
-                    position="right center"
+                    position="bottom right"
                     closeOnDocumentClick
                 >
                     <span>
-                        <React.Fragment>
-                            <LayerControl
-                            layers = {this.state.layers}
-                            currentlayer = {this.state.currentlayer}/>
-                        </React.Fragment>
+                        <LayerControl
+                        layers = {this.state.layers}
+                        currentlayer = {this.state.currentlayer}/>
                     </span>
                 </Popup>
                 
@@ -231,8 +209,9 @@ class ProtoMap extends React.Component {
                     trigger={open => (
                     <button className="layerControl">Add Layer</button>
                     )}
-                    position="right center"
+                    position="bottom right"
                     closeOnDocumentClick
+                    on={'hover'}
                 >
                     <span>
                         <LayerAdd
@@ -240,36 +219,9 @@ class ProtoMap extends React.Component {
                     </span>
                 </Popup>
 
-
-                
-
-                
-
-                {/* <Control position="topright">
-                    <React.Fragment>
-                    <select value={this.state.currentlayer} onChange={e => this.setState({currentlayer: e.target.value})}>
-                        {layerselect}
-                    </select>
-                    <form> 
-                        <label>
-                            Name
-                            <input type="string" name="name" value={this.state.layer_name} onChange={e => this.setState({layer_name: e.target.value})}/>
-                        </label>
-                        <label>
-                            Description
-                            <input type="string" name="description" value={this.state.layer_desc} onChange={e => this.setState({layer_desc: e.target.value})}/>
-                        </label>
-                        <button
-                            onClick={this.addLayer(this.state.currentlayer)}
-                        > Submit changes
-                        </button>
-                        <button
-                            onClick={this.removeLayerFromState(this.state.currentlayer)}
-                        > Delete layer
-                        </button>
-                    </form>
-                    </React.Fragment>
-                </Control> */}
+                <Control position="topright">
+                      <button className="btn-addMarker" onClick={this.prepAddMarker}>Add Marker</button>
+                </Control>
 
                 <Control position="bottomright">
                       <button className="btn-resetview" onClick={this.createLines}>Reset View</button>

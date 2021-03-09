@@ -51,8 +51,6 @@ export class LayerContent extends React.Component {
     }
 
     fetchData() {
-        console.log("data being fetched...")
-        console.log("calling getLandmarks, layer = ", this.state.layer, ", layerlandmarks = ", this.state.layerlandmarks)
         this.setState({layerlandmarks: []})
         this.getLandmarks()
     }
