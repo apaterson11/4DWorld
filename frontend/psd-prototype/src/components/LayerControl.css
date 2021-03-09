@@ -1,0 +1,59 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+}
+#root, #map, #mapUI {
+  width: inherit;
+  height: inherit;
+  background-color: #000;
+  z-index:1
+}
+
+.layerControl {
+  position: relative;
+  top: 80px;
+  display: block;
+  float: left;
+  z-index: 401;
+  width: auto;
+  height: auto;
+  background: white;
+  margin: 10px;
+  font-family: sans-serif;
+  font-size: 12px;
+  padding: 5px;
+  border-radius: 7px;
+}
+
+.layerControlPopup {
+  position: relative;
+  top: 10px;
+  left: 150px;
+  z-index: 402;
+  width: 200px;
+  height: auto;
+  background: white;
+  font-family: sans-serif;
+  font-size: 12px;
+  padding: 10px;
+  padding-bottom: 20px;
+  border-radius: 7px;
+}
+
+.layerControlPopup hr {
+  border: 1px solid #000;
+  margin: 5px;
+}
+.layerControlPopup h3 {
+  margin-top: 0;
+  padding-left: 5px;
+}
+.layerControlPopup p {
+  padding-left: 5px;
+}
+.layerControlPopup select {
+  display: block;
+  margin: 0 auto;
+}
