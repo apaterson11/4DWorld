@@ -13,6 +13,7 @@ import axiosInstance from '../axios';
 import ImageGallery from 'react-image-gallery';
 require("./EditMarker.css");
 
+// popup attached to landmark
 export default class EditMarker extends React.Component{
     state = {
         landmarks: this.props.landmarks,
@@ -56,10 +57,12 @@ export default class EditMarker extends React.Component{
     //     .catch(error => console.log(error.response));
     // }
 
+    // passes back to updateLandmarks in LayerContent.js
     handleEdit = () => {
         this.props.markerEdit(this.state.layer, this.state.content, this.state.icontype, this.state.lat, this.state.lng, this.props.id, this.state.position, this.state.layerlandmarks);
     }
 
+    // passes back to removeMarkerFromState in LayerContent.js
     handleDelete = () => {
         this.props.markerDelete(this.props.id);
     }
@@ -68,17 +71,20 @@ export default class EditMarker extends React.Component{
     //     this.setState({icontype: event.target.value})
     // }
 
+    // handles rich text editor
     onChange = (value) => {
         this.setState({value})
         this.setState({content: value.toString('html')})
     };
 
+    // first half of image uploading
     fileSelectedHandler = (e) => {
         this.setState({
             selectedFile: e.target.files[0]
         })
     }
 
+    // second half of image uploading
     uploadImage = (e) => {
         const formData = new FormData();
         formData.append('image', this.state.selectedFile, this.state.selectedFile.name);
@@ -97,17 +103,19 @@ export default class EditMarker extends React.Component{
         })
     }
 
+    // get images for each landmark
     getImages = (e) => {
         const results = [];
         const response = axiosInstance.get('/landmark-images/', {
 
         }).then(response => response.data.forEach(item => {
-            if (item.landmark == this.props.id) {
+            if (item.landmark == this.props.id) {   // matches up each series of images to their corresponding landmark
                 results.push({
                     image: item.image,
                 });
             }
             // console.log(results)
+            // maps results so that they can be displayed in image gallery
             this.setState({images: results.map(obj => ({
                 original: `${obj.image}`,
                 thumbnail: `${obj.image}`,
@@ -118,7 +126,7 @@ export default class EditMarker extends React.Component{
 
     render() {
         const toolbarConfig = {
-            // Optionally specify the groups to display (displayed in the order listed).
+            // toolbarConfig defines what is displayed at the top of the rich text editor (e.g. bold, italics)
             display: ['INLINE_STYLE_BUTTONS', 'BLOCK_TYPE_BUTTONS', 'BLOCK_TYPE_DROPDOWN', 'HISTORY_BUTTONS'],
             INLINE_STYLE_BUTTONS: [
                 {label: 'Bold', style: 'BOLD', className: 'custom-css-class'},
@@ -137,12 +145,38 @@ export default class EditMarker extends React.Component{
             ]
         }
 
+        // conditional rendering depending on whether or not any images have been uploaded to landmark
+        let imageGalleryMessage = ''
+        if (this.state.images.length == 0) {
+            imageGalleryMessage = "No images present, upload some below!"
+        }
+        else {
+            imageGalleryMessage = <ImageGallery items = {this.state.images}
+                                showIndex = {false}
+                                showBullets = {true}
+                                infinite = {true}
+                                showThumbnails = {false}
+                                showFullscreenButton = {true}
+                                showGalleryFullscreenButton = {false}
+                                showPlayButton = {false}
+                                showGalleryPlayButton = {false}
+                                showNav = {true}
+                                isRTL = {false}
+                                lazyLoad = {false}
+                                slideDuration = {450}
+                                slideInterval = {2000}
+                                slideOnThumbnailOver = {false}
+                                useWindowKeyDown = {true}/>
+        }
+
         return(
             <React.Fragment>
                 <Grid container spacing={2} direction="column">
                     <Grid item>
                         {"position = " + this.props.position}
                     </Grid>
+
+                    {/* rich text editor for editing text content */}
                     <Grid item>
                         <InputLabel id="label">Content</InputLabel>
                         <RichTextEditor toolbarConfig={toolbarConfig}
@@ -151,30 +185,23 @@ export default class EditMarker extends React.Component{
                             placeholder = 'Enter text here...' 
                         />
                     </Grid>
+
+                    {/* image gallery */}
                     <Grid item>
-                        <InputLabel id="label">Images</InputLabel>
-                        <ImageGallery items = {this.state.images}
-                        showIndex = {false}
-                        showBullets = {true}
-                        infinite = {true}
-                        showThumbnails = {false}
-                        showFullscreenButton = {true}
-                        showGalleryFullscreenButton = {false}
-                        showPlayButton = {false}
-                        showGalleryPlayButton = {false}
-                        showNav = {true}
-                        isRTL = {false}
-                        lazyLoad = {true}
-                        slideDuration = {450}
-                        slideInterval = {2000}
-                        slideOnThumbnailOver = {false}
-                        useWindowKeyDown = {true}/>
+                        <Grid>
+                            <InputLabel id="label">Images</InputLabel>
+                            {imageGalleryMessage}
+                        </Grid>
                     </Grid>
+
+                    {/* upload image button */}
                     <Grid item>
                         <InputLabel id="label">Upload new image</InputLabel>
                         <input type="file" onChange={this.fileSelectedHandler}/>
                         <button onClick={this.uploadImage}>Upload</button>
                     </Grid>
+
+                    {/* icon type */}
                     <Grid item>
                         <InputLabel id="label">Icon type</InputLabel>
                         <Select
@@ -197,6 +224,8 @@ export default class EditMarker extends React.Component{
                             
                         </Select>
                     </Grid>
+
+                    {/* location */}
                     <Grid item>
                         <InputLabel id="label">Location</InputLabel>
                         <form>
@@ -215,6 +244,7 @@ export default class EditMarker extends React.Component{
                         </form>
                     </Grid>
 
+                    {/* layer selector */}
                     <Grid item>
                     <InputLabel id="label">Choose Layer</InputLabel>
                         <Select
@@ -227,7 +257,8 @@ export default class EditMarker extends React.Component{
                         })}
                         </Select>
                     </Grid>
-
+                    
+                    {/* delete and submit changes */}
                     <Grid item>   
                         <Button
                             onClick={this.handleDelete}
