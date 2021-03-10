@@ -156,6 +156,20 @@ class ProtoMap extends React.Component {
                 })
             })
       };
+
+
+    // handle what exactly? that's right, the click
+    handleClick = (e) => {
+        console.log(this.state.landmarks)
+
+        this.state.landmarks.forEach((marker) => {
+            console.log(marker.id)
+        })
+
+        // for (const marker in [...this.state.landmarks]) {
+            
+        // }
+    }
     
     // displays correct layers in dropdown layer select menu
     handleLayer(e) {
@@ -243,7 +257,7 @@ class ProtoMap extends React.Component {
                 
                 {/* reset view button - will this ever be fixed? only time will tell */}
                 <Control position="bottomright">
-                      <button className="btn-resetview" onClick={this.createLines}>Reset View</button>
+                      <button className="btn-resetview" onClick={this.handleClick}>Reset View</button>
                 </Control>
             </Map>   
         )
