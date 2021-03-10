@@ -35,8 +35,7 @@ export class LayerContent extends React.Component {
 
     state = {
                 landmarks: this.props.landmarks,
-                splitlandmarks: this.props.splitlandmarks,
-                layerlandmarks: this.props.newlandmarks,
+                layerlandmarks: this.props.layerlandmarks,
                 layers: this.props.layers,
                 layer: this.props.layer,
                 landmark_id: this.props.landmark_id,
@@ -49,32 +48,23 @@ export class LayerContent extends React.Component {
 
     componentDidMount() {
         this.fetchData()
-        console.log("layercontent layerlandmarks = ",this.state.layerlandmarks);
-        console.log(this.props.newlandmarks);
+        //console.log("layercontent layerlandmarks = ",this.state.layerlandmarks);
+        //console.log(this.props.newlandmarks);
     
     }
 
     fetchData() {
-<<<<<<< HEAD
-        this.setState({layerlandmarks: []})
-        this.getLandmarks()
-    }
-
-    componentDidUpdate(prevProps, prevState) {
-        if (prevProps.landmarks.length !== this.props.landmarks.length) {
-=======
-        console.log("data being fetched...")
-        console.log("calling getLandmarks, layer = ", this.state.layer, ", layerlandmarks = ", this.state.layerlandmarks)
+        //console.log("data being fetched...")
+        //console.log("calling getLandmarks, layer = ", this.state.layer, ", layerlandmarks = ", this.state.layerlandmarks)
         // let splitlandmarks = Object.values([...this.state.splitlandmarks])
         // this.setState({layerlandmarks: splitlandmarks[this.state.layer]})
         // this.getLandmarks()
     }
 
     componentDidUpdate(prevProps, prevState) {
-        console.log("prevProps length", prevProps.landmarks.length)
-        console.log("thisProps length", this.props.landmarks.length)
+        //console.log("prevProps length", prevProps.landmarks.length)
+        //console.log("thisProps length", this.props.landmarks.length)
         if ((this.props.layerlandmarks) && (prevProps.layerlandmarks.length !== this.props.layerlandmarks.length)) {
->>>>>>> 08d6f192dd2e1a4b8d46114e640234ba8fe137b9
             this.fetchData()
         }
     }
@@ -111,7 +101,6 @@ export class LayerContent extends React.Component {
         })
     };
 
-<<<<<<< HEAD
     // function gets all landmarks 
     getLandmarks = async() => {
         const results = [];
@@ -123,25 +112,6 @@ export class LayerContent extends React.Component {
         }))
         this.setState({layerlandmarks: results})
     }
-=======
-    // getLandmarks = async() => {
-    //     // console.log("layer: ", layer, "#####################")
-    //     // console.log("layer: ", layer, ", getLandmarks called");
-    //     const results = [];
-    //     const response = await axiosInstance.get('/landmarks/', {
-    //     }).then(response => response.data.forEach(item => {
-    //         if (item.layer === this.state.layer) {
-    //             results.push(item);
-    //         }
-    //     }))
-    //     this.setState({layerlandmarks: results})
-    //     // console.log("layer: ", layer, ", about to set state now")
-    //     // console.log("layer: ", layer, ", results", results)
-    //     // console.log("layer: ", layer, ", layer landmarks:", layerlandmarks)
-
-    //     // console.log("layer: ", layer, "#####################")
-    // }
->>>>>>> 08d6f192dd2e1a4b8d46114e640234ba8fe137b9
 
     // used for passing through to editmarker.js
     submitDelete = (id) => {
@@ -165,10 +135,10 @@ export class LayerContent extends React.Component {
 
     render() {
             const layerlandmarks = this.state.layerlandmarks
+            console.log("layerlandmarks", layerlandmarks)
             let content = ''
             let lines = ''
 
-<<<<<<< HEAD
             // content renders all the landmarks onto the map 
             content = layerlandmarks.map((landmark, index) =>
             <Marker key={landmark.id} position={[landmark.latitude, landmark.longitude]} icon={(landmark.markertype in iconRef) ? iconRef[landmark.markertype] : blueIcon} >
@@ -201,62 +171,14 @@ export class LayerContent extends React.Component {
             // make copies of landmarks array
             let fromLandmarks = [...this.state.layerlandmarks];
             let toLandmarks = [...this.state.layerlandmarks]; 
-=======
-            if (layerlandmarks) {
-                content = layerlandmarks.map((landmark, index) =>
-                <Marker key={landmark.id} position={[landmark.latitude, landmark.longitude]} icon={(landmark.markertype in iconRef) ? iconRef[landmark.markertype] : blueIcon} >
-                    <Popup 
-                    autoClose={false} 
-                    nametag={'marker'}
-                    minWidth={400} 
-                    maxWidth={2000}
-                    >
-                    <React.Fragment>
-                    <EditMarker 
-                        landmarks={this.state.landmarks}
-                        layerlandmarks={this.state.layerlandmarks}
-                        content={landmark.content} 
-                        position={landmark.position}
-                        icontype={landmark.markertype}  
-                        lat = {landmark.latitude}
-                        lng = {landmark.longitude}
-                        id = {landmark.id}
-                        layer = {this.state.layer}
-                        layers = {this.state.layers}
-                        markerEdit={this.submitEdit}
-                        markerDelete={this.submitDelete}>
-                    </EditMarker>
-                    </React.Fragment>
-                    
-                    </Popup>
-                </Marker>)
-            
-     
-
-                let fromLandmarks = [...this.state.layerlandmarks];
-                let toLandmarks = [...this.state.layerlandmarks]; 
-                // make copies of landmarks array
->>>>>>> 08d6f192dd2e1a4b8d46114e640234ba8fe137b9
 
                 fromLandmarks.pop()
                 fromLandmarks.sort((a, b) => a.position > b.position ? 1 : -1);
                 toLandmarks = toLandmarks.slice(1)
                 toLandmarks.sort((a, b) => a.position > b.position ? 1 : -1);
 
-<<<<<<< HEAD
             // range(length of fromLandmarks)
             let range = Array(fromLandmarks.length).fill().map((x,i)=>i)
-=======
-
-                //console.log("from = ",fromLandmarks);
-                //console.log("to = ",toLandmarks);
-                // two new arrays, from = [1st marker ... 2nd last] and to = [2nd marker ... last]
-
-                // console.log("fromLandmarks = ", fromLandmarks[5].latitude);
-
-                let range = Array(fromLandmarks.length).fill().map((x,i)=>i)
-                // range(length of fromLandmarks)
->>>>>>> 08d6f192dd2e1a4b8d46114e640234ba8fe137b9
 
                 lines = range.map((i) => 
                     <Polyline 
@@ -264,16 +186,16 @@ export class LayerContent extends React.Component {
                             positions={[[fromLandmarks[i].latitude, fromLandmarks[i].longitude], [toLandmarks[i].latitude, toLandmarks[i].longitude]]} 
                             color={'red'} />)
                 // creates one line between each pair of markers
+                return (
+                    <React.Fragment>
+                        {content}
+                        {lines}
+                    </React.Fragment>
+                )
             }
 
-        return (
-            <React.Fragment>
-                {content}
-                {lines}
-            </React.Fragment>
-        )
         
+            
     }
-}
 
 export default LayerContent

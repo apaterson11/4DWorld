@@ -1,5 +1,5 @@
 import React from "react";
-import {Map, TileLayer, Marker, Popup, Polyline, LayersControl, LayerGroup, Circle, withLeaflet} from 'react-leaflet';
+import {Map, TileLayer, Marker, Polyline, LayersControl, LayerGroup, Circle, withLeaflet} from 'react-leaflet';
 import Control from '@skyeer/react-leaflet-custom-control' 
 import axiosInstance from '../axios'
 import {LayerContent, getLandmarks, addMarker} from './LayerContent';
@@ -92,54 +92,24 @@ class ProtoMap extends React.Component {
         splitlandmarks: []
     }
 
-    componentDidUpdate(prevProps, prevState) {
+    // componentDidUpdate(prevProps, prevState) {
+    //     if (prevState.landmarks.length !== this.state.landmarks.length) {
+    //         this.getData()
+    //     }
+    // }
 
-
-        if (prevState.landmarks.length !== this.state.landmarks.length) {
-            this.getData()
-        }
-    }
-
-    componentDidMount(){
-        this.getData()
-    }
-
-    getData = async() => {
-        await axiosInstance.get('/landmarks/').then(response => this.setState({landmarks: response.data, fetched: true}))
-        await axiosInstance.get('/layers/').then(response => this.setState({layers: response.data, fetched: true}))
-        this.getSplitLandmarks()
-
+    componentDidMount() {
+        axiosInstance.get('/landmarks/').then(response => this.setState({landmarks: response.data, fetched: true}))
+        axiosInstance.get('/layers/').then(response => this.setState({layers: response.data, fetched: true}))
     }
     
     getSplitLandmarks = () => {
-        console.log('getSplitLandmarks start')
-        console.log('landmark size (getSPLIT) = ',this.state.landmarks.length)
+        let split = groupBy([...this.state.landmarks], i => i.layer)
+        console.log("1 ", split)
+        const testtt = Object.entries(split)
 
-        // console.log([...this.state.landmarks]);
-
-        let splitlandmarks = groupBy([...this.state.landmarks], i => i.layer)
-        const testtt = Object.entries(splitlandmarks)
-        
-        console.log("splitlandmarks =",splitlandmarks);
-
-    
-        console.log(testtt);
-
-        this.setState({splitlandmarks: splitlandmarks})
-
-
-
-        console.log(this.state.splitlandmarks);
-        
-        console.log("after-----", this.state.landmarks)
-
-
-
+        this.setState({splitlandmarks: split})
     }
-
-    // handleClick = () => {
-    //     this.setState({ viewport: DEFAULT_VIEWPORT })
-    // }
 
     // function to enter into the "add marker" state and indicate to user that button is active
     prepAddMarker = (e) => {
@@ -163,7 +133,7 @@ class ProtoMap extends React.Component {
             position: pos,
         }).then(response => {
             let newLandmarks = [...this.state.landmarks] // copy original state
-            console.log('landmark size BEFORE = ',this.state.landmarks.length)
+            //console.log('landmark size BEFORE = ',this.state.landmarks.length)
             newLandmarks.push(response.data);
             this.setState({landmarks: newLandmarks}, this.getSplitLandmarks) // update the state with the new landmark
             this.refAddMarkerButton.click();
@@ -210,13 +180,11 @@ class ProtoMap extends React.Component {
 
             // toggle layer visibility menu
             let renderlayers = ''
-            console.log("swag ", this.state.splitlandmarks)
-            console.log("swag 2 ", this.state.splitlandmarks[1])
             renderlayers = this.state.layers.map((e, index) =>
 
             <LayersControl.Overlay key={e.id} checked name={e.name}>
                 <LayerGroup>
-                    <LayerContent key={e.id} layer={e.id} newlandmarks={groupedvalues[0]} landmark_id={this.state.id} splitlandmarks={this.state.landmarks} content={this.state.content} latitude={this.props.latitude} longitude={this.props.longitude} markertype={this.state.markertype} position={this.state.position} layers={this.state.layers} landmarks={this.state.landmarks}></LayerContent>
+                    <LayerContent key={e.id} layer={e.id} layerlandmarks={landmarksgrouped[e.id]} landmark_id={this.state.id} content={this.state.content} latitude={this.props.latitude} longitude={this.props.longitude} markertype={this.state.markertype} position={this.state.position} layers={this.state.layers} landmarks={this.state.landmarks}></LayerContent>
                 </LayerGroup>
             </LayersControl.Overlay>);
 
