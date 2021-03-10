@@ -89,7 +89,7 @@ class ProtoMap extends React.Component {
         layer_name: "",
         layer_desc: "",
         canClick: false,    // add marker functionality, changes when "add marker" button is clicked
-        currentlayer: '',
+        currentlayer: '1',
     }
 
     // componentDidUpdate(prevProps, prevState) {
@@ -99,7 +99,7 @@ class ProtoMap extends React.Component {
     // }
 
     rerenderParentCallback() {
-        console.log("force parent update")
+        // console.log("force parent update")
         axiosInstance.get('/landmarks/').then(response => this.setState({landmarks: response.data, fetched: true}))
         axiosInstance.get('/layers/').then(response => this.setState({layers: response.data, fetched: true}))
         this.forceUpdate();
@@ -122,7 +122,16 @@ class ProtoMap extends React.Component {
 
         /* Adds a new landmark to the map at a given latitude and longitude, via a POST request */
         const { lat, lng } = e.latlng;
-        const pos = this.state.landmarks.length;
+
+        console.log(this.state.landmarks)
+        let currentlayerlandmarks = this.state.landmarks.filter(landmark => parseInt(landmark.layer) == parseInt(this.state.currentlayer))
+
+        // let landmarksgrouped = groupBy([...this.state.landmarks], i => i.layer)
+        // const currentlayerlandmarks = landmarksgrouped[this.state.currentlayer]
+        console.log(currentlayerlandmarks)
+
+        const pos = ((currentlayerlandmarks) ? (currentlayerlandmarks.length) : 0)
+
         const response = axiosInstance.post('/landmarks/', {
             layer: this.state.currentlayer,
             content: 'sample text',
@@ -168,12 +177,14 @@ class ProtoMap extends React.Component {
 
     // handle what exactly? that's right, the click
     handleClick = (e) => {
+        // console.log(this.state.landmarks)
+
+        // this.state.landmarks.forEach((marker) => {
+        //     console.log(marker.id)
+        // })
+
+        console.log(this.state.currentlayer);
         console.log(this.state.landmarks)
-
-        this.state.landmarks.forEach((marker) => {
-            console.log(marker.id)
-        })
-
         // for (const marker in [...this.state.landmarks]) {
             
         // }

@@ -86,12 +86,12 @@ export class LayerContent extends React.Component {
         console.log("this.state.layerlandmarks",this.state.layerlandmarks)
 
         this.state.layerlandmarks.forEach((marker) => {
-            console.log('marker iter = ',marker)
-            console.log(marker.id + " ==? " + landmark_id)
+            // console.log('marker iter = ',marker)
+            // console.log(marker.id + " ==? " + landmark_id)
             if (marker.id == landmark_id) {
-                console.log('yes')
+                // console.log('yes')
                 oldlayer = marker.layer
-                console.log(oldlayer, marker.layer)
+                // console.log(oldlayer, marker.layer)
             }
         })
 
@@ -100,19 +100,19 @@ export class LayerContent extends React.Component {
         // }
 
         // update position if the layer has changed
-        let newposition = -1
+        let newposition = 0
+        let updateOldLayer = false
         console.log("comparing layers", oldlayer, layer)
         if (oldlayer !== layer) {
             let positions = []
-            this.props.landmarksgrouped[layer].forEach((marker) => {
-                positions.push(parseInt(marker.position))
-            })
+            if (this.props.landmarksgrouped[layer]) {
+                this.props.landmarksgrouped[layer].forEach((marker) => {
+                    positions.push(parseInt(marker.position))
+                })
+                newposition = (Math.max(...positions) + 1)
+            }
 
-            // for (var i=0; i < this.props.layerlandmarks[layer]; i++) {
-
-                
-            // }
-            newposition = (Math.max(...positions) + 1)
+            updateOldLayer = true
         }
 
         const response = axiosInstance.put(`/landmarks/${landmark_id}/`, {
@@ -135,6 +135,20 @@ export class LayerContent extends React.Component {
             this.setState({landmarks: updatedLandmarks}, this.getLandmarks)
 
         })
+
+        if (updateOldLayer) {
+            this.props.layerlandmarks.forEach((marker, index) => {
+                axiosInstance.put(`/landmarks/${marker.id}/`, {
+                    content: marker.content,
+                    markertype: marker.markertype,
+                    latitude: marker.latitude,
+                    longitude: marker.longitude,
+                    layer: marker.layer,
+                    position: (index-1)
+                })
+            })
+            updateOldLayer = false
+        }
     };
 
     // function gets all landmarks 
