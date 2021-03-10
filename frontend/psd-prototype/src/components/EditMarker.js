@@ -26,10 +26,12 @@ export default class EditMarker extends React.Component{
         value: RichTextEditor.createValueFromString(this.props.content, 'html'),
         selectedFile: null,
         images: [],
+        items: [],
         imagesEmptyText: null,
         schemas: [],
         layers: this.props.layers,
-        layer: this.props.layer
+        layer: this.props.layer,
+        currentImage: "",
     }
 
     componentDidMount() {
@@ -85,7 +87,7 @@ export default class EditMarker extends React.Component{
     }
 
     // second half of image uploading
-    uploadImage = (e) => {
+    uploadImage = () => {
         const formData = new FormData();
         formData.append('image', this.state.selectedFile, this.state.selectedFile.name);
         formData.append('landmark', this.props.id)
@@ -103,9 +105,20 @@ export default class EditMarker extends React.Component{
         })
     }
 
+    // removes landmark from state
+    removeImage = (image_id) => {
+        /* Deletes the given image from the state, by sending a DELETE request to the API */
+        const response = axiosInstance.delete(`/landmark-images/${image_id}/`)
+            .then(response => {
+                // filter out the images that have been deleted from the state
+                this.getImages()
+            })
+      };
+
     // get images for each landmark
     getImages = (e) => {
         const results = [];
+        const items = [];
         const response = axiosInstance.get('/landmark-images/', {
 
         }).then(response => response.data.forEach(item => {
@@ -113,15 +126,23 @@ export default class EditMarker extends React.Component{
                 results.push({
                     image: item.image,
                 });
+                items.push({
+                    id: item.id,
+                    landmark: item.landmark,
+                    image: item.image
+
+                })
             }
-            // console.log(results)
+            //maps results so that they can be chosen to delete
+            this.setState({images: items})
+            this.setState({currentImage: this.state.images[0]})
+            
             // maps results so that they can be displayed in image gallery
-            this.setState({images: results.map(obj => ({
+            this.setState({items: results.map(obj => ({
                 original: `${obj.image}`,
                 thumbnail: `${obj.image}`,
             }))})
         }))
-
     }
 
     render() {
@@ -147,11 +168,23 @@ export default class EditMarker extends React.Component{
 
         // conditional rendering depending on whether or not any images have been uploaded to landmark
         let imageGalleryMessage = ''
+        let imagelabel = ''
+        let imageselect = ''
+        let deleteimage = ''
+        let deletebutton = ''
+        let deletelabel = ''
+
         if (this.state.images.length == 0) {
-            imageGalleryMessage = "No images present, upload some below!"
+            imageGalleryMessage = ''
+            imageselect = ''
+            deleteimage = ''
+            deletebutton = ''
+            imagelabel = ''
+            deletelabel = ''
         }
         else {
-            imageGalleryMessage = <ImageGallery items = {this.state.images}
+            imagelabel = <InputLabel id="label">Images</InputLabel>
+            imageGalleryMessage = <ImageGallery items = {this.state.items}
                                 showIndex = {false}
                                 showBullets = {true}
                                 infinite = {true}
@@ -167,7 +200,20 @@ export default class EditMarker extends React.Component{
                                 slideInterval = {2000}
                                 slideOnThumbnailOver = {false}
                                 useWindowKeyDown = {true}/>
+
+            imageselect = this.state.images.map((e, key) =>
+            <option key={e.id} value={e.id}>{e.image}</option>);
+
+            deletelabel = <InputLabel id="label">Delete Image</InputLabel>
+
+            deleteimage = (<select value={this.state.currentImage} onChange={e => this.setState({currentImage: e.target.value})}>
+                    {imageselect}
+            </select>)
+
+            deletebutton = <button onClick={() => this.removeImage(this.state.currentImage.id)}>Delete</button>
         }
+
+        
 
         return(
             <React.Fragment>
@@ -189,8 +235,17 @@ export default class EditMarker extends React.Component{
                     {/* image gallery */}
                     <Grid item>
                         <Grid>
-                            <InputLabel id="label">Images</InputLabel>
+                            {imagelabel}
                             {imageGalleryMessage}
+                        </Grid>
+                    </Grid>
+
+                    {/* delete image button */}
+                    <Grid item>
+                        <Grid>
+                            {deletelabel}
+                            {deleteimage}
+                            {deletebutton}
                         </Grid>
                     </Grid>
 
