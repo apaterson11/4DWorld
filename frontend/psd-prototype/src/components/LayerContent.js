@@ -61,7 +61,7 @@ export class LayerContent extends React.Component {
     componentDidUpdate(prevProps, prevState) {
         //console.log("prevProps length", prevProps.landmarks.length)
         //console.log("thisProps length", this.props.landmarks.length)
-        if (prevProps.landmarks.length !== this.props.landmarks.length) {
+        if ((this.props.layerlandmarks) && (prevProps.layerlandmarks.length !== this.props.layerlandmarks.length)) {
             this.fetchData()
         }
     }
@@ -125,8 +125,8 @@ export class LayerContent extends React.Component {
                     landmarks: this.state.landmarks.filter(landmark => landmark.id !== landmark_id)
                 })
                 console.log("calling getLandmarks, layer = ", this.state.layer, ", layerlandmarks = ", this.state.layerlandmarks)
-                //this.setState({layerlandmarks: []})
-                //this.getLandmarks()
+                this.setState({layerlandmarks: []})
+                this.getLandmarks()
             })
       };
 
