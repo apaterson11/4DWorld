@@ -15,6 +15,11 @@ require("./EditMarker.css");
 
 // popup attached to landmark
 export default class EditMarker extends React.Component{
+    constructor(props) {
+        super(props)
+        this.refImageSelect = React.createRef();    // reference used to set current image
+    }
+
     state = {
         landmarks: this.props.landmarks,
         layerlandmarks:this.props.layerlandmarks,
@@ -89,7 +94,8 @@ export default class EditMarker extends React.Component{
     // second half of image uploading
     uploadImage = () => {
         const formData = new FormData();
-        formData.append('image', this.state.selectedFile, this.state.selectedFile.name);
+        formData.append('image', this.state.selectedFile, this.state.selectedFile.name)
+        formData.append('image_name', this.state.selectedFile.name)
         formData.append('landmark', this.props.id)
 
         const config = {
@@ -117,12 +123,12 @@ export default class EditMarker extends React.Component{
 
     // get images for each landmark
     getImages = (e) => {
-        console.log("getimages called")
         const results = [];
         const items = [];
         const response = axiosInstance.get('/landmark-images/', {
 
         }).then(response => response.data.forEach(item => {
+            console.log(item)
             if (item.landmark == this.props.id) {   // matches up each series of images to their corresponding landmark
                 results.push({
                     image: item.image,
@@ -130,12 +136,10 @@ export default class EditMarker extends React.Component{
                 items.push({
                     id: item.id,
                     landmark: item.landmark,
-                    image: item.image
+                    image: item.image,
+                    image_name: item.image_name,
                 })
             }
-            //maps results so that they can be chosen to delete
-            console.log("items", items)
-            this.setState({images: items})
             
             // maps results so that they can be displayed in image gallery
             this.setState({items: results.map(obj => ({
@@ -143,15 +147,14 @@ export default class EditMarker extends React.Component{
                 thumbnail: `${obj.image}`,
             }))})
         }))
-        console.log(this.state.images)
-            if (this.state.images.length > 0) {
-                console.log("length > 0")
-                this.setState({currentImage: this.state.images[0]})
-            }
-            else {
-                console.log("length 0")
-                this.setState({currentImage: ''})
-            }
+
+        this.setState({images: items})
+        if (this.state.images.length > 0) {
+            this.setState({currentImage: this.state.images[0]})
+        }
+        else {
+            this.setState({currentImage: ''})
+        }
     }
 
     render() {
@@ -211,26 +214,20 @@ export default class EditMarker extends React.Component{
                                 useWindowKeyDown = {true}/>
 
             imageselect = this.state.images.map((e, key) =>
-            <option key={e.id} value={e.id}>{e.image}</option>);
+            <option key={e.id} value={e.id}>{e.image_name}</option>);
 
             deletelabel = <InputLabel id="label">Delete Image</InputLabel>
 
-            deleteimage = (<select value={this.state.currentImage} onFocus={e => this.setState({currentImage: e.target.value})} onChange={e => this.setState({currentImage: e.target.value})}>
+            deleteimage = (<select onFocus={e => this.setState({currentImage: e.target.value})} onChange={e => this.setState({currentImage: e.target.value})} required>
+                    <option value='' selected disabled>Select an image...</option>
                     {imageselect}
             </select>)
-            console.log(this.state.currentImage)
-            deletebutton = <button onClick={() => this.removeImage(this.state.currentImage)}>Delete</button>
+            deletebutton = <button disabled={!this.state.currentImage} onClick={() => this.removeImage(this.state.currentImage)}>Delete</button>
         }
-
-        
 
         return(
             <React.Fragment>
                 <Grid container spacing={2} direction="column">
-                    <Grid item>
-                        {"position = " + this.props.position}
-                    </Grid>
-
                     {/* rich text editor for editing text content */}
                     <Grid item>
                         <InputLabel id="label">Content</InputLabel>
@@ -261,8 +258,8 @@ export default class EditMarker extends React.Component{
                     {/* upload image button */}
                     <Grid item>
                         <InputLabel id="label">Upload new image</InputLabel>
-                        <input type="file" onChange={this.fileSelectedHandler}/>
-                        <button onClick={this.uploadImage}>Upload</button>
+                        <input type="file" onChange={this.fileSelectedHandler} required/>
+                        <button disabled={!this.state.selectedFile} onClick={this.uploadImage}>Upload</button>
                     </Grid>
 
                     {/* icon type */}

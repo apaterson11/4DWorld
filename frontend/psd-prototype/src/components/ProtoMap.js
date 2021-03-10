@@ -53,13 +53,6 @@ const markerText = {
     autoClose: true,
 }
 
-// const groupBy = (arr, property) => {
-//     return arr.reduce((acc, cur) => {
-//       acc[cur[property]] = [...acc[cur[property]] || [], cur];
-//       return acc;
-//     }, {});
-// }
-
 const groupBy = (array, fn) => array.reduce((result, item) => {
     const key = fn(item);
     if (!result[key]) result[key] = [];
@@ -99,7 +92,6 @@ class ProtoMap extends React.Component {
     // }
 
     rerenderParentCallback() {
-        console.log("force parent update")
         axiosInstance.get('/landmarks/').then(response => this.setState({landmarks: response.data, fetched: true}))
         axiosInstance.get('/layers/').then(response => this.setState({layers: response.data, fetched: true}))
         this.forceUpdate();
@@ -190,11 +182,6 @@ class ProtoMap extends React.Component {
             // layer select dropdown menu
             layerselect = this.state.layers.map((e, key) =>
             <option key={e.id} value={e.id}>{e.name}</option>);
-        
-
-
-
-            
 
         return (
             <Map onViewportChanged={this.onViewportChanged} 
