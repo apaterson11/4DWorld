@@ -1,5 +1,5 @@
 import React from "react";
-import {Map, TileLayer, Marker, Polyline, LayersControl, LayerGroup, Circle} from 'react-leaflet';
+import {Map, TileLayer, Marker, Popup, Polyline, LayersControl, LayerGroup, Circle, withLeaflet} from 'react-leaflet';
 import Control from '@skyeer/react-leaflet-custom-control' 
 import axiosInstance from '../axios'
 import {LayerContent, getLandmarks, addMarker} from './LayerContent';
@@ -23,6 +23,7 @@ import {
     trading,
     village
 } from './Icons';
+import { __RouterContext } from "react-router";
 
 require("./LayerControl.css");
 require("./ProtoMap.css");
@@ -46,6 +47,26 @@ const iconRef = {"army": army,
                  "village": village
                  };
 
+const markerText = {
+    popupContent: '<h2>sample text</h2>sample text',
+    open: false,
+    autoClose: true,
+}
+
+// const groupBy = (arr, property) => {
+//     return arr.reduce((acc, cur) => {
+//       acc[cur[property]] = [...acc[cur[property]] || [], cur];
+//       return acc;
+//     }, {});
+// }
+
+const groupBy = (array, fn) => array.reduce((result, item) => {
+    const key = fn(item);
+    if (!result[key]) result[key] = [];
+    result[key].push(item);
+    return result;
+  }, {});
+
 class ProtoMap extends React.Component {
 
     constructor(props) {
@@ -64,16 +85,56 @@ class ProtoMap extends React.Component {
         landmarks: [],
         layers: [],
         layerlandmarks: [],
-        currentlayer: "",
         layer_name: "",
         layer_desc: "",
         canClick: false,    // add marker functionality, changes when "add marker" button is clicked
+        currentlayer: '',
+        splitlandmarks: []
     }
 
-    componentDidMount() {
-        /* Fetch the list of landmarks on component loading */
-        axiosInstance.get('/landmarks/').then(response => this.setState({landmarks: response.data, fetched: true}))
-        axiosInstance.get('/layers/').then(response => this.setState({layers: response.data, fetched: true}))
+    componentDidUpdate(prevProps, prevState) {
+
+
+        if (prevState.landmarks.length !== this.state.landmarks.length) {
+            this.getData()
+        }
+    }
+
+    componentDidMount(){
+        this.getData()
+    }
+
+    getData = async() => {
+        await axiosInstance.get('/landmarks/').then(response => this.setState({landmarks: response.data, fetched: true}))
+        await axiosInstance.get('/layers/').then(response => this.setState({layers: response.data, fetched: true}))
+        this.getSplitLandmarks()
+
+    }
+    
+    getSplitLandmarks = () => {
+        console.log('getSplitLandmarks start')
+        console.log('landmark size (getSPLIT) = ',this.state.landmarks.length)
+
+        // console.log([...this.state.landmarks]);
+
+        let splitlandmarks = groupBy([...this.state.landmarks], i => i.layer)
+        const testtt = Object.entries(splitlandmarks)
+        
+        console.log("splitlandmarks =",splitlandmarks);
+
+    
+        console.log(testtt);
+
+        this.setState({splitlandmarks: splitlandmarks})
+
+
+
+        console.log(this.state.splitlandmarks);
+        
+        console.log("after-----", this.state.landmarks)
+
+
+
     }
 
     // handleClick = () => {
@@ -102,10 +163,13 @@ class ProtoMap extends React.Component {
             position: pos,
         }).then(response => {
             let newLandmarks = [...this.state.landmarks] // copy original state
-            newLandmarks.push(response.data)  // add the new landmark to the copy
-            this.setState({landmarks: newLandmarks}) // update the state with the new landmark
-            this.refAddMarkerButton.click();    // reset add marker button
+            console.log('landmark size BEFORE = ',this.state.landmarks.length)
+            newLandmarks.push(response.data);
+            this.setState({landmarks: newLandmarks}, this.getSplitLandmarks) // update the state with the new landmark
+            this.refAddMarkerButton.click();
         })
+        
+        
     };
 
     // function adds new layer through "add layer" button
@@ -141,14 +205,18 @@ class ProtoMap extends React.Component {
         const {fetched, landmarks, popup} = this.state 
         let content = ''
         let lines = ''
+        const landmarksgrouped = groupBy([...this.state.landmarks], i => i.layer)
+        const groupedvalues = Object.values(landmarksgrouped)
 
             // toggle layer visibility menu
             let renderlayers = ''
-            renderlayers = this.state.layers.map((e, key) =>
+            console.log("swag ", this.state.splitlandmarks)
+            console.log("swag 2 ", this.state.splitlandmarks[1])
+            renderlayers = this.state.layers.map((e, index) =>
 
             <LayersControl.Overlay key={e.id} checked name={e.name}>
                 <LayerGroup>
-                    <LayerContent layer={e.id} landmark_id={this.state.id} layerlandmarks={this.state.layerlandmarks} content={this.state.content} latitude={this.props.latitude} longitude={this.props.longitude} markertype={this.state.markertype} position={this.state.position} layers={this.state.layers} landmarks={this.state.landmarks}></LayerContent>
+                    <LayerContent key={e.id} layer={e.id} newlandmarks={groupedvalues[0]} landmark_id={this.state.id} splitlandmarks={this.state.landmarks} content={this.state.content} latitude={this.props.latitude} longitude={this.props.longitude} markertype={this.state.markertype} position={this.state.position} layers={this.state.layers} landmarks={this.state.landmarks}></LayerContent>
                 </LayerGroup>
             </LayersControl.Overlay>);
 
