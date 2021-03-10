@@ -40,6 +40,7 @@ export class LayerContent extends React.Component {
     state = {
                 landmarks: this.props.landmarks,
                 layerlandmarks: this.props.layerlandmarks,
+                landmarksgrouped: this.props.landmarksgrouped,
                 layers: this.props.layers,
                 layer: this.props.layer,
                 landmark_id: this.props.landmark_id,
@@ -60,7 +61,6 @@ export class LayerContent extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        // this.fetchData()
         if (this.props.layerlandmarks && prevProps.layerlandmarks) {
             if (prevProps.layerlandmarks.length !== this.props.layerlandmarks.length) {
                 this.fetchData()
@@ -153,7 +153,6 @@ export class LayerContent extends React.Component {
 
     // function gets all landmarks 
     getLandmarks = async() => {
-        // console.log("getLandmarks")
         const results = [];
         const response = await axiosInstance.get('/landmarks/', {
         }).then(response => response.data.forEach(item => {
@@ -179,7 +178,6 @@ export class LayerContent extends React.Component {
                 this.setState({
                     landmarks: this.state.landmarks.filter(landmark => landmark.id !== landmark_id)
                 })
-                console.log("calling getLandmarks, layer = ", this.state.layer, ", layerlandmarks = ", this.state.layerlandmarks)
                 this.setState({layerlandmarks: []})
                 this.getLandmarks()
             })
@@ -187,7 +185,6 @@ export class LayerContent extends React.Component {
 
     render() {
             const layerlandmarks = this.state.layerlandmarks
-            // console.log("layerlandmarks", this.state.layer, layerlandmarks)
             let content = ''
             let lines = ''
 
