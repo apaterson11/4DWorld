@@ -33,6 +33,10 @@ const iconRef = {"army": army,
 
 export class LayerContent extends React.Component {
 
+    constructor(props) {
+        super(props);
+    }
+
     state = {
                 landmarks: this.props.landmarks,
                 layerlandmarks: this.props.layerlandmarks,
@@ -48,9 +52,6 @@ export class LayerContent extends React.Component {
 
     componentDidMount() {
         this.fetchData()
-        //console.log("layercontent layerlandmarks = ",this.state.layerlandmarks);
-        //console.log(this.props.newlandmarks);
-    
     }
 
     fetchData() {
@@ -59,22 +60,26 @@ export class LayerContent extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
-        //console.log("prevProps length", prevProps.landmarks.length)
-        //console.log("thisProps length", this.props.landmarks.length)
-        if ((this.props.layerlandmarks) && (prevProps.layerlandmarks.length !== this.props.layerlandmarks.length)) {
+        // this.fetchData()
+        if (this.props.layerlandmarks && prevProps.layerlandmarks) {
+            if (prevProps.layerlandmarks.length !== this.props.layerlandmarks.length) {
+                this.fetchData()
+            }
+        }
+        else if (this.props.layerlandmarks) {
             this.fetchData()
         }
     }
 
     submitEdit = (layer, content, icontype, lat, lng, id, pos, layerlandmarks) => {
         this.updateLandmarks(layer, content, icontype, lat, lng, id, pos, layerlandmarks)
-        window.location.reload();
     }
 
     updateLandmarks = (layer, content, markertype, lat, lng, landmark_id, position, layerlandmarks) => {
         /* Updates the landmarks by sending a PUT request to the API,
            and updating the state in the then() callback
         */
+
         const response = axiosInstance.put(`/landmarks/${landmark_id}/`, {
             content: content,
             markertype: markertype,
@@ -92,14 +97,14 @@ export class LayerContent extends React.Component {
             updatedLandmarks.splice(idx, 1, response.data)
 
             // set the state with the newly updated landmark
-            this.setState({
-                landmarks: updatedLandmarks
-            })
+            this.setState({landmarks: updatedLandmarks}, this.getLandmarks)
+
         })
     };
 
     // function gets all landmarks 
     getLandmarks = async() => {
+        console.log("getLandmarks")
         const results = [];
         const response = await axiosInstance.get('/landmarks/', {
         }).then(response => response.data.forEach(item => {
@@ -108,6 +113,7 @@ export class LayerContent extends React.Component {
             }
         }))
         this.setState({layerlandmarks: results})
+        this.props.rerenderParentCallback() // rerender ProtoMap to display change in layers
     }
 
     // used for passing through to editmarker.js
@@ -132,65 +138,70 @@ export class LayerContent extends React.Component {
 
     render() {
             const layerlandmarks = this.state.layerlandmarks
-            console.log("layerlandmarks", layerlandmarks)
+            console.log("layerlandmarks", this.state.layer, layerlandmarks)
             let content = ''
             let lines = ''
 
             // content renders all the landmarks onto the map 
-            content = layerlandmarks.map((landmark, index) =>
-            <Marker key={landmark.id} position={[landmark.latitude, landmark.longitude]} icon={(landmark.markertype in iconRef) ? iconRef[landmark.markertype] : blueIcon} >
-                <Popup 
-                autoClose={false} 
-                nametag={'marker'}
-                minWidth={400} 
-                maxWidth={2000}
-                >
-                <React.Fragment>
-                {/* EditMarker is the popup attached to each landmark */}
-                <EditMarker 
-                    landmarks={this.state.landmarks}
-                    layerlandmarks={this.state.layerlandmarks}
-                    content={landmark.content} 
-                    position={landmark.position}
-                    icontype={landmark.markertype}  
-                    lat = {landmark.latitude}
-                    lng = {landmark.longitude}
-                    id = {landmark.id}
-                    layer = {this.state.layer}
-                    layers = {this.state.layers}
-                    markerEdit={this.submitEdit}
-                    markerDelete={this.submitDelete}>
-                </EditMarker>
-                </React.Fragment>
-                </Popup>
-            </Marker>)
-     
-            // make copies of landmarks array
-            let fromLandmarks = [...this.state.layerlandmarks];
-            let toLandmarks = [...this.state.layerlandmarks]; 
-
-                fromLandmarks.pop()
-                fromLandmarks.sort((a, b) => a.position > b.position ? 1 : -1);
-                toLandmarks = toLandmarks.slice(1)
-                toLandmarks.sort((a, b) => a.position > b.position ? 1 : -1);
-
-            // range(length of fromLandmarks)
-            let range = Array(fromLandmarks.length).fill().map((x,i)=>i)
-
-                lines = range.map((i) => 
-                    <Polyline 
-                            key={fromLandmarks.id} 
-                            positions={[[fromLandmarks[i].latitude, fromLandmarks[i].longitude], [toLandmarks[i].latitude, toLandmarks[i].longitude]]} 
-                            color={'red'} />)
-                // creates one line between each pair of markers
-                return (
+            if (this.state.layerlandmarks) {
+                content = layerlandmarks.map((landmark, index) =>
+                <Marker key={landmark.id} position={[landmark.latitude, landmark.longitude]} icon={(landmark.markertype in iconRef) ? iconRef[landmark.markertype] : blueIcon} >
+                    <Popup 
+                    autoClose={false} 
+                    nametag={'marker'}
+                    minWidth={400} 
+                    maxWidth={2000}
+                    >
                     <React.Fragment>
-                        {content}
-                        {lines}
+                    {/* EditMarker is the popup attached to each landmark */}
+                    <EditMarker 
+                        landmarks={this.state.landmarks}
+                        layerlandmarks={this.state.layerlandmarks}
+                        content={landmark.content} 
+                        position={landmark.position}
+                        icontype={landmark.markertype}  
+                        lat = {landmark.latitude}
+                        lng = {landmark.longitude}
+                        id = {landmark.id}
+                        layer = {this.state.layer}
+                        layers = {this.state.layers}
+                        markerEdit={this.submitEdit}
+                        markerDelete={this.submitDelete}>
+                    </EditMarker>
                     </React.Fragment>
-                )
-            }
+                    </Popup>
+                </Marker>)
+        
+                // make copies of landmarks array
+                let fromLandmarks = [...this.state.layerlandmarks];
+                let toLandmarks = [...this.state.layerlandmarks]; 
 
+                    fromLandmarks.pop()
+                    fromLandmarks.sort((a, b) => a.position > b.position ? 1 : -1);
+                    toLandmarks = toLandmarks.slice(1)
+                    toLandmarks.sort((a, b) => a.position > b.position ? 1 : -1);
+
+                // range(length of fromLandmarks)
+                let range = Array(fromLandmarks.length).fill().map((x,i)=>i)
+
+                    lines = range.map((i) => 
+                        <Polyline 
+                                key={fromLandmarks.id} 
+                                positions={[[fromLandmarks[i].latitude, fromLandmarks[i].longitude], [toLandmarks[i].latitude, toLandmarks[i].longitude]]} 
+                                color={'red'} />)
+                    // creates one line between each pair of markers
+                    return (
+                        <React.Fragment>
+                            {content}
+                            {lines}
+                        </React.Fragment>
+                    )
+                }
+                else {
+                    return null
+                }
+            }
+            
         
             
     }

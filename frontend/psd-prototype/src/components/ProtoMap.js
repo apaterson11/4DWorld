@@ -74,6 +74,7 @@ class ProtoMap extends React.Component {
         this.handleLayer = this.handleLayer.bind(this);
         this.refLayerSelect = React.createRef();    // reference used to set current layer
         this.refAddMarkerButton = React.createRef();    // reference used to control add marker button
+        this.rerenderParentCallback = this.rerenderParentCallback.bind(this);
     }
 
     state = {
@@ -89,7 +90,6 @@ class ProtoMap extends React.Component {
         layer_desc: "",
         canClick: false,    // add marker functionality, changes when "add marker" button is clicked
         currentlayer: '',
-        splitlandmarks: []
     }
 
     // componentDidUpdate(prevProps, prevState) {
@@ -98,17 +98,16 @@ class ProtoMap extends React.Component {
     //     }
     // }
 
+    rerenderParentCallback() {
+        console.log("force parent update")
+        axiosInstance.get('/landmarks/').then(response => this.setState({landmarks: response.data, fetched: true}))
+        axiosInstance.get('/layers/').then(response => this.setState({layers: response.data, fetched: true}))
+        this.forceUpdate();
+    }
+
     componentDidMount() {
         axiosInstance.get('/landmarks/').then(response => this.setState({landmarks: response.data, fetched: true}))
         axiosInstance.get('/layers/').then(response => this.setState({layers: response.data, fetched: true}))
-    }
-    
-    getSplitLandmarks = () => {
-        let split = groupBy([...this.state.landmarks], i => i.layer)
-        console.log("1 ", split)
-        const testtt = Object.entries(split)
-
-        this.setState({splitlandmarks: split})
     }
 
     // function to enter into the "add marker" state and indicate to user that button is active
@@ -175,24 +174,25 @@ class ProtoMap extends React.Component {
         const {fetched, landmarks, popup} = this.state 
         let content = ''
         let lines = ''
+        let renderlayers = ''
+        let layerselect = ''
         let landmarksgrouped = groupBy([...this.state.landmarks], i => i.layer)
-        let groupedvalues = Object.values(landmarksgrouped)
 
             // toggle layer visibility menu
-            let renderlayers = ''
             renderlayers = this.state.layers.map((e, index) =>
 
             <LayersControl.Overlay key={e.id} checked name={e.name}>
                 <LayerGroup>
-                    <LayerContent key={e.id} layer={e.id} layerlandmarks={landmarksgrouped[e.id]} landmark_id={this.state.id} content={this.state.content} latitude={this.props.latitude} longitude={this.props.longitude} markertype={this.state.markertype} position={this.state.position} layers={this.state.layers} landmarks={this.state.landmarks}></LayerContent>
+                    <LayerContent key={e.id} layer={e.id} landmarksgrouped={landmarksgrouped} layerlandmarks={landmarksgrouped[e.id]} landmark_id={this.state.id} content={this.state.content} latitude={this.props.latitude} longitude={this.props.longitude} markertype={this.state.markertype} position={this.state.position} layers={this.state.layers} landmarks={this.state.landmarks} rerenderParentCallback={this.rerenderParentCallback}></LayerContent>
                 </LayerGroup>
             </LayersControl.Overlay>);
 
             // layer select dropdown menu
-            let layerselect = ''
             layerselect = this.state.layers.map((e, key) =>
             <option key={e.id} value={e.id}>{e.name}</option>);
-            
+        
+
+
 
             
 
