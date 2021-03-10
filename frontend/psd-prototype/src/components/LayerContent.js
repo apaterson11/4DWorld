@@ -51,23 +51,17 @@ export class LayerContent extends React.Component {
     }
 
     fetchData() {
-        console.log("data being fetched...")
-        console.log("calling getLandmarks, layer = ", this.state.layer, ", layerlandmarks = ", this.state.layerlandmarks)
         this.setState({layerlandmarks: []})
         this.getLandmarks()
     }
 
     componentDidUpdate(prevProps, prevState) {
-        // console.log("prevProps length", prevProps.landmarks.length)
-        // console.log("thisProps length", this.props.landmarks.length)
         if (prevProps.landmarks.length !== this.props.landmarks.length) {
             this.fetchData()
         }
     }
 
     submitEdit = (layer, content, icontype, lat, lng, id, pos, layerlandmarks) => {
-        //console.log(layer, layerlandmarks)  // layer it is changing to
-        //console.log(this.state.layer, this.props.layerlandmarks)   // layer it used to be
         this.updateLandmarks(layer, content, icontype, lat, lng, id, pos, layerlandmarks)
         window.location.reload();
     }
@@ -99,9 +93,8 @@ export class LayerContent extends React.Component {
         })
     };
 
+    // function gets all landmarks 
     getLandmarks = async() => {
-        // console.log("layer: ", layer, "#####################")
-        // console.log("layer: ", layer, ", getLandmarks called");
         const results = [];
         const response = await axiosInstance.get('/landmarks/', {
         }).then(response => response.data.forEach(item => {
@@ -110,17 +103,14 @@ export class LayerContent extends React.Component {
             }
         }))
         this.setState({layerlandmarks: results})
-        // console.log("layer: ", layer, ", about to set state now")
-        // console.log("layer: ", layer, ", results", results)
-        // console.log("layer: ", layer, ", layer landmarks:", layerlandmarks)
-
-        // console.log("layer: ", layer, "#####################")
     }
 
+    // used for passing through to editmarker.js
     submitDelete = (id) => {
         this.removeMarkerFromState(id)
     }
 
+    // removes landmark from state
     removeMarkerFromState = (landmark_id) => {
         /* Deletes the given landmark from the state, by sending a DELETE request to the API */
         const response = axiosInstance.delete(`/landmarks/${landmark_id}/`)
@@ -136,11 +126,11 @@ export class LayerContent extends React.Component {
       };
 
     render() {
-        
             const layerlandmarks = this.state.layerlandmarks
             let content = ''
             let lines = ''
 
+            // content renders all the landmarks onto the map 
             content = layerlandmarks.map((landmark, index) =>
             <Marker key={landmark.id} position={[landmark.latitude, landmark.longitude]} icon={(landmark.markertype in iconRef) ? iconRef[landmark.markertype] : blueIcon} >
                 <Popup 
@@ -150,6 +140,7 @@ export class LayerContent extends React.Component {
                 maxWidth={2000}
                 >
                 <React.Fragment>
+                {/* EditMarker is the popup attached to each landmark */}
                 <EditMarker 
                     landmarks={this.state.landmarks}
                     layerlandmarks={this.state.layerlandmarks}
@@ -165,29 +156,20 @@ export class LayerContent extends React.Component {
                     markerDelete={this.submitDelete}>
                 </EditMarker>
                 </React.Fragment>
-                
                 </Popup>
             </Marker>)
      
-
+            // make copies of landmarks array
             let fromLandmarks = [...this.state.layerlandmarks];
             let toLandmarks = [...this.state.layerlandmarks]; 
-            // make copies of landmarks array
 
             fromLandmarks.pop()
             fromLandmarks.sort((a, b) => a.position > b.position ? 1 : -1);
             toLandmarks = toLandmarks.slice(1)
             toLandmarks.sort((a, b) => a.position > b.position ? 1 : -1);
 
-
-            //console.log("from = ",fromLandmarks);
-            //console.log("to = ",toLandmarks);
-            // two new arrays, from = [1st marker ... 2nd last] and to = [2nd marker ... last]
-
-            // console.log("fromLandmarks = ", fromLandmarks[5].latitude);
-
-            let range = Array(fromLandmarks.length).fill().map((x,i)=>i)
             // range(length of fromLandmarks)
+            let range = Array(fromLandmarks.length).fill().map((x,i)=>i)
 
             lines = range.map((i) => 
                 <Polyline 
