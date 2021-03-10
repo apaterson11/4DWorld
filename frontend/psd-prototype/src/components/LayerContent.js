@@ -68,7 +68,7 @@ export class LayerContent extends React.Component {
 
     submitEdit = (layer, content, icontype, lat, lng, id, pos, layerlandmarks) => {
         this.updateLandmarks(layer, content, icontype, lat, lng, id, pos, layerlandmarks)
-        // window.location.reload();
+        window.location.reload();
     }
 
     updateLandmarks = (layer, content, markertype, lat, lng, landmark_id, position, layerlandmarks) => {
