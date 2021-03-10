@@ -117,7 +117,7 @@ export default class EditMarker extends React.Component{
 
     // get images for each landmark
     getImages = (e) => {
-        console.log("getimages called")
+        // console.log("getimages called")
         const results = [];
         const items = [];
         const response = axiosInstance.get('/landmark-images/', {
@@ -143,13 +143,13 @@ export default class EditMarker extends React.Component{
                 thumbnail: `${obj.image}`,
             }))})
         }))
-        console.log(this.state.images)
+        // console.log(this.state.images)
             if (this.state.images.length > 0) {
                 console.log("length > 0")
                 this.setState({currentImage: this.state.images[0]})
             }
             else {
-                console.log("length 0")
+                // console.log("length 0")
                 this.setState({currentImage: ''})
             }
     }

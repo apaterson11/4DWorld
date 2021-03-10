@@ -80,13 +80,48 @@ export class LayerContent extends React.Component {
            and updating the state in the then() callback
         */
 
+        // get the current layer of the changing marker
+        let oldlayer = -1
+
+        console.log("this.state.layerlandmarks",this.state.layerlandmarks)
+
+        this.state.layerlandmarks.forEach((marker) => {
+            console.log('marker iter = ',marker)
+            console.log(marker.id + " ==? " + landmark_id)
+            if (marker.id == landmark_id) {
+                console.log('yes')
+                oldlayer = marker.layer
+                console.log(oldlayer, marker.layer)
+            }
+        })
+
+        // for (var marker in [...this.state.layerlandmarks]) {
+        
+        // }
+
+        // update position if the layer has changed
+        let newposition = -1
+        console.log("comparing layers", oldlayer, layer)
+        if (oldlayer !== layer) {
+            let positions = []
+            this.props.landmarksgrouped[layer].forEach((marker) => {
+                positions.push(parseInt(marker.position))
+            })
+
+            // for (var i=0; i < this.props.layerlandmarks[layer]; i++) {
+
+                
+            // }
+            newposition = (Math.max(...positions) + 1)
+        }
+
         const response = axiosInstance.put(`/landmarks/${landmark_id}/`, {
             content: content,
             markertype: markertype,
             latitude: lat,
             longitude: lng,
             layer: layer,
-            position: position
+            position: newposition
         }).then(response => {
             let updatedLandmarks = [...this.state.landmarks]  // copy original state
             
@@ -104,7 +139,7 @@ export class LayerContent extends React.Component {
 
     // function gets all landmarks 
     getLandmarks = async() => {
-        console.log("getLandmarks")
+        // console.log("getLandmarks")
         const results = [];
         const response = await axiosInstance.get('/landmarks/', {
         }).then(response => response.data.forEach(item => {
@@ -138,7 +173,7 @@ export class LayerContent extends React.Component {
 
     render() {
             const layerlandmarks = this.state.layerlandmarks
-            console.log("layerlandmarks", this.state.layer, layerlandmarks)
+            // console.log("layerlandmarks", this.state.layer, layerlandmarks)
             let content = ''
             let lines = ''
 
