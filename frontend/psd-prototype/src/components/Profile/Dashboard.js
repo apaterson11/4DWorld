@@ -4,6 +4,7 @@ import Grid from '@material-ui/core/Grid';
 import Paper from '@material-ui/core/Paper';
 import ProfileCard from './ProfileCard'
 import ProjectContainer from '../Project/ProjectContainer'
+import DropFileContainer from '../Project/DropFileContainer'
 import UserGroupsCard from './UserGroupsCard'
 import { UserContext } from '../../Context';
 import Spinner from '../Spinner';
@@ -21,7 +22,9 @@ function Dashboard() {
     const classes = useStyles();
     const {userDetails, setUserDetails} = useContext(UserContext)
 
-    const [students, setStudents] = React.useState([]);
+    const [students, setStudents] = React.useState([
+        {email: "fake@gmail.com", name: "fake"}
+    ]);
 
     useEffect(() => {
         if (userDetails === undefined) {
@@ -45,40 +48,10 @@ function Dashboard() {
                         <UserGroupsCard />
                     </Grid>
 
-                    <div>
-                        <h3>Import CSV File</h3>
-                        <div                
-                            onDragOver={(e) => {
-                                e.preventDefault();
-                            }}
-
-                            onDrop={(e) => {
-                                e.preventDefault();
-
-                                Array.from(e.dataTransfer.files)
-                                .filter((file) => file.type === "text/csv")
-                                .forEach((file) => {
-                                    const text =  file.text();
-                                    console.log(text);
-                                });
-
-                            }}                     
-                        >
-                        
-                        Drop Here Hello 1
-                        </div>
-
-                        <ul>
-                            {students.map((student) => (
-                            <li key={student.Email}>
-                                <strong>{student.First}</strong>: {student.Email}
-                            </li>
-                            ))}
-                        </ul>
-
-
-                    </div>
-
+                    <Grid item xs={12}>
+                        <DropFileContainer />
+                    </Grid>
+                    
 
                 </Grid>
                 <Grid item wrap='wrap' xs={12} sm={6} md={8} className={classes.pad}>
