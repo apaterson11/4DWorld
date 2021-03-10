@@ -54,17 +54,14 @@ export class LayerContent extends React.Component {
     }
 
     fetchData() {
-        //console.log("data being fetched...")
-        //console.log("calling getLandmarks, layer = ", this.state.layer, ", layerlandmarks = ", this.state.layerlandmarks)
-        // let splitlandmarks = Object.values([...this.state.splitlandmarks])
-        // this.setState({layerlandmarks: splitlandmarks[this.state.layer]})
-        // this.getLandmarks()
+        this.setState({layerlandmarks: []})
+        this.getLandmarks()
     }
 
     componentDidUpdate(prevProps, prevState) {
         //console.log("prevProps length", prevProps.landmarks.length)
         //console.log("thisProps length", this.props.landmarks.length)
-        if ((this.props.layerlandmarks) && (prevProps.layerlandmarks.length !== this.props.layerlandmarks.length)) {
+        if (prevProps.landmarks.length !== this.props.landmarks.length) {
             this.fetchData()
         }
     }

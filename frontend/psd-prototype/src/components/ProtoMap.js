@@ -135,7 +135,7 @@ class ProtoMap extends React.Component {
             let newLandmarks = [...this.state.landmarks] // copy original state
             //console.log('landmark size BEFORE = ',this.state.landmarks.length)
             newLandmarks.push(response.data);
-            this.setState({landmarks: newLandmarks}, this.getSplitLandmarks) // update the state with the new landmark
+            this.setState({landmarks: newLandmarks}) // update the state with the new landmark
             this.refAddMarkerButton.click();
         })
         
@@ -175,8 +175,8 @@ class ProtoMap extends React.Component {
         const {fetched, landmarks, popup} = this.state 
         let content = ''
         let lines = ''
-        const landmarksgrouped = groupBy([...this.state.landmarks], i => i.layer)
-        const groupedvalues = Object.values(landmarksgrouped)
+        let landmarksgrouped = groupBy([...this.state.landmarks], i => i.layer)
+        let groupedvalues = Object.values(landmarksgrouped)
 
             // toggle layer visibility menu
             let renderlayers = ''
