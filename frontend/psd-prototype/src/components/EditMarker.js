@@ -117,6 +117,7 @@ export default class EditMarker extends React.Component{
 
     // get images for each landmark
     getImages = (e) => {
+        console.log("getimages called")
         const results = [];
         const items = [];
         const response = axiosInstance.get('/landmark-images/', {
@@ -130,12 +131,11 @@ export default class EditMarker extends React.Component{
                     id: item.id,
                     landmark: item.landmark,
                     image: item.image
-
                 })
             }
             //maps results so that they can be chosen to delete
+            console.log("items", items)
             this.setState({images: items})
-            this.setState({currentImage: this.state.images[0]})
             
             // maps results so that they can be displayed in image gallery
             this.setState({items: results.map(obj => ({
@@ -143,6 +143,15 @@ export default class EditMarker extends React.Component{
                 thumbnail: `${obj.image}`,
             }))})
         }))
+        console.log(this.state.images)
+            if (this.state.images.length > 0) {
+                console.log("length > 0")
+                this.setState({currentImage: this.state.images[0]})
+            }
+            else {
+                console.log("length 0")
+                this.setState({currentImage: ''})
+            }
     }
 
     render() {
@@ -206,11 +215,11 @@ export default class EditMarker extends React.Component{
 
             deletelabel = <InputLabel id="label">Delete Image</InputLabel>
 
-            deleteimage = (<select value={this.state.currentImage} onChange={e => this.setState({currentImage: e.target.value})}>
+            deleteimage = (<select value={this.state.currentImage} onFocus={e => this.setState({currentImage: e.target.value})} onChange={e => this.setState({currentImage: e.target.value})}>
                     {imageselect}
             </select>)
-
-            deletebutton = <button onClick={() => this.removeImage(this.state.currentImage.id)}>Delete</button>
+            console.log(this.state.currentImage)
+            deletebutton = <button onClick={() => this.removeImage(this.state.currentImage)}>Delete</button>
         }
 
         
