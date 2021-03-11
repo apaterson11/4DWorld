@@ -48,7 +48,7 @@ function ProjectContainer(props) {
             return <Typography>You have no projects yet</Typography>
         }
         return projects.map(
-            project => <ProjectCard title={project.title} key={project.id}/>
+            project => <ProjectCard project={project} key={project.id}/>
         )
     }
 
