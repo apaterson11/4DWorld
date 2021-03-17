@@ -247,7 +247,7 @@ class ProtoMap extends React.Component {
                     closeOnDocumentClick
                 >
                     <span>
-                        <LayerControl layers = {this.state.layers} currentlayer = {this.state.currentlayer}/>
+                        <LayerControl layers = {this.state.layers} currentlayer = {this.state.currentlayer} landmarksgrouped = {landmarksgrouped} landmarks = {this.state.landmarks}/>
                     </span>
                 </Popup>
                 
