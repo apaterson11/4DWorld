@@ -20,6 +20,10 @@ class LandmarkAdmin(admin.ModelAdmin):
     inlines = [LandmarkImageAdmin]
     list_display = ('content', 'latitude', 'longitude', 'layer', 'map')
 
+@admin.register(Layer)
+class LayerAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'description', 'map')
+
 @admin.register(LandmarkImage)
 class LandmarkImageAdmin(admin.ModelAdmin):
     pass
@@ -31,4 +35,3 @@ admin.site.register(Project)
 admin.site.register(Profile)
 admin.site.register(State)
 admin.site.register(MapStyle)
-admin.site.register(Layer)
