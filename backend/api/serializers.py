@@ -48,7 +48,7 @@ class LandmarkSerializer(ModelSerializer):
 class LandmarkImageSerializer(ModelSerializer):
     class Meta:
         model = LandmarkImage
-        fields = ('id', 'landmark', 'image')
+        fields = ('id', 'landmark', 'image', 'image_name')
 
 
 class CreateLandmarkSerializer(ModelSerializer):
