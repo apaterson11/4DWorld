@@ -9,7 +9,7 @@ class LandmarkSerializer(ModelSerializer):
     class Meta:
         model = Landmark
         fields = ('id', 'content', 'latitude',
-                  'longitude', 'markertype', 'position', 'layer')
+                  'longitude', 'markertype', 'position', 'layer', 'map')
 
 class RegisterUserSerializer(ModelSerializer):
     class Meta:
@@ -31,7 +31,7 @@ class GroupSerializer(ModelSerializer):
         fields = ('id', 'name', 'user_count')
 
 class MapSerializer(ModelSerializer):
-    landmarks = LandmarkSerializer(many=True)
+    landmarks = LandmarkSerializer(many=True, required=False)
 
     class Meta:
         model = Map
@@ -39,14 +39,13 @@ class MapSerializer(ModelSerializer):
 
 
 class UserProjectsSerializer(ModelSerializer):
-    map = MapSerializer()
+    map = MapSerializer(required=False)
 
     class Meta:
         model = Project
         fields = ('id', 'title', 'description', 'creator', 'group', 'map')
     
     def create(self, validated_data):
-        validated_data.pop('map')  # TODO: look at this
         user = self.context.get('request').user.profile
         project = Project(**validated_data)
         project.creator = user
@@ -70,7 +69,7 @@ class CreateLandmarkSerializer(ModelSerializer):
 class LayerSerializer(ModelSerializer):
     class Meta:
         model = Layer
-        fields = ('id', 'name', 'description')
+        fields = ('id', 'name', 'description', 'map')
 
 
 class UserDetailsSerializer(ModelSerializer):

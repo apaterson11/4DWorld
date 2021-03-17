@@ -30,8 +30,9 @@ function EditMap(props) {
   const [landmarks, setLandmarks] = useState();
   const [layers, setLayers] = useState([]);
   const [canClick, setCanClick] = useState(false);
-  const [currentLayer, setCurrentLayer] = useState();
+  const [currentLayer, setCurrentLayer] = useState(null);
   const [fetching, setFetching] = useState(false);
+  const [addLayerPopupOpen, setAddLayerPopupOpen] = useState(false);
   const refLayerSelect = useRef();
   const refAddMarkerButton = useRef();
   const { projectID } = useParams();
@@ -62,6 +63,12 @@ function EditMap(props) {
       });
   }, []);
 
+  useEffect(() => {
+    if (currentLayer == null && layers.length > 0) {
+      setCurrentLayer(layers[0]);
+    }
+  }, [layers]);
+
   // function to enter into the "add marker" state and indicate to user that button is active
   const prepAddMarker = (e) => {
     setCanClick(!canClick);
@@ -70,14 +77,12 @@ function EditMap(props) {
 
   // function adds marker to map on click via post request
   const addMarker = (e) => {
-    refLayerSelect.current.focus(); // get current layer
-
     /* Adds a new landmark to the map at a given latitude and longitude, via a POST request */
     const { lat, lng } = e.latlng;
     const pos = landmarks.length;
     const response = axiosInstance
       .post("/landmarks/", {
-        layer: currentLayer,
+        layer: currentLayer.id,
         content: "sample text",
         latitude: lat,
         longitude: lng,
@@ -93,11 +98,12 @@ function EditMap(props) {
   };
 
   // function adds new layer through "add layer" button
-  const addLayer = () => {
+  const addLayer = (name, description) => {
     const response = axiosInstance
       .post(`/layers/`, {
-        name: state.layer_name,
-        description: state.layer_desc,
+        name: name,
+        description: description,
+        map: project.map.id,
       })
       .then((response) => {
         let newLayers = [...layers]; // copy original state
@@ -204,9 +210,10 @@ function EditMap(props) {
           <Popup
             trigger={() => <button className="layerControl">Add Layer</button>}
             position="bottom right"
+            closeOnDocumentClick
           >
             <span>
-              <LayerAdd layers={layers} />
+              <LayerAdd layers={layers} addLayer={addLayer} />
             </span>
           </Popup>
 
