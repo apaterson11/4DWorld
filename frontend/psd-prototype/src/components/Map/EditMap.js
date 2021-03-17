@@ -65,7 +65,7 @@ function EditMap(props) {
 
   useEffect(() => {
     if (currentLayer == null && layers.length > 0) {
-      setCurrentLayer(layers[0]);
+      setCurrentLayer(layers[0].id);
     }
   }, [layers]);
 
@@ -82,7 +82,7 @@ function EditMap(props) {
     const pos = landmarks.length;
     const response = axiosInstance
       .post("/landmarks/", {
-        layer: currentLayer.id,
+        layer: currentLayer,
         content: "sample text",
         latitude: lat,
         longitude: lng,
