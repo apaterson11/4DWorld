@@ -94,6 +94,7 @@ class ProtoMap extends React.Component {
     rerenderParentCallback() {
         // console.log("force parent update")
         axiosInstance.get('/landmarks/').then(response => this.setState({landmarks: response.data, fetched: true}))
+        console.log(this.state.landmarks)
         axiosInstance.get('/layers/').then(response => this.setState({layers: response.data, fetched: true}))
         this.forceUpdate();
     }
@@ -116,12 +117,12 @@ class ProtoMap extends React.Component {
         /* Adds a new landmark to the map at a given latitude and longitude, via a POST request */
         const { lat, lng } = e.latlng;
 
-        console.log(this.state.landmarks)
+        //console.log(this.state.landmarks)
         let currentlayerlandmarks = this.state.landmarks.filter(landmark => parseInt(landmark.layer) == parseInt(this.state.currentlayer))
 
         // let landmarksgrouped = groupBy([...this.state.landmarks], i => i.layer)
         // const currentlayerlandmarks = landmarksgrouped[this.state.currentlayer]
-        console.log(currentlayerlandmarks)
+        //console.log(currentlayerlandmarks)
 
         const pos = ((currentlayerlandmarks) ? (currentlayerlandmarks.length) : 0)
 
