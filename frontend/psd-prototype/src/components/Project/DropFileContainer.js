@@ -13,14 +13,15 @@ import Box from '@material-ui/core/Box';
 
 const useStyles = makeStyles({
   root: {
-    height: '100vh',
+    height: '125px',
     minWidth: "90%"
   },
   paper: {
-    margin: '20px 40px 50px 40px',
+    marginTop: '50px',
+    marginBottom: '50px',
     display: 'flex',
-    flexDirection: 'row',
-    flexWrap: 'wrap'
+    flexDirection: 'column',
+    alignItems: 'center',
   },
   header: {
       marginTop: '50px',
@@ -39,8 +40,7 @@ const useStyles = makeStyles({
   },
   dropHere:{
     textAlign: 'middle',
-    verticalAlign: 'middle'
-    
+    verticalAlign: 'middle'  
   }
 });
 
@@ -51,7 +51,7 @@ export default function DropFileContainer() {
 
   const classes = useStyles();
   const [students, setStudents] = React.useState([
-    
+    {/*First: "john", Last: "doe", Email: "test@email.com", Role: "manager", Status:"Active"*/}
   ]);
 
   return (
@@ -94,11 +94,20 @@ export default function DropFileContainer() {
                 Drop File Here
               </Typography>
             </Box>
-                   
-            
-            
+ 
             </div>
 
+            <ul>
+                {students.map((s) => (
+                <li key={s.Email}>
+                    <strong>{s.First}</strong> {s.Last} {s.Email} {s.Role} {s.Status}
+                    {s.Group1} {s.Group2} {s.Group3}
+                    {s.Project1} {s.Project2} {s.Project3}
+                </li>
+                ))}
+            </ul>
+
+            {/*
             <ul>
                 {students.map((student) => (
                 <li key={student.email}>
@@ -106,6 +115,8 @@ export default function DropFileContainer() {
                 </li>
                 ))}
             </ul>
+            */}
+
           </CardContent>
         </Card>
     </div> 

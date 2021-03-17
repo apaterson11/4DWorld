@@ -14,7 +14,7 @@ const useStyles = makeStyles({
     pad: {
         paddingLeft: '20px',
         paddingRight: '20px',
-        height: '93vh'
+        height: '92vh'
     },
 })
 
