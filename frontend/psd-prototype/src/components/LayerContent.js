@@ -91,12 +91,8 @@ export class LayerContent extends React.Component {
         // get the current layer of the changing marker
         let oldlayer = -1
         layerlandmarks.forEach((marker) => {
-            // console.log('marker iter = ',marker)
-            // console.log(marker.id + " ==? " + landmark_id)
             if (marker.id == landmark_id) {
-                // console.log('yes')
                 oldlayer = marker.layer
-                // console.log(oldlayer, marker.layer)
             }
         })
 
@@ -105,28 +101,22 @@ export class LayerContent extends React.Component {
         // update position if the layer has changed
         let newposition = 0
         let updateOldLayer = false
-        console.log("comparing layers", oldlayer, layer)
+        this.getLandmarks()
         if (oldlayer !== layer) {
-            // console.log("bleh")
             let positions = []
-            let landmarksgrouped = groupBy([...this.state.landmarks], i => i.layer)
-            console.log("new layer fromgrouped",landmarksgrouped[layer])
+            let landmarksgrouped = groupBy([...this.props.landmarks], i => i.layer)
+
 
             if (landmarksgrouped[layer]) {
                 landmarksgrouped[layer].forEach((marker) => {
                     
                     positions.push(parseInt(marker.position))
                 })
-                console.log(positions)
                 newposition = (Math.max(...positions) + 1)
-                console.log("new position =", newposition)
             }
             updateOldLayer = true
         }
 
-        // console.log(layer)
-        // console.log("put request going through")
-        // console.log(landmark_id)
         const response = axiosInstance.put(`/landmarks/${landmark_id}/`, {
             content: content,
             markertype: markertype,
@@ -135,7 +125,6 @@ export class LayerContent extends React.Component {
             layer: layer,
             position: newposition
         }).then(response => {
-            // console.log("put request gone through")
             let updatedLandmarks = [...this.state.landmarks]  // copy original state
             
             // find the index of the landmark we need to change
@@ -155,37 +144,66 @@ export class LayerContent extends React.Component {
             }
         })
         
-        // console.log('markers to update', markersToUpdate)
         if (updateOldLayer) {
             console.log("layerlandmarksbeforefilter",this.state.layerlandmarks)
-            markersToUpdate.forEach((marker, index) => {
-                // if (marker.id != landmark_id) {
-                    // console.log(counter)
-                    const response = axiosInstance.put(`/landmarks/${marker.id}/`, {
-                        content: marker.content,
-                        markertype: marker.markertype,
-                        latitude: marker.latitude,
-                        longitude: marker.longitude,
-                        layer: marker.layer,
-                        position: index,
-                    }).then(response => {
-                        this.getLandmarks()
-                        this.setState({layerlandmarks: this.state.layerlandmarks.filter(landmark => landmark.id !== landmark_id)})
-                        console.log("layerlandmarks after filter",this.state.layerlandmarks)
-                    })
-                // }
-            })
+
+            this.updatePositions(markersToUpdate)
+            // markersToUpdate.forEach((marker, index) => {
+            //     // if (marker.id != landmark_id) {
+            //         const response = axiosInstance.put(`/landmarks/${marker.id}/`, {
+            //             content: marker.content,
+            //             markertype: marker.markertype,
+            //             latitude: marker.latitude,
+            //             longitude: marker.longitude,
+            //             layer: marker.layer,
+            //             position: index,
+            //         }).then(response => {
+            //             this.getLandmarks()
+            //             this.setState({layerlandmarks: this.state.layerlandmarks.filter(landmark => landmark.id !== landmark_id)})
+            //         })
+            //     // }
+            // })
+
+            // this.getLandmarks()
+            this.setState({layerlandmarks: this.state.layerlandmarks.filter(landmark => landmark.id !== landmark_id)})
             updateOldLayer = false
             //this.getLandmarks()
         }
     };
 
+
+
+    updatePositions(array) {
+        array.forEach((marker, index) => {
+                // if (marker.id != landmark_id) {
+
+            const response = axiosInstance.put(`/landmarks/${marker.id}/`, {
+                            content: marker.content,
+                            markertype: marker.markertype,
+                            latitude: marker.latitude,
+                            longitude: marker.longitude,
+                            layer: marker.layer,
+                            position: index,
+                        }).then(response => {
+                            this.getLandmarks()
+                            
+                        })
+                    // console.log(counter)
+                    // axiosInstance.put(`/landmarks/${marker.id}/`, {
+                    //     content: marker.content,
+                    //     markertype: marker.markertype,
+                    //     latitude: marker.latitude,
+                    //     longitude: marker.longitude,
+                    //     layer: marker.layer,
+                    //     position: index,
+                    // })
+                // }
+            })
+    }
     
 
     // function gets all landmarks 
-    getLandmarks =() => {
-        console.log(this.state.layerlandmarks)
-        console.log("getLandmarks on layer ",this.state.layer)
+    getLandmarks = () => {
         const results = [];
         const allmarkers = [];
         const response = axiosInstance.get('/landmarks/', {
@@ -207,16 +225,39 @@ export class LayerContent extends React.Component {
 
     // removes landmark from state
     removeMarkerFromState = (landmark_id) => {
+        
         /* Deletes the given landmark from the state, by sending a DELETE request to the API */
+        console.log("layerlandmarks before delete", this.state.layerlandmarks)
+
         const response = axiosInstance.delete(`/landmarks/${landmark_id}/`)
             .then(response => {
                 // filter out the landmark that's been deleted from the state
                 this.setState({
-                    landmarks: this.state.landmarks.filter(landmark => landmark.id !== landmark_id)
+                    landmarks: this.state.landmarks.filter(landmark => landmark.id !== landmark_id),
+                    layerlandmarks: this.state.layerlandmarks.filter(landmark => landmark.id !== landmark_id)
                 })
-                this.getLandmarks()
+                // this.getLandmarks()
+                let markersToUpdate = [...this.state.layerlandmarks]
+                this.updatePositions(markersToUpdate)
             })
-      };
+            
+            // this.setState({layerlandmarks: this.state.layerlandmarks.filter(landmark => landmark.id !== landmark_id)})
+            // markersToUpdate.forEach((marker, index) => {
+            //     // if (marker.id != landmark_id) {
+            //         const response = axiosInstance.put(`/landmarks/${marker.id}/`, {
+            //             content: marker.content,
+            //             markertype: marker.markertype,
+            //             latitude: marker.latitude,
+            //             longitude: marker.longitude,
+            //             layer: marker.layer,
+            //             position: index,
+                    // }).then(response => {
+
+            this.getLandmarks()
+                        
+    }
+                    
+        
 
     render() {
             let layerlandmarks = this.state.layerlandmarks
