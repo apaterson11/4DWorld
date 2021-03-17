@@ -104,9 +104,17 @@ export class LayerContent extends React.Component {
         console.log("comparing layers", oldlayer, layer)
         if (oldlayer !== layer) {
             let positions = []
-            this.props.landmarksgrouped[layer].forEach((marker) => {
-                positions.push(parseInt(marker.position))
-            })
+
+            // accounts for changing landmark layer into layer with no previous landmarks
+            if (!this.state.landmarksgrouped[layer]) {
+                positions.push(parseInt(this.state.layerlandmarks[0].position))
+            }
+            else {
+                this.state.landmarksgrouped[layer].forEach((marker) => {
+                    positions.push(parseInt(marker.position))
+                })
+            }
+            
 
             // for (var i=0; i < this.props.layerlandmarks[layer]; i++) {
 

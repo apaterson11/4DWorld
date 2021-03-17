@@ -128,7 +128,6 @@ export default class EditMarker extends React.Component{
         const response = axiosInstance.get('/landmark-images/', {
 
         }).then(response => response.data.forEach(item => {
-            console.log(item)
             if (item.landmark == this.props.id) {   // matches up each series of images to their corresponding landmark
                 results.push({
                     image: item.image,
