@@ -30,7 +30,12 @@ function ProjectCard(props) {
         </Typography>
       </CardContent>
       <CardActions>
-        <Link to={{ pathname: "/projects/edit", project: props.project }}>
+        <Link
+          to={{
+            pathname: `/projects/edit/${props.project.id}`,
+            project: props.project,
+          }}
+        >
           <Button size="small" color="primary">
             Edit
           </Button>

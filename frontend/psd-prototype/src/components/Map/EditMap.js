@@ -1,139 +1,239 @@
-import React from "react";
+import React, { useState, useRef, useEffect, useContext } from "react";
 import { Map, TileLayer, LayersControl, LayerGroup } from "react-leaflet";
+import { useParams } from "react-router-dom";
 import Control from "@skyeer/react-leaflet-custom-control";
 import axiosInstance from "../../axios";
 import { LayerContent } from "../LayerContent";
+import Popup from "reactjs-popup";
+import LayerControl from "../LayerControl";
+import LayerAdd from "../LayerAdd";
+import Spinner from "../Spinner";
+
+require("../LayerControl.css");
+require("../ProtoMap.css");
 
 const DEFAULT_VIEWPORT = {
   center: [55.86515, -4.25763],
   zoom: 13,
 };
 
-class ProtoMap extends React.Component {
-  constructor(props) {
-    super(props);
-    this.handleLayer = this.handleLayer.bind(this);
-  }
-
-  state = {
+function EditMap(props) {
+  const [state, setState] = useState({
     fetched: false,
-    defLat: this.props.latitude,
-    defLng: this.props.longitude,
     viewport: DEFAULT_VIEWPORT,
     markertype: "default",
-    landmarks: [],
-    layers: [],
     layerlandmarks: [],
-    currentlayer: "1",
+    currentlayer: "",
+    layer_name: "",
+    layer_desc: "",
+    canClick: false,
+  });
+  const [project, setProject] = useState();
+  const [landmarks, setLandmarks] = useState();
+  const [layers, setLayers] = useState([]);
+  const [fetching, setFetching] = useState(false);
+  const refLayerSelect = useRef();
+  const refAddMarkerButton = useRef();
+  const { projectID } = useParams();
+
+  useEffect(() => {
+    setFetching(true);
+    // get project information
+    axiosInstance
+      .get(`/projects/${projectID}`)
+      .then((response) => {
+        setProject(response.data);
+        return Promise.resolve(response.data);
+      })
+      .then((response) => {
+        // get the landmarks
+        const landmarkRequest = axiosInstance.get(
+          `/landmarks?map_id=${response.map.id}`
+        );
+        const layerRequest = axiosInstance.get(
+          `/layers?map_id=${response.map.id}`
+        );
+
+        Promise.all([landmarkRequest, layerRequest]).then((response) => {
+          setLandmarks(response[0].data);
+          setLayers(response[1].data);
+          setFetching(false);
+        });
+      });
+  }, []);
+
+  // function to enter into the "add marker" state and indicate to user that button is active
+  const prepAddMarker = (e) => {
+    setState({ ...state, canClick: !state.canClick });
+    e.target.style.background = state.canClick ? "#b8bfba" : "white";
   };
 
-  componentDidMount() {
-    /* Fetch the list of landmarks on component loading */
-    axiosInstance
-      .get("/landmarks/")
-      .then((response) =>
-        this.setState({ landmarks: response.data, fetched: true })
-      );
-    axiosInstance
-      .get("/layers/")
-      .then((response) =>
-        this.setState({ layers: response.data, fetched: true })
-      );
-  }
+  // function adds marker to map on click via post request
+  const addMarker = (e) => {
+    refLayerSelect.current.focus(); // get current layer
 
-  handleClick = () => {
-    this.setState({ viewport: DEFAULT_VIEWPORT });
-  };
-
-  addMarker = (e) => {
     /* Adds a new landmark to the map at a given latitude and longitude, via a POST request */
     const { lat, lng } = e.latlng;
-    const pos = this.state.landmarks.length;
-
+    const pos = landmarks.length;
     const response = axiosInstance
       .post("/landmarks/", {
-        layer: "1",
+        layer: state.currentlayer,
         content: "sample text",
         latitude: lat,
         longitude: lng,
         markertype: "default",
         position: pos,
+        map: project.map.id,
       })
       .then((response) => {
-        let newLandmarks = [...this.state.landmarks]; // copy original state
+        let newLandmarks = [...landmarks]; // copy original state
         newLandmarks.push(response.data); // add the new landmark to the copy
-        this.setState({ landmarks: newLandmarks }); // update the state with the new landmark
+        setState({ ...state, landmarks: newLandmarks }); // update the state with the new landmark
       });
   };
 
-  handleLayer(event) {
-    this.setState({ currentlayer: event.target.value });
-  }
+  // function adds new layer through "add layer" button
+  const addLayer = () => {
+    const response = axiosInstance
+      .post(`/layers/`, {
+        name: state.layer_name,
+        description: state.layer_desc,
+      })
+      .then((response) => {
+        let newLayers = [...layers]; // copy original state
+        newLayers.push(response.data); // add the new landmark to the copy
+        setState({ ...state, layers: newLayers }); // update the state with the new landmark
+      });
+  };
 
-  render() {
-    let renderlayers = "";
-    renderlayers = this.state.layers.map((e, key) => (
-      <LayersControl.Overlay key={e.id} checked name={e.name}>
-        <LayerGroup>
-          <LayerContent
-            layer={e.id}
-            landmark_id={this.state.id}
-            layerlandmarks={this.state.layerlandmarks}
-            content={this.state.content}
-            latitude={this.props.latitude}
-            longitude={this.props.longitude}
-            markertype={this.state.markertype}
-            position={this.state.position}
-            layers={this.state.layers}
-            landmarks={this.state.landmarks}
-          ></LayerContent>
-        </LayerGroup>
-      </LayersControl.Overlay>
-    ));
+  // function deletes layer through "edit layer" function
+  const removeLayerFromState = (layer_id) => {
+    /* Deletes the given landmark from the state, by sending a DELETE request to the API */
+    const response = axiosInstance
+      .delete(`/layers/${layer_id}/`)
+      .then((response) => {
+        // filter out the landmark that's been deleted from the state
+        setState({
+          ...state,
+          layers: layers.filter((layer) => layer.id !== layer_id),
+        });
+      });
+  };
 
-    let layerselect = "";
-    layerselect = this.state.layers.map((e, key) => (
-      <option key={e.id} value={e.name}>
-        {e.name}
-      </option>
-    ));
+  // displays correct layers in dropdown layer select menu
+  const handleLayer = (e) => {
+    setState({ ...state, currentlayer: e.target.value });
+  };
 
-    return (
-      <Map
-        onViewportChanged={this.onViewportChanged}
-        viewport={this.state.viewport}
-        center={[this.props.latitude, this.props.longitude]}
-        onClick={this.addMarker}
-        zoom={4}
-        maxBounds={[
-          [90, -180],
-          [-90, 180],
-        ]}
-      >
-        <TileLayer
-          url="http://{s}.tile.osm.org/{z}/{x}/{y}.png"
-          minZoom={1}
-          maxZoom={18}
-          noWrap={true}
-        />
+  // toggle layer visibility menu
+  const renderlayers = layers.map((e, key) => (
+    <LayersControl.Overlay key={e.id} checked name={e.name}>
+      <LayerGroup>
+        <LayerContent
+          layer={e.id}
+          landmark_id={state.id}
+          layerlandmarks={state.layerlandmarks}
+          content={state.content}
+          latitude={props.latitude}
+          longitude={props.longitude}
+          markertype={state.markertype}
+          position={state.position}
+          layers={layers}
+          landmarks={landmarks}
+        ></LayerContent>
+      </LayerGroup>
+    </LayersControl.Overlay>
+  ));
 
-        <Control position="topright">
-          <React.Fragment>
-            <select value={this.state.currentlayer} onChange={this.handleLayer}>
-              {layerselect}
-            </select>
-          </React.Fragment>
-        </Control>
+  return (
+    <React.Fragment>
+      {fetching ? (
+        <Spinner />
+      ) : (
+        <Map
+          // onViewportChanged={onViewportChanged}
+          viewport={state.viewport}
+          center={[props.latitude, props.longitude]}
+          onClick={state.canClick ? addMarker : undefined}
+          zoom={4}
+          maxBounds={[
+            [90, -180],
+            [-90, 180],
+          ]}
+        >
+          <TileLayer
+            url="http://{s}.tile.osm.org/{z}/{x}/{y}.png"
+            minZoom={1}
+            maxZoom={18}
+            noWrap={true}
+          />
 
-        <LayersControl position="topright">{renderlayers}</LayersControl>
-        <Control position="bottomright">
-          <button className="btn-resetview" onClick={this.createLines}>
-            {this.state.currentlayer}
-          </button>
-        </Control>
-      </Map>
-    );
-  }
+          {/* toggle layer visibility menu */}
+          <LayersControl position="topright">{renderlayers}</LayersControl>
+
+          {/* select layer dropdown menu */}
+          <Control position="topright">
+            <React.Fragment>
+              <select
+                value={state.currentlayer}
+                onFocus={handleLayer}
+                onChange={handleLayer}
+                ref={refLayerSelect}
+              >
+                {layers.map((e, key) => {
+                  console.log(e);
+                  return (
+                    <option key={e.id} value={e.id}>
+                      {e.name}
+                    </option>
+                  );
+                })}
+              </select>
+            </React.Fragment>
+          </Control>
+
+          {/* edit layer button */}
+          <Popup
+            trigger={() => <button className="layerControl">Edit Layer</button>}
+            position="bottom right"
+            closeOnDocumentClick
+          >
+            <span>
+              <LayerControl layers={layers} currentlayer={state.currentlayer} />
+            </span>
+          </Popup>
+
+          {/* add layer button */}
+          <Popup
+            trigger={() => <button className="layerControl">Add Layer</button>}
+            position="bottom right"
+          >
+            <span>
+              <LayerAdd layers={layers} />
+            </span>
+          </Popup>
+
+          {/* add marker button */}
+          <Control position="topright">
+            <button
+              className="btn-addMarker"
+              onClick={prepAddMarker}
+              ref={refAddMarkerButton}
+            >
+              Add Marker
+            </button>
+          </Control>
+
+          {/* reset view button - will this ever be fixed? only time will tell */}
+          {/* <Control position="bottomright">
+        <button className="btn-resetview" onClick={createLines}>
+          Reset View
+        </button>
+      </Control> */}
+        </Map>
+      )}
+    </React.Fragment>
+  );
 }
 
-export default ProtoMap;
+export default EditMap;

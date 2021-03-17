@@ -63,6 +63,7 @@ class Map(models.Model):
 class Layer(models.Model):
     name = models.TextField(default="")
     description = models.TextField(default="")
+    map = models.ForeignKey(Map, on_delete=models.CASCADE, null=True, blank=True)  # should not be nullable later on
 
     def __str__(self):
         return str(self.id)
@@ -82,9 +83,6 @@ class Landmark(models.Model):
 
     def __str__(self):
         return str(self.id)
-
-    def save(self, *args, **kwargs):
-        super(Landmark, self).save(*args, **kwargs)
 
 
 class LandmarkImage(models.Model):

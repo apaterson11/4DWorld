@@ -5,6 +5,7 @@ from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
+from api.mixins import FilterByMapMixin
 from api.models import City, Country, Landmark, LandmarkImage, Map, MapStyle, Project, Profile, State, Layer
 from api.serializers import (
     RegisterUserSerializer,
@@ -55,7 +56,7 @@ class GroupAPIView(viewsets.ModelViewSet):
         group.user_set.add(self.request.user)
 
 
-class LandmarkAPIView(viewsets.ModelViewSet):
+class LandmarkAPIView(FilterByMapMixin, viewsets.ModelViewSet):
     permission_classes = [AllowAny]
     serializer_class = LandmarkSerializer
     model = Landmark
@@ -69,12 +70,11 @@ class LandmarkImageAPIView(viewsets.ModelViewSet):
     queryset = LandmarkImage.objects.all()
 
 
-class LayerAPIView(viewsets.ModelViewSet):
+class LayerAPIView(FilterByMapMixin, viewsets.ModelViewSet):
     permission_classes = [AllowAny]
     serializer_class = LayerSerializer
     model = Layer
     queryset = Layer.objects.all()
-
 
 class ProjectAPIView(viewsets.ModelViewSet):
     permission_classes = [AllowAny]
@@ -132,8 +132,8 @@ class MapStylesAPIView(viewsets.ModelViewSet):
 class MapAPIView(viewsets.ModelViewSet):
     permission_classes = [AllowAny]
     serializer_class = MapSerializer
-    queryset = Map.objects.all()
     model = Map
+    queryset = Map.objects.all()
 
 
 class BlacklistTokenUpdateView(APIView):

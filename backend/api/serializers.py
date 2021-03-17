@@ -4,6 +4,12 @@ from rest_framework.serializers import ModelSerializer
 from api.models import City, Country, Landmark, LandmarkImage, Map, MapStyle, Profile, Project, State, Layer
 
 
+class LandmarkSerializer(ModelSerializer):
+
+    class Meta:
+        model = Landmark
+        fields = ('id', 'content', 'latitude',
+                  'longitude', 'markertype', 'position', 'layer')
 
 class RegisterUserSerializer(ModelSerializer):
     class Meta:
@@ -24,25 +30,28 @@ class GroupSerializer(ModelSerializer):
         model = Group
         fields = ('id', 'name', 'user_count')
 
+class MapSerializer(ModelSerializer):
+    landmarks = LandmarkSerializer(many=True)
+
+    class Meta:
+        model = Map
+        fields = ('id', 'project', 'latitude', 'longitude', 'zoom', 'style', 'landmarks')
+
 
 class UserProjectsSerializer(ModelSerializer):
+    map = MapSerializer()
+
     class Meta:
         model = Project
-        fields = ('id', 'title', 'description', 'creator', 'group')
+        fields = ('id', 'title', 'description', 'creator', 'group', 'map')
     
     def create(self, validated_data):
+        validated_data.pop('map')  # TODO: look at this
         user = self.context.get('request').user.profile
         project = Project(**validated_data)
         project.creator = user
         project.save()
         return project
-
-
-class LandmarkSerializer(ModelSerializer):
-    class Meta:
-        model = Landmark
-        fields = ('id', 'content', 'latitude',
-                  'longitude', 'markertype', 'position', 'layer')
 
 
 class LandmarkImageSerializer(ModelSerializer):
@@ -123,8 +132,3 @@ class MapStyleSerializer(ModelSerializer):
         model = MapStyle
         fields = ('id', 'name', 'url', 'min_zoom', 'max_zoom', 'attribution')
 
-
-class MapSerializer(ModelSerializer):
-    class Meta:
-        model = Map
-        fields = ('id', 'project', 'latitude', 'longitude', 'zoom', 'style')
