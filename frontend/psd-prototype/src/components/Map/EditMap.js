@@ -23,14 +23,14 @@ function EditMap(props) {
     viewport: DEFAULT_VIEWPORT,
     markertype: "default",
     layerlandmarks: [],
-    currentlayer: "",
     layer_name: "",
     layer_desc: "",
-    canClick: false,
   });
   const [project, setProject] = useState();
   const [landmarks, setLandmarks] = useState();
   const [layers, setLayers] = useState([]);
+  const [canClick, setCanClick] = useState(false);
+  const [currentLayer, setCurrentLayer] = useState();
   const [fetching, setFetching] = useState(false);
   const refLayerSelect = useRef();
   const refAddMarkerButton = useRef();
@@ -64,8 +64,8 @@ function EditMap(props) {
 
   // function to enter into the "add marker" state and indicate to user that button is active
   const prepAddMarker = (e) => {
-    setState({ ...state, canClick: !state.canClick });
-    e.target.style.background = state.canClick ? "#b8bfba" : "white";
+    setCanClick(!canClick);
+    e.target.style.background = canClick ? "#b8bfba" : "white";
   };
 
   // function adds marker to map on click via post request
@@ -77,7 +77,7 @@ function EditMap(props) {
     const pos = landmarks.length;
     const response = axiosInstance
       .post("/landmarks/", {
-        layer: state.currentlayer,
+        layer: currentLayer,
         content: "sample text",
         latitude: lat,
         longitude: lng,
@@ -88,7 +88,7 @@ function EditMap(props) {
       .then((response) => {
         let newLandmarks = [...landmarks]; // copy original state
         newLandmarks.push(response.data); // add the new landmark to the copy
-        setState({ ...state, landmarks: newLandmarks }); // update the state with the new landmark
+        setLandmarks(newLandmarks); // update the state with the new landmark
       });
   };
 
@@ -102,7 +102,7 @@ function EditMap(props) {
       .then((response) => {
         let newLayers = [...layers]; // copy original state
         newLayers.push(response.data); // add the new landmark to the copy
-        setState({ ...state, layers: newLayers }); // update the state with the new landmark
+        setLayers(newLayers); // update the state with the new landmark
       });
   };
 
@@ -113,16 +113,13 @@ function EditMap(props) {
       .delete(`/layers/${layer_id}/`)
       .then((response) => {
         // filter out the landmark that's been deleted from the state
-        setState({
-          ...state,
-          layers: layers.filter((layer) => layer.id !== layer_id),
-        });
+        setLayers(layers.filter((layer) => layer.id !== layer_id));
       });
   };
 
   // displays correct layers in dropdown layer select menu
   const handleLayer = (e) => {
-    setState({ ...state, currentlayer: e.target.value });
+    setCurrentLayer(e.target.value);
   };
 
   // toggle layer visibility menu
@@ -154,7 +151,7 @@ function EditMap(props) {
           // onViewportChanged={onViewportChanged}
           viewport={state.viewport}
           center={[props.latitude, props.longitude]}
-          onClick={state.canClick ? addMarker : undefined}
+          onClick={canClick ? addMarker : undefined}
           zoom={4}
           maxBounds={[
             [90, -180],
@@ -175,7 +172,7 @@ function EditMap(props) {
           <Control position="topright">
             <React.Fragment>
               <select
-                value={state.currentlayer}
+                value={currentLayer}
                 onFocus={handleLayer}
                 onChange={handleLayer}
                 ref={refLayerSelect}
@@ -199,7 +196,7 @@ function EditMap(props) {
             closeOnDocumentClick
           >
             <span>
-              <LayerControl layers={layers} currentlayer={state.currentlayer} />
+              <LayerControl layers={layers} currentlayer={currentLayer} />
             </span>
           </Popup>
 
