@@ -12,38 +12,36 @@ import Spinner from "../Spinner";
 require("../LayerControl.css");
 require("../ProtoMap.css");
 
-const DEFAULT_VIEWPORT = {
-  center: [55.86515, -4.25763],
-  zoom: 13,
-};
-
 function EditMap(props) {
   const [state, setState] = useState({
-    fetched: false,
-    viewport: DEFAULT_VIEWPORT,
     markertype: "default",
     layerlandmarks: [],
     layer_name: "",
     layer_desc: "",
   });
+  const [viewport, setViewport] = useState();
   const [project, setProject] = useState();
   const [landmarks, setLandmarks] = useState();
   const [layers, setLayers] = useState([]);
+  const [mapStyle, setMapStyle] = useState();
   const [canClick, setCanClick] = useState(false);
   const [currentLayer, setCurrentLayer] = useState(null);
-  const [fetching, setFetching] = useState(false);
+  const [fetching, setFetching] = useState(true);
   const [addLayerPopupOpen, setAddLayerPopupOpen] = useState(false);
   const refLayerSelect = useRef();
   const refAddMarkerButton = useRef();
   const { projectID } = useParams();
 
   useEffect(() => {
-    setFetching(true);
     // get project information
     axiosInstance
       .get(`/projects/${projectID}`)
       .then((response) => {
         setProject(response.data);
+        setViewport({
+          center: [response.data.map.latitude, response.data.map.longitude],
+          zoom: response.data.map.zoom,
+        });
         return Promise.resolve(response.data);
       })
       .then((response) => {
@@ -54,12 +52,18 @@ function EditMap(props) {
         const layerRequest = axiosInstance.get(
           `/layers?map_id=${response.map.id}`
         );
+        const mapStyleRequest = axiosInstance.get(
+          `/map-styles/${response.map.style}`
+        );
 
-        Promise.all([landmarkRequest, layerRequest]).then((response) => {
-          setLandmarks(response[0].data);
-          setLayers(response[1].data);
-          setFetching(false);
-        });
+        Promise.all([landmarkRequest, layerRequest, mapStyleRequest]).then(
+          (response) => {
+            setLandmarks(response[0].data);
+            setLayers(response[1].data);
+            setMapStyle(response[2].data);
+            setFetching(false);
+          }
+        );
       });
   }, []);
 
@@ -155,19 +159,17 @@ function EditMap(props) {
       ) : (
         <Map
           // onViewportChanged={onViewportChanged}
-          viewport={state.viewport}
-          center={[props.latitude, props.longitude]}
+          viewport={viewport}
           onClick={canClick ? addMarker : undefined}
-          zoom={4}
           maxBounds={[
             [90, -180],
             [-90, 180],
           ]}
         >
           <TileLayer
-            url="http://{s}.tile.osm.org/{z}/{x}/{y}.png"
-            minZoom={1}
-            maxZoom={18}
+            url={mapStyle.url}
+            minZoom={mapStyle.min_zoom}
+            maxZoom={mapStyle.max_zoom}
             noWrap={true}
           />
 

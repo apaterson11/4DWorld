@@ -26,7 +26,7 @@ class LayerAdmin(admin.ModelAdmin):
 
 @admin.register(LandmarkImage)
 class LandmarkImageAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('id', 'landmark', 'image')
 
 admin.site.register(City)
 admin.site.register(Country)

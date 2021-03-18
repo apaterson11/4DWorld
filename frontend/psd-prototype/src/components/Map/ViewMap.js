@@ -14,7 +14,6 @@ function ViewMap(props) {
   const { projectID } = useParams();
 
   useEffect(() => {
-    setFetching(true);
     // get project information
     axiosInstance
       .get(`/projects/${projectID}`)
@@ -27,14 +26,13 @@ function ViewMap(props) {
         return Promise.resolve(response.data);
       })
       .then((response) => {
-        // get the landmarks and layers
+        // get the landmarks, layers and map style
         const landmarkRequest = axiosInstance.get(
           `/landmarks?map_id=${response.map.id}`
         );
         const layerRequest = axiosInstance.get(
           `/layers?map_id=${response.map.id}`
         );
-
         const mapStyleRequest = axiosInstance.get(
           `/map-styles/${response.map.style}`
         );
@@ -71,34 +69,6 @@ function ViewMap(props) {
 
           {/* toggle layer visibility menu */}
           {/* <LayersControl position="topright">{renderlayers}</LayersControl> */}
-
-          {/* select layer dropdown menu */}
-          {/* <Control position="topright">
-                <React.Fragment>
-                <select
-                    value={currentLayer}
-                    onFocus={handleLayer}
-                    onChange={handleLayer}
-                    ref={refLayerSelect}
-                >
-                    {layers.map((e, key) => {
-                    console.log(e);
-                    return (
-                        <option key={e.id} value={e.id}>
-                        {e.name}
-                        </option>
-                    );
-                    })}
-                </select>
-                </React.Fragment>
-            </Control> */}
-
-          {/* reset view button - will this ever be fixed? only time will tell */}
-          {/* <Control position="bottomright">
-            <button className="btn-resetview" onClick={createLines}>
-            Reset View
-            </button>
-        </Control> */}
         </Map>
       )}
     </React.Fragment>
