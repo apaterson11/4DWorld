@@ -4,6 +4,7 @@ import { Route, BrowserRouter as Router, Switch } from "react-router-dom";
 import About from "./components/About";
 import Header from "./components/Header";
 import EditMap from "./components/Map/EditMap";
+import ViewMap from "./components/Map/ViewMap";
 import Footer from "./components/Footer";
 import Login from "./components/Auth/Login";
 import Logout from "./components/Auth/Logout";
@@ -83,6 +84,7 @@ function App(props) {
             <Route exact path="/dashboard/" render={() => <Dashboard />} />
             <Route exact path="/projects/create/" component={CreateProject} />
             <Route exact path="/projects/edit/:projectID" component={EditMap} />
+            <Route exact path="/projects/view/:projectID" component={ViewMap} />
             <Route exact path="/register/" component={Register} />
             <Route
               exact

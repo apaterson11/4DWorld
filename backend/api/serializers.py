@@ -11,6 +11,13 @@ class LandmarkSerializer(ModelSerializer):
         fields = ('id', 'content', 'latitude',
                   'longitude', 'markertype', 'position', 'layer', 'map')
 
+
+class MapStyleSerializer(ModelSerializer):
+    class Meta:
+        model = MapStyle
+        fields = ('id', 'name', 'url', 'min_zoom', 'max_zoom', 'attribution')
+
+
 class RegisterUserSerializer(ModelSerializer):
     class Meta:
         model = User
@@ -124,10 +131,4 @@ class CitySerializer(ModelSerializer):
     class Meta:
         model = City
         fields = ('id', 'name', 'country', 'state', 'latitude', 'longitude')
-
-
-class MapStyleSerializer(ModelSerializer):
-    class Meta:
-        model = MapStyle
-        fields = ('id', 'name', 'url', 'min_zoom', 'max_zoom', 'attribution')
 

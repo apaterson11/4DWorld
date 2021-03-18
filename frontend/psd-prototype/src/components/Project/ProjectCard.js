@@ -18,10 +18,6 @@ const useStyles = makeStyles({
 function ProjectCard(props) {
   const classes = useStyles();
 
-  const handleClick = (e) => {
-    console.log("clicked");
-  };
-
   return (
     <Card className={classes.card}>
       <CardContent>
@@ -40,9 +36,16 @@ function ProjectCard(props) {
             Edit
           </Button>
         </Link>
-        <Button size="small" color="primary" onClick={handleClick}>
-          View
-        </Button>
+        <Link
+          to={{
+            pathname: `/projects/view/${props.project.id}`,
+            project: props.project,
+          }}
+        >
+          <Button size="small" color="primary">
+            View
+          </Button>
+        </Link>
       </CardActions>
     </Card>
   );
