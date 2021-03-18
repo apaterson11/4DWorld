@@ -1,13 +1,6 @@
-import React, { Component, PropTypes } from "react";
+import React from "react";
 import { Button, MenuItem, InputLabel, Select } from "@material-ui/core/";
-import CssBaseline from "@material-ui/core/CssBaseline";
-import TextField from "@material-ui/core/TextField";
-import Paper from "@material-ui/core/Paper";
 import Grid from "@material-ui/core/Grid";
-import Typography from "@material-ui/core/Typography";
-import { withStyles } from "@material-ui/core/styles";
-import { Link } from "react-router-dom";
-import { withRouter } from "react-router-dom";
 import RichTextEditor from "react-rte";
 import axiosInstance from "../axios";
 import ImageGallery from "react-image-gallery";
