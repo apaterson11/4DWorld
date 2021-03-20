@@ -94,7 +94,7 @@ class ProtoMap extends React.Component {
     rerenderParentCallback() {
         // console.log("force parent update")
         axiosInstance.get('/landmarks/').then(response => this.setState({landmarks: response.data, fetched: true}))
-        console.log(this.state.landmarks)
+        //console.log(this.state.landmarks)
         axiosInstance.get('/layers/').then(response => this.setState({layers: response.data, fetched: true}))
         this.forceUpdate();
     }
@@ -247,7 +247,7 @@ class ProtoMap extends React.Component {
                     closeOnDocumentClick
                 >
                     <span>
-                        <LayerControl layers = {this.state.layers} currentlayer = {this.state.currentlayer} landmarksgrouped = {landmarksgrouped} landmarks = {this.state.landmarks}/>
+                        <LayerControl layers = {this.state.layers} currentlayer = {this.state.currentlayer} landmarksgrouped = {landmarksgrouped} landmarks = {this.state.landmarks} rerenderParentCallback={this.rerenderParentCallback}/>
                     </span>
                 </Popup>
                 

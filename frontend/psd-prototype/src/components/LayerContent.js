@@ -70,7 +70,7 @@ export class LayerContent extends React.Component {
 
     componentDidUpdate(prevProps, prevState) {
         if (this.props.layerlandmarks && prevProps.layerlandmarks) {
-            if (prevProps.layerlandmarks.length !== this.props.layerlandmarks.length) {
+            if (JSON.stringify(prevProps.layerlandmarks) !== JSON.stringify(this.props.layerlandmarks)) {
                 this.fetchData()
             }
         }
@@ -116,6 +116,10 @@ export class LayerContent extends React.Component {
             }
             updateOldLayer = true
         }
+        else if (oldlayer == layer) {
+            newposition = this.state.position
+        }
+
 
         const response = axiosInstance.put(`/landmarks/${landmark_id}/`, {
             content: content,
