@@ -12,6 +12,7 @@ import TableContainer from "@material-ui/core/TableContainer";
 import TableRow from "@material-ui/core/TableRow";
 import axiosInstance from "../../axios";
 import EditGroupsCardModal from "./EditGroupsCardModal";
+import AddUsersToGroupModal from "./AddUsersToGroupModal";
 import { UserContext } from "../../Context";
 import MUIDataTable from "mui-datatables";
 
@@ -32,13 +33,19 @@ export default function UserGroupsCard() {
   const classes = useStyles();
   const [groups, setGroups] = useState([]);
   const [open, setOpen] = useState(false);
+  const [groupClicked, setGroupClicked] = useState();
+  const [groupOpen, setGroupOpen] = useState(false);
   const { userDetails, setUserDetails } = useContext(UserContext);
 
   useEffect(() => {
     axiosInstance
       .get(`/user-details/${userDetails.profile_id}`)
       .then((response) => {
-        setGroups(response.data.user.groups);
+        setGroups(
+          response.data.user.groups.filter(
+            (grp) => grp.id != userDetails.default_group
+          )
+        );
       });
   }, []);
 
@@ -57,7 +64,7 @@ export default function UserGroupsCard() {
 
   const columns = ["Name", "Members"];
   const data = groups.map((group) => {
-    return [group.name, group.user_count];
+    return [group.name, group.user_count, group.id];
   });
   const options = {
     download: false,
@@ -66,7 +73,20 @@ export default function UserGroupsCard() {
     elevation: 0,
     rowsPerPage: 3,
     rowsPerPageOptions: false,
-  }; // onRowClick, onRowsDelete
+    onRowsDelete: (rowsDeleted) => {
+      rowsDeleted.data.map((d) => {
+        const deleteId = data[d.dataIndex][2];
+        axiosInstance.delete(`/groups/${deleteId}`).then((res) => {
+          const newGroups = groups.filter((grp) => grp.id !== deleteId);
+          setGroups(newGroups);
+        });
+      });
+    },
+    onRowClick: (rowData, rowMeta) => {
+      setGroupClicked(data[rowMeta.dataIndex][2]);
+      setGroupOpen(true);
+    },
+  }; // onRowClick
 
   return (
     <>
@@ -74,6 +94,12 @@ export default function UserGroupsCard() {
         open={open}
         onClose={() => setOpen(false)}
         onSubmit={handleSubmit}
+      />
+      <AddUsersToGroupModal
+        open={groupOpen}
+        groupID={groupClicked}
+        onClose={() => setGroupOpen(false)}
+        onSubmit={() => console.log("submit")}
       />
       <div className={classes.paper}>
         <Card className={classes.root}>
