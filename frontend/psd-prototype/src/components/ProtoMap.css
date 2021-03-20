@@ -5,6 +5,17 @@ html, body {
   width: 100%;
 }
 
+.select-layer {
+  background-color: white;
+  padding-top: 1px;
+  padding-bottom: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
+  border-radius: 7px;
+  width: auto;
+  border: 1px solid grey;
+}
+
 .display-block {
   display: block;
 }

@@ -38,6 +38,7 @@ const groupBy = (array, fn) => array.reduce((result, item) => {
     return result;
 }, {});
 
+
 export class LayerContent extends React.Component {
 
     constructor(props) {

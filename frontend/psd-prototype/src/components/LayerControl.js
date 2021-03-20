@@ -34,9 +34,7 @@ export default class EditMarker extends React.Component{
 
     // selects layer to be edited
     handleLayer = (e) => {
-        this.setState({currentlayer: e.target.value});
-        this.setState({layerlandmarks: this.state.landmarksgrouped[this.state.currentlayer]})
-        //console.log(this.state.layerlandmarks)
+        this.setState({currentlayer: e.target.value}, this.setState({layerlandmarks: this.state.landmarksgrouped[this.state.currentlayer]}));
     }
 
     // edits layer via PUT request
@@ -89,7 +87,6 @@ export default class EditMarker extends React.Component{
                     <select value = {this.state.currentlayer}
                         type="select"
                         name="selectLayer"
-                        onFocus={this.handleLayer}
                         onChange={this.handleLayer}
                         ref = {this.refSelect}>
                         { /* list all the layers*/ }
@@ -120,7 +117,7 @@ export default class EditMarker extends React.Component{
                             <DndProvider backend={HTML5Backend} >
                                 <DND 
                                     layerlandmarks={this.state.landmarksgrouped[this.state.currentlayer]}
-                                    getLandmarks={this.getLandmarks}
+                                    currentlayer={this.state.currentlayer}
                                     rerenderParentCallback={this.props.rerenderParentCallback}
                                 ></DND>
                             </DndProvider>
