@@ -24,15 +24,7 @@ export default class EditMarker extends React.Component{
         layerlandmarks: [],
     }
 
-    componentDidMount() {
-        //this.refSelect.current.focus()
-    }
-
-    // getLandmarks() {
-        
-    // }
-
-    // selects layer to be edited
+    // selects layer to be edited and changes layer landmarks to appropriate layer
     handleLayer = (e) => {
         this.setState({currentlayer: e.target.value}, this.setState({layerlandmarks: this.state.landmarksgrouped[this.state.currentlayer]}));
     }
@@ -88,6 +80,7 @@ export default class EditMarker extends React.Component{
                         type="select"
                         name="selectLayer"
                         onChange={this.handleLayer}
+                        onFocus={this.handleLayer}
                         ref = {this.refSelect}>
                         { /* list all the layers*/ }
                         {

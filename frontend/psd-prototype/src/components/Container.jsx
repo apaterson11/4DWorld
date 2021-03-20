@@ -8,6 +8,7 @@ const style = {
 
 export const Container = (props) => {
     {
+        // get cards from layer's landmarks
         let options = ''
         if (props.layerlandmarks) {
             options = props.layerlandmarks
@@ -24,10 +25,12 @@ export const Container = (props) => {
             options
         );
 
+        // update displayed cards when current layer changes
         useEffect(() => 
             setCards(options), [props.currentlayer]
         );
 
+        // handle cards being moved around
         const moveCard = useCallback((dragIndex, hoverIndex) => {
             const dragCard = cards[dragIndex];
 
@@ -39,6 +42,7 @@ export const Container = (props) => {
             }));
         }, [cards]);
 
+        // reorder markers based on order of cards
         let marker = ''
         if (cards) {
             cards.forEach((card, index) => {
@@ -57,6 +61,10 @@ export const Container = (props) => {
             return (<>
                     <div style={style}>{cards.map((card, i) => renderCard(card, i))}</div>
                 </>);
+        }
+        // if no cards (i.e. no markers), return nothing
+        else {
+            return null
         }
     }
 };
