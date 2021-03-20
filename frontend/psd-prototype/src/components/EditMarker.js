@@ -229,6 +229,9 @@ export default class EditMarker extends React.Component{
                 <Grid container spacing={2} direction="column">
                     {/* rich text editor for editing text content */}
                     <Grid item>
+                        {/* temporary position label for debugging purposes */}
+                        <InputLabel>Position = {this.state.position}</InputLabel>   
+                        <br></br>
                         <InputLabel id="label">Content</InputLabel>
                         <RichTextEditor toolbarConfig={toolbarConfig}
                             value = {this.state.value}
@@ -296,10 +299,6 @@ export default class EditMarker extends React.Component{
                             <label>
                                 Longitude
                                 <input type="number" name="lng" value={this.state.lng} onChange={e => this.setState({lng: e.target.value})}/> 
-                            </label>
-                            <label>
-                                Position (ordering)
-                                <input type="number" name="pos" value={this.state.position} onChange={e => this.setState({position: e.target.value})} />
                             </label>
                         </form>
                     </Grid>
