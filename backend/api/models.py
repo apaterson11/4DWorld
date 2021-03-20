@@ -7,7 +7,7 @@ class Profile(models.Model):
         User, on_delete=models.CASCADE, related_name='profile'
     )
     department = models.CharField(max_length=64)
-    default_group = models.ForeignKey(Group, on_delete=models.CASCADE)
+    default_group = models.ForeignKey(Group, on_delete=models.PROTECT)
 
     def __str__(self):
         return self.user.username

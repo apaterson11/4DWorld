@@ -27,15 +27,22 @@ class RegisterUserSerializer(ModelSerializer):
         return self.Meta.model.objects.create_user(**validated_data)
 
 
+class GroupMemberSerializer(ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('email', 'first_name', 'username')
+
+
 class GroupSerializer(ModelSerializer):
     user_count = serializers.SerializerMethodField('get_user_count')
+    members = GroupMemberSerializer(many=True, required=False)
 
     def get_user_count(self, obj):
         return obj.user_set.count()
 
     class Meta:
         model = Group
-        fields = ('id', 'name', 'user_count')
+        fields = ('id', 'name', 'user_count', 'members')
 
 class MapSerializer(ModelSerializer):
     landmarks = LandmarkSerializer(many=True, required=False)

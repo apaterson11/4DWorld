@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.db.models.deletion import ProtectedError
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework.test import APIClient
@@ -100,8 +101,26 @@ class ProjectTests(TestCase):
             'latitude': 34.4,
             'longitude': 54.2,
             'zoom': 10,
-            'style': MapStyle.objects.create(min_zoom=10, max_zoom=12, name='x', attribution='a', url='https://x.com').id
+            'style': MapStyle.objects.create(
+                min_zoom=10, max_zoom=12, name='x', attribution='a', url='https://x.com'
+            ).id
         }, HTTP_AUTHORIZATION=self.auth_header)
 
         # ensure an associated layer has been created
         self.assertEqual(Layer.objects.filter(map=1).count(), 1)
+
+    def test_user_default_group_is_created(self):
+        user = User.objects.get(username=self.user_details.get('username'))
+        self.assertEqual(user.profile.default_group.name, f"{user.username} (me)")
+
+    def test_user_cannot_delete_default_group(self):
+        user = User.objects.get(username=self.user_details.get('username'))
+        delete_grp_endpoint = reverse(
+            'groups-detail', kwargs={"pk": user.profile.default_group.pk}
+        )
+
+        with self.assertRaises(ProtectedError) as err:
+            response = self.client.delete(
+                delete_grp_endpoint,
+                HTTP_AUTHORIZATION=self.auth_header
+            )
