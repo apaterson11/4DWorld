@@ -30,12 +30,12 @@ class RegisterUserSerializer(ModelSerializer):
 class GroupMemberSerializer(ModelSerializer):
     class Meta:
         model = User
-        fields = ('email', 'first_name', 'username')
+        fields = ('id', 'email', 'first_name', 'username')
 
 
 class GroupSerializer(ModelSerializer):
     user_count = serializers.SerializerMethodField('get_user_count')
-    members = GroupMemberSerializer(many=True, required=False)
+    members = GroupMemberSerializer(many=True, required=False, source='user_set')
 
     def get_user_count(self, obj):
         return obj.user_set.count()
