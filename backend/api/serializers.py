@@ -30,7 +30,7 @@ class RegisterUserSerializer(ModelSerializer):
 class GroupMemberSerializer(ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'email', 'first_name', 'username')
+        fields = ('id', 'email', 'first_name', 'last_name', 'username')
 
 
 class GroupSerializer(ModelSerializer):
@@ -89,7 +89,7 @@ class LayerSerializer(ModelSerializer):
 class UserDetailsSerializer(ModelSerializer):
     class Meta:
         model = User
-        fields = ('first_name', 'email')
+        fields = ('id', 'first_name', 'last_name', 'email')
 
 
 class UserSerializer(ModelSerializer):
@@ -97,7 +97,7 @@ class UserSerializer(ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('first_name', 'email', 'groups')
+        fields = ('first_name', 'last_name', 'email', 'groups')
 
 
 class ProfileDetailsSerializer(ModelSerializer):
@@ -117,6 +117,8 @@ class ProfileDetailsSerializer(ModelSerializer):
         # update associated user
         instance.user.first_name = user.get(
             'first_name', instance.user.first_name)
+        instance.user.last_name = user.get(
+            'last_name', instance.user.last_name)
         instance.user.email = user.get('email', instance.user.email)
         instance.user.save()
         return instance

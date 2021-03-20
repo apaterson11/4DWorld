@@ -4,7 +4,7 @@ from django.test import TestCase
 from django.urls import reverse
 from rest_framework.test import APIClient
 
-from api.models import Project, Map, MapStyle, Layer
+from api.models import Profile, Project, Map, MapStyle, Layer
 
 # Create your tests here.
 class TestUserRegisterAndLoginView(TestCase):
@@ -38,6 +38,18 @@ class TestUserRegisterAndLoginView(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIn("access", response.json())
         self.assertIn("refresh", response.json())
+
+    def test_users_profile_is_automatically_created_when_registering(self):
+        data = {
+            "email": "test@test.com",
+            "password": "password",
+            "username": "test_user"
+        }
+        response = self.client.post(self.register_url, data)
+        self.assertEqual(response.status_code, 201)
+        self.assertTrue(
+            Profile.objects.filter(user__username=data['username']).exists()
+        )
 
 
 class TestUserDetailViewset(TestCase):
