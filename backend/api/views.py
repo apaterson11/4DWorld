@@ -1,6 +1,7 @@
 from django.shortcuts import render
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, User
 from rest_framework import status, viewsets
+from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -54,6 +55,31 @@ class GroupAPIView(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         group = serializer.save()
         group.user_set.add(self.request.user)
+
+
+class DeleteUserFromGroup(APIView):
+
+    def post(self, request, *args, **kwargs):
+        group_id = kwargs.get('pk')
+        user_id = kwargs.get('user_pk')
+        try:
+            group = Group.objects.get(pk=group_id)
+            user = User.objects.get(pk=user_id)
+            group.user_set.add(user)
+            return Response({'success': True}, 200)
+        except (Group.DoesNotExist, User.DoesNotExist) as e:
+            return Response({'error': 'model not found'}, 404)    
+
+    def delete(self, request, *args, **kwargs):
+        group_id = kwargs.get('pk')
+        user_id = kwargs.get('user_pk')
+        try:
+            group = Group.objects.get(pk=group_id)
+            user = User.objects.get(pk=user_id)
+            group.user_set.remove(user)
+            return Response({'success': True}, 200)
+        except (Group.DoesNotExist, User.DoesNotExist) as e:
+            return Response({'error': 'model not found'}, 404)
 
 
 class LandmarkAPIView(FilterByMapMixin, viewsets.ModelViewSet):

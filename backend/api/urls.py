@@ -4,6 +4,7 @@ from api.views import (
     BlacklistTokenUpdateView,
     CityAPIView,
     CountryAPIView,
+    DeleteUserFromGroup,
     GroupAPIView, 
     LandmarkAPIView,
     LandmarkImageAPIView,
@@ -32,6 +33,7 @@ router.register('map-styles', MapStylesAPIView, basename='map-styles')
 router.register('maps', MapAPIView, basename='maps')
 
 urlpatterns = [
+    path('groups/<int:pk>/user/<int:user_pk>/', DeleteUserFromGroup.as_view(), name='del-user-from-group'),
     path('register/', UserRegisterView.as_view(), name='register'),
     path('logout/blacklist/', BlacklistTokenUpdateView.as_view(), name='blacklist')
 ]

@@ -26,22 +26,33 @@ const useStyles = makeStyles({
 export default function UserGroupsCard() {
   const classes = useStyles();
   const [groups, setGroups] = useState([]);
+  const [data, setData] = useState([]);
   const [open, setOpen] = useState(false);
   const [groupClicked, setGroupClicked] = useState();
   const [groupOpen, setGroupOpen] = useState(false);
   const { userDetails, setUserDetails } = useContext(UserContext);
+  const columns = ["Name", "Members"];
 
-  useEffect(() => {
+  const userDetailsRequest = () =>
     axiosInstance
       .get(`/user-details/${userDetails.profile_id}`)
       .then((response) => {
-        setGroups(
-          response.data.user.groups.filter(
-            (grp) => grp.id != userDetails.default_group
-          )
+        const userGroups = response.data.user.groups.filter(
+          (grp) => grp.id != userDetails.default_group
         );
+        setGroups(userGroups);
       });
+
+  useEffect(() => {
+    userDetailsRequest();
   }, []);
+
+  useEffect(() => {
+    const data = groups.map((grp) => {
+      return [grp.name, grp.user_count, grp.id];
+    });
+    setData(data);
+  }, [groups]);
 
   const handleSubmit = (newGroup) => {
     axiosInstance
@@ -56,10 +67,6 @@ export default function UserGroupsCard() {
       });
   };
 
-  const columns = ["Name", "Members"];
-  const data = groups.map((group) => {
-    return [group.name, group.user_count, group.id];
-  });
   const options = {
     download: false,
     print: false,
@@ -91,6 +98,7 @@ export default function UserGroupsCard() {
       />
       <AddUsersToGroupModal
         open={groupOpen}
+        userDetailsRequest={userDetailsRequest}
         groupID={groupClicked}
         onClose={() => setGroupOpen(false)}
         onSubmit={() => console.log("submit")}
