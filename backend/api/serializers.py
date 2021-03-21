@@ -94,6 +94,7 @@ class UserDetailsSerializer(ModelSerializer):
 
 class UserSerializer(ModelSerializer):
     groups = GroupSerializer(many=True, required=False)
+    username = serializers.CharField(required=False)
 
     class Meta:
         model = User
