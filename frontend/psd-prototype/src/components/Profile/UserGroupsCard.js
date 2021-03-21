@@ -15,7 +15,7 @@ const useStyles = makeStyles({
     minWidth: "90%",
   },
   paper: {
-    marginTop: "50px",
+    marginTop: "20px",
     marginBottom: "50px",
     display: "flex",
     flexDirection: "column",
@@ -55,17 +55,19 @@ export default function UserGroupsCard() {
   }, [groups]);
 
   const handleSubmit = (newGroup) => {
-    axiosInstance
-      .post(`/groups/`, {
-        name: newGroup.name,
-      })
-      .then((response) => {
-        let groupsClone = [...groups];
-        groupsClone.push(response.data);
-        setGroups(groupsClone);
-        userDetailsRequest();
-        setOpen(false);
-      });
+    if (newGroup.name.length !== 0) {
+      axiosInstance
+        .post(`/groups/`, {
+          name: newGroup.name,
+        })
+        .then((response) => {
+          let groupsClone = [...groups];
+          groupsClone.push(response.data);
+          setGroups(groupsClone);
+          userDetailsRequest();
+          setOpen(false);
+        });
+    }
   };
 
   const options = {
@@ -80,10 +82,7 @@ export default function UserGroupsCard() {
       const indices = rowsDeleted.data.map((d) => d.dataIndex);
       let requests = [];
       for (let idx of indices) {
-        console.log(idx);
         const groupId = groupsClone[idx].id;
-        console.log(groupsClone);
-        console.log(groupId);
         requests.push(axiosInstance.delete(`/groups/${groupId}`));
       }
       Promise.all(requests).then((res) => {
@@ -116,7 +115,6 @@ export default function UserGroupsCard() {
         userDetailsRequest={userDetailsRequest}
         groupID={groupClicked}
         onClose={() => setGroupOpen(false)}
-        onSubmit={() => console.log("submit")}
       />
       <div className={classes.paper}>
         <Card className={classes.root}>

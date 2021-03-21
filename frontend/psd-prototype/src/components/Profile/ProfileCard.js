@@ -19,8 +19,8 @@ const useStyles = makeStyles({
     minWidth: "90%",
   },
   paper: {
-    marginTop: "50px",
-    marginBottom: "50px",
+    marginTop: "0",
+    marginBottom: "20px",
     display: "flex",
     flexDirection: "column",
     alignItems: "center",

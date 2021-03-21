@@ -9,9 +9,12 @@ import { Link } from "react-router-dom";
 
 const useStyles = makeStyles({
   card: {
-    minWidth: "180px",
-    minHeight: "150px",
-    margin: "0 10px 20px 10px",
+    margin: "5px",
+  },
+  row: {
+    display: "flex",
+    verticalAlign: "middle",
+    justifyContent: "space-between",
   },
 });
 
@@ -25,27 +28,31 @@ function ProjectCard(props) {
           <Link to="demo-map">{props.project.title}</Link>
         </Typography>
       </CardContent>
-      <CardActions>
-        <Link
-          to={{
-            pathname: `/projects/edit/${props.project.id}`,
-            project: props.project,
-          }}
-        >
-          <Button size="small" color="primary">
-            Edit
-          </Button>
-        </Link>
-        <Link
-          to={{
-            pathname: `/projects/view/${props.project.id}`,
-            project: props.project,
-          }}
-        >
-          <Button size="small" color="primary">
-            View
-          </Button>
-        </Link>
+      <CardActions className={classes.row}>
+        <div>
+          <Link
+            to={{
+              pathname: `/projects/edit/${props.project.id}`,
+              project: props.project,
+            }}
+          >
+            <Button size="small" color="primary">
+              Edit
+            </Button>
+          </Link>
+        </div>
+        <div>
+          <Link
+            to={{
+              pathname: `/projects/view/${props.project.id}`,
+              project: props.project,
+            }}
+          >
+            <Button size="small" color="primary">
+              View
+            </Button>
+          </Link>
+        </div>
       </CardActions>
     </Card>
   );

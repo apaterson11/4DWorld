@@ -14,6 +14,12 @@ const useStyles = makeStyles({
     paddingRight: "20px",
     minHeight: "93vh",
   },
+  profile: {
+    paddingLeft: "20px",
+    paddingRight: "20px",
+    minHeight: "93vh",
+    background: "#002e5b",
+  },
 });
 
 function Dashboard() {
@@ -38,7 +44,7 @@ function Dashboard() {
             xs={12}
             sm={6}
             md={4}
-            className={classes.pad}
+            className={classes.profile}
             component={Paper}
             square
           >
@@ -49,7 +55,15 @@ function Dashboard() {
               <UserGroupsCard />
             </Grid>
           </Grid>
-          <Grid item wrap="wrap" xs={12} sm={6} md={8} className={classes.pad}>
+          <Grid
+            item
+            wrap="wrap"
+            xs={12}
+            sm={6}
+            md={8}
+            component={Paper}
+            className={classes.pad}
+          >
             <ProjectContainer />
           </Grid>
         </Grid>

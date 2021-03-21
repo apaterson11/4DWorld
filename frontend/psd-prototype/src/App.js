@@ -93,7 +93,6 @@ function App(props) {
             />
             <Route path="/logout/" render={() => <Logout logout={logout} />} />
           </Switch>
-          <Footer isAuthenticated={isAuthenticated} />
         </IsAuthenticated.Provider>
       </UserContext.Provider>
     </Router>
