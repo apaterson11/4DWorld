@@ -49,6 +49,11 @@ export default function AddUsersToGroupModal(props) {
         );
       }
       Promise.all(requests).then((res) => {
+        // sort the indices from highest to lowest
+        // this prevents slicing error
+        indices.sort(function (a, b) {
+          return parseInt(b) - parseInt(a);
+        });
         for (let idx of indices) {
           membersClone.splice(idx, 1);
         }

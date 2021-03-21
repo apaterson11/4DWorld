@@ -63,6 +63,7 @@ export default function UserGroupsCard() {
         let groupsClone = [...groups];
         groupsClone.push(response.data);
         setGroups(groupsClone);
+        userDetailsRequest();
         setOpen(false);
       });
   };
@@ -75,12 +76,26 @@ export default function UserGroupsCard() {
     rowsPerPage: 3,
     rowsPerPageOptions: false,
     onRowsDelete: (rowsDeleted) => {
-      rowsDeleted.data.map((d) => {
-        const deleteId = data[d.dataIndex][2];
-        axiosInstance.delete(`/groups/${deleteId}`).then((res) => {
-          const newGroups = groups.filter((grp) => grp.id !== deleteId);
-          setGroups(newGroups);
+      const groupsClone = [...groups];
+      const indices = rowsDeleted.data.map((d) => d.dataIndex);
+      let requests = [];
+      for (let idx of indices) {
+        console.log(idx);
+        const groupId = groupsClone[idx].id;
+        console.log(groupsClone);
+        console.log(groupId);
+        requests.push(axiosInstance.delete(`/groups/${groupId}`));
+      }
+      Promise.all(requests).then((res) => {
+        // sort the indices from highest to lowest
+        // this prevents slicing error
+        indices.sort(function (a, b) {
+          return parseInt(b) - parseInt(a);
         });
+        for (let idx of indices) {
+          groupsClone.splice(idx, 1);
+        }
+        setGroups(groupsClone);
       });
     },
     onRowClick: (rowData, rowMeta) => {
