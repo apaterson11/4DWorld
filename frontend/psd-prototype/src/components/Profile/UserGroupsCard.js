@@ -38,7 +38,7 @@ export default function UserGroupsCard() {
       .get(`/user-details/${userDetails.profile_id}`)
       .then((response) => {
         const userGroups = response.data.user.groups.filter(
-          (grp) => grp.id != userDetails.default_group
+          (grp) => grp.id !== userDetails.default_group
         );
         setGroups(userGroups);
       });
@@ -76,7 +76,7 @@ export default function UserGroupsCard() {
     viewColumns: false,
     elevation: 0,
     rowsPerPage: 3,
-    rowsPerPageOptions: false,
+    rowsPerPageOptions: [],
     onRowsDelete: (rowsDeleted) => {
       const groupsClone = [...groups];
       const indices = rowsDeleted.data.map((d) => d.dataIndex);

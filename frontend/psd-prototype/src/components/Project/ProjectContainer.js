@@ -6,40 +6,47 @@ import ProjectCard from "./ProjectCard";
 import AddCircleIcon from "@material-ui/icons/AddCircle";
 import { Link } from "react-router-dom";
 import Grid from "@material-ui/core/Grid";
+import Chip from "@material-ui/core/Chip";
+import ProjectDetailModal from "./ProjectDetailModal";
 
 const useStyles = makeStyles({
   paper: {
-    padding: "2% 5%",
+    padding: "0% 5% 5% 5%",
     display: "flex",
     flexDirection: "row",
     flexWrap: "wrap",
   },
   header: {
-    marginTop: "50px",
-    marginLeft: "40px",
+    margin: "40px",
   },
   row: {
     display: "flex",
-    verticalAlign: "middle",
+    alignItems: "center",
   },
-  padding: {
-    margin: "40px 50px 10px 50px",
+  chip: {
+    backgroundColor: "#6C8C4C",
+    fontSize: "18px",
+    color: "white",
   },
-  largeIcon: {
-    width: 45,
-    height: 45,
-    color: "#002e5b",
+  icon: {
+    color: "white",
   },
 });
 
 function ProjectContainer(props) {
   const classes = useStyles();
   const [projects, setProjects] = useState([]);
+  const [open, setOpen] = useState(false);
+  const [clickedProject, setClickedProject] = useState(null);
 
-  useEffect(() => {
-    const response = axiosInstance
+  const fetchProjects = () => {
+    axiosInstance
       .get("/projects/")
       .then((response) => setProjects(response.data));
+  };
+
+  useEffect(() => {
+    fetchProjects();
   }, []);
 
   let renderCard = () => {
@@ -47,14 +54,28 @@ function ProjectContainer(props) {
       return <Typography>You have no projects yet</Typography>;
     }
     return projects.map((project) => (
-      <Grid item sm={12} md={4} lg={3}>
-        <ProjectCard project={project} key={project.id} />
+      <Grid item sm={12} md={4}>
+        <ProjectCard
+          project={project}
+          key={project.id}
+          setOpen={setOpen}
+          setClickedProject={setClickedProject}
+        />
       </Grid>
     ));
   };
 
   return (
     <React.Fragment>
+      <ProjectDetailModal
+        open={open}
+        onClose={() => {
+          setOpen(false);
+          setClickedProject(null);
+        }}
+        project={clickedProject}
+        setProjects={fetchProjects}
+      />
       <div className={classes.row}>
         <div>
           <Typography
@@ -66,9 +87,14 @@ function ProjectContainer(props) {
             My Projects
           </Typography>
         </div>
-        <div className={classes.padding}>
+        <div>
           <Link to="projects/create/">
-            <AddCircleIcon className={classes.largeIcon} />
+            <Chip
+              label={"Add"}
+              className={classes.chip}
+              icon={<AddCircleIcon className={classes.icon} />}
+              clickable={true}
+            />
           </Link>
         </div>
       </div>

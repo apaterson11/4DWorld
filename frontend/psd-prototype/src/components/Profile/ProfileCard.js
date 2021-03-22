@@ -13,6 +13,7 @@ import TableContainer from "@material-ui/core/TableContainer";
 import TableRow from "@material-ui/core/TableRow";
 import EditProfileModal from "./EditProfileModal";
 import { UserContext } from "../../Context";
+import AccountCircleIcon from "@material-ui/icons/AccountCircle";
 
 const useStyles = makeStyles({
   root: {
@@ -23,6 +24,16 @@ const useStyles = makeStyles({
     marginBottom: "20px",
     display: "flex",
     flexDirection: "column",
+    alignItems: "center",
+  },
+  largeIcon: {
+    width: 45,
+    height: 45,
+    color: "#002e5b",
+    paddingRight: "10px",
+  },
+  row: {
+    display: "flex",
     alignItems: "center",
   },
 });
@@ -76,9 +87,16 @@ export default function ProfileCard() {
       <div className={classes.paper}>
         <Card className={classes.root}>
           <CardContent>
-            <Typography gutterBottom variant="h5" component="h2">
-              {userDetails.username}
-            </Typography>
+            <div className={classes.row}>
+              <div>
+                <AccountCircleIcon className={classes.largeIcon} />
+              </div>
+              <div>
+                <Typography gutterBottom variant="h5" component="h2">
+                  {userDetails.username}
+                </Typography>
+              </div>
+            </div>
             <TableContainer>
               <Table size="small">
                 <TableBody>
