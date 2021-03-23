@@ -36,7 +36,7 @@ const groupBy = (array, fn) => array.reduce((result, item) => {
     const key = fn(item);
     if (!result[key]) result[key] = [];
     result[key].push(item);
-    return result;
+    return result
 }, {});
 
 
@@ -107,6 +107,8 @@ export class LayerContent extends React.Component {
         if (oldlayer !== layer) {
             let positions = []
             let landmarksgrouped = groupBy([...this.props.landmarks], i => i.layer)
+            // console.log(landmarksgrouped[layer])
+            // console.log(landmarksgrouped[oldlayer])
 
             if (landmarksgrouped[layer]) {
                 landmarksgrouped[layer].forEach((marker) => {
@@ -160,6 +162,7 @@ export class LayerContent extends React.Component {
     // updates positions of all markers after a marker's layer is changed
     updatePositions(array) {
         array.forEach((marker, index) => {
+            console.log(marker, index)
             const response = axiosInstance.put(`/landmarks/${marker.id}/`, {
                             content: marker.content,
                             markertype: marker.markertype,
@@ -177,17 +180,20 @@ export class LayerContent extends React.Component {
     // function gets all landmarks 
     getLandmarks = () => {
         const results = [];
-        const allmarkers = [];
+        //const allmarkers = [];
         const response = axiosInstance.get('/landmarks/', {
         }).then(response => response.data.forEach(item => {
             if (item.layer === this.state.layer) {
                 results.push(item);
             }
-            allmarkers.push(item);
-        }))
-        this.setState({layerlandmarks: results})
-        this.setState({landmarks: allmarkers})
-        this.props.rerenderParentCallback() // rerender ProtoMap to display change in layers
+            //allmarkers.push(item);
+            results.sort((a, b) => a.position > b.position ? 1 : -1)
+        }),
+            this.setState({layerlandmarks: results},this.props.rerenderParentCallback())
+        )
+
+        // this.setState({landmarks: allmarkers})
+         // rerender ProtoMap to display change in layers
     }
 
     // used for passing through to editmarker.js
@@ -203,10 +209,14 @@ export class LayerContent extends React.Component {
         const response = axiosInstance.delete(`/landmarks/${landmark_id}/`)
             .then(response => {
                 // filter out the landmark that's been deleted from the state
+                //console.log(this.state.landmarks)
+                console.log(this.state.layerlandmarks)
                 this.setState({
                     landmarks: this.state.landmarks.filter(landmark => landmark.id !== landmark_id),
                     layerlandmarks: this.state.layerlandmarks.filter(landmark => landmark.id !== landmark_id)
                 })
+                //console.log(this.state.landmarks)
+                console.log(this.state.layerlandmarks)
                 // this.getLandmarks()
                 let markersToUpdate = [...this.state.layerlandmarks]
                 this.updatePositions(markersToUpdate)

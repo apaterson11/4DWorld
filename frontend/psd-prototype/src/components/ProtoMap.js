@@ -79,7 +79,7 @@ class ProtoMap extends React.Component {
 
         let currentlayerlandmarks = this.state.landmarks.filter(landmark => parseInt(landmark.layer) == parseInt(this.state.currentlayer.id))
 
-        const pos = ((currentlayerlandmarks) ? (currentlayerlandmarks.length) : 0)
+        const pos = ((currentlayerlandmarks) ? (currentlayerlandmarks.length) : 0)  // current concurrency issue here where if post request has not finished, length is not updated - if user clicks fast enough, will get same position
 
         const response = axiosInstance.post('/landmarks/', {
             layer: this.state.currentlayer.id,
