@@ -275,6 +275,8 @@ export default class EditMarker extends React.Component{
                             <MenuItem value={"default"}>Default</MenuItem>
                             <MenuItem value={"individual"}>Significant Individual</MenuItem>
                             <MenuItem value={"army"}>Army</MenuItem>
+                            <MenuItem value={"PinkArmy"}>Pink Army</MenuItem>
+                            <MenuItem value={"GreenArmy"}>Green Army</MenuItem>                                  
                             <MenuItem value={"knowledge"}>Knowledge Site</MenuItem>
                             <MenuItem value={"trading"}>Trading Site</MenuItem>
                             <MenuItem value={"religious"}>Religious Site</MenuItem>
