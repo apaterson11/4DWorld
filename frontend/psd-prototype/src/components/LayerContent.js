@@ -113,7 +113,6 @@ export class LayerContent extends React.Component {
 
             if (landmarksgrouped[layer]) {
                 landmarksgrouped[layer].forEach((marker) => {
-                    
                     positions.push(parseInt(marker.position))
                 })
                 newposition = (Math.max(...positions) + 1)

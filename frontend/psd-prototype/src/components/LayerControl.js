@@ -17,8 +17,8 @@ export default class EditMarker extends React.Component{
     state = {
         currentlayer: this.props.currentlayer,
         layers: this.props.layers,
-        layer_name: this.props.currentlayer.name,
-        layer_desc: this.props.currentlayer.description,
+        // layer_name: this.props.currentlayer.name,
+        // layer_desc: this.props.currentlayer.description,
         landmarks: this.props.landmarks,
         landmarksgrouped: this.props.landmarksgrouped,
         layerlandmarks: [],

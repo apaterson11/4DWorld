@@ -77,12 +77,12 @@ class ProtoMap extends React.Component {
         /* Adds a new landmark to the map at a given latitude and longitude, via a POST request */
         const { lat, lng } = e.latlng;
 
-        let currentlayerlandmarks = this.state.landmarks.filter(landmark => parseInt(landmark.layer) == parseInt(this.state.currentlayer))
+        let currentlayerlandmarks = this.state.landmarks.filter(landmark => parseInt(landmark.layer) == parseInt(this.state.currentlayer.id))
 
         const pos = ((currentlayerlandmarks) ? (currentlayerlandmarks.length) : 0)
 
         const response = axiosInstance.post('/landmarks/', {
-            layer: this.state.currentlayer,
+            layer: this.state.currentlayer.id,
             content: 'sample text',
             latitude: lat,
             longitude: lng,
@@ -123,7 +123,11 @@ class ProtoMap extends React.Component {
     
     // displays correct layers in dropdown layer select menu
     handleLayer(e) {
-        this.setState({currentlayer: e.target.value});
+        this.state.layers.forEach(item => {
+            if (item.id == e.target.value) {
+                this.setState({currentlayer: item});
+            }
+        })
     }
  
     render() {
@@ -171,7 +175,7 @@ class ProtoMap extends React.Component {
                     <React.Fragment>
                         <div className = 'select-layer'>
                         <p>Select layer: </p>
-                        <select value={this.state.currentlayer} onFocus={this.handleLayer} onChange={this.handleLayer} ref={this.refLayerSelect}>
+                        <select onFocus={this.handleLayer} onChange={this.handleLayer} ref={this.refLayerSelect}>
                             {layerselect}
                         </select>
                         </div>
