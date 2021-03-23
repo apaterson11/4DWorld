@@ -31,11 +31,26 @@ const iconRef = {"army": army,
                  "village": village
                  };
 
+// groups layer landmarks
+const groupBy = (array, fn) => array.reduce((result, item) => {
+    const key = fn(item);
+    if (!result[key]) result[key] = [];
+    result[key].push(item);
+    return result
+}, {});
+
+
 export class LayerContent extends React.Component {
 
+    constructor(props) {
+        super(props);
+    }
+
     state = {
-                landmarks: this.props.landmarks,
+                landmarks: [],
                 layerlandmarks: this.props.layerlandmarks,
+                currentlandmarks: [],
+                landmarksgrouped: this.props.landmarksgrouped,
                 layers: this.props.layers,
                 layer: this.props.layer,
                 landmark_id: this.props.landmark_id,
@@ -46,37 +61,77 @@ export class LayerContent extends React.Component {
                 position: this.props.position,
             }
 
+    // fetches all markers when page is loaded
     componentDidMount() {
         this.fetchData()
     }
 
     fetchData() {
-        this.setState({layerlandmarks: []})
         this.getLandmarks()
     }
 
+    // refetches updated markers when they are changed
     componentDidUpdate(prevProps, prevState) {
-        if (prevProps.landmarks.length !== this.props.landmarks.length) {
+        if (this.props.layerlandmarks && prevProps.layerlandmarks) {
+            if (JSON.stringify(prevProps.layerlandmarks) !== JSON.stringify(this.props.layerlandmarks)) {
+                this.fetchData()
+            }
+        }
+        // covers case where there were no markers initially
+        else if (this.props.layerlandmarks) {
             this.fetchData()
         }
     }
 
     submitEdit = (layer, content, icontype, lat, lng, id, pos, layerlandmarks) => {
         this.updateLandmarks(layer, content, icontype, lat, lng, id, pos, layerlandmarks)
-        window.location.reload();
     }
 
     updateLandmarks = (layer, content, markertype, lat, lng, landmark_id, position, layerlandmarks) => {
         /* Updates the landmarks by sending a PUT request to the API,
            and updating the state in the then() callback
         */
+
+        // get the current layer of the changing marker
+        let oldlayer = -1
+        layerlandmarks.forEach((marker) => {
+            if (marker.id == landmark_id) {
+                oldlayer = marker.layer
+            }
+        })
+
+        // update position if the layer has changed
+        let newposition = 0
+        let updateOldLayer = false
+        this.getLandmarks()
+        if (oldlayer !== layer) {
+            let positions = []
+            let landmarksgrouped = groupBy([...this.props.landmarks], i => i.layer)
+            // console.log(landmarksgrouped[layer])
+            // console.log(landmarksgrouped[oldlayer])
+
+            if (landmarksgrouped[layer]) {
+                landmarksgrouped[layer].forEach((marker) => {
+                    positions.push(parseInt(marker.position))
+                })
+                newposition = (Math.max(...positions) + 1)
+            }
+            updateOldLayer = true
+        }
+
+        // if just updating marker properties e.g. content and not changing layer
+        else if (oldlayer == layer) {
+            newposition = this.state.position
+        }
+
+        // update marker
         const response = axiosInstance.put(`/landmarks/${landmark_id}/`, {
             content: content,
             markertype: markertype,
             latitude: lat,
             longitude: lng,
             layer: layer,
-            position: position
+            position: newposition
         }).then(response => {
             let updatedLandmarks = [...this.state.landmarks]  // copy original state
             
@@ -87,22 +142,58 @@ export class LayerContent extends React.Component {
             updatedLandmarks.splice(idx, 1, response.data)
 
             // set the state with the newly updated landmark
-            this.setState({
-                landmarks: updatedLandmarks
+            this.setState({landmarks: updatedLandmarks})
+
+            // find all markers to update and send to updatePositions function
+            let markersToUpdate = []
+            this.state.layerlandmarks.forEach((marker) => {
+                if (marker.id != landmark_id) {
+                    markersToUpdate.push(marker)
+                }
             })
+            
+            if (updateOldLayer) {
+                this.setState({layerlandmarks: this.state.layerlandmarks.filter(landmark => landmark.id !== landmark_id)}, this.updatePositions(markersToUpdate))   // do not change, this is the correct order of things (probably)
+                updateOldLayer = false
+            }
         })
     };
 
+    // updates positions of all markers after a marker's layer is changed
+    updatePositions(array) {
+        array.forEach((marker, index) => {
+            console.log(marker, index)
+            const response = axiosInstance.put(`/landmarks/${marker.id}/`, {
+                            content: marker.content,
+                            markertype: marker.markertype,
+                            latitude: marker.latitude,
+                            longitude: marker.longitude,
+                            layer: marker.layer,
+                            position: index,
+                        }).then(response => {
+                            this.getLandmarks()
+                            
+                        })
+            })
+    }
+
     // function gets all landmarks 
-    getLandmarks = async() => {
+    getLandmarks = () => {
         const results = [];
-        const response = await axiosInstance.get('/landmarks/', {
+        //const allmarkers = [];
+        const response = axiosInstance.get('/landmarks/', {
         }).then(response => response.data.forEach(item => {
             if (item.layer === this.state.layer) {
                 results.push(item);
             }
-        }))
-        this.setState({layerlandmarks: results})
+            //allmarkers.push(item);
+            results.sort((a, b) => a.position > b.position ? 1 : -1)
+        }),
+            this.setState({layerlandmarks: results},this.props.rerenderParentCallback())
+        )
+
+        // this.setState({landmarks: allmarkers})
+         // rerender ProtoMap to display change in layers
     }
 
     // used for passing through to editmarker.js
@@ -112,80 +203,91 @@ export class LayerContent extends React.Component {
 
     // removes landmark from state
     removeMarkerFromState = (landmark_id) => {
+        
         /* Deletes the given landmark from the state, by sending a DELETE request to the API */
+
         const response = axiosInstance.delete(`/landmarks/${landmark_id}/`)
             .then(response => {
                 // filter out the landmark that's been deleted from the state
+                //console.log(this.state.landmarks)
+                console.log(this.state.layerlandmarks)
                 this.setState({
-                    landmarks: this.state.landmarks.filter(landmark => landmark.id !== landmark_id)
+                    landmarks: this.state.landmarks.filter(landmark => landmark.id !== landmark_id),
+                    layerlandmarks: this.state.layerlandmarks.filter(landmark => landmark.id !== landmark_id)
                 })
-                console.log("calling getLandmarks, layer = ", this.state.layer, ", layerlandmarks = ", this.state.layerlandmarks)
-                //this.setState({layerlandmarks: []})
-                this.getLandmarks()
+                //console.log(this.state.landmarks)
+                console.log(this.state.layerlandmarks)
+                // this.getLandmarks()
+                let markersToUpdate = [...this.state.layerlandmarks]
+                this.updatePositions(markersToUpdate)
             })
-      };
+                        
+    }   
 
     render() {
-            const layerlandmarks = this.state.layerlandmarks
+            let layerlandmarks = this.state.layerlandmarks
             let content = ''
             let lines = ''
 
             // content renders all the landmarks onto the map 
-            content = layerlandmarks.map((landmark, index) =>
-            <Marker key={landmark.id} position={[landmark.latitude, landmark.longitude]} icon={(landmark.markertype in iconRef) ? iconRef[landmark.markertype] : blueIcon} >
-                <Popup 
-                autoClose={false} 
-                nametag={'marker'}
-                minWidth={400} 
-                maxWidth={2000}
-                >
-                <React.Fragment>
-                {/* EditMarker is the popup attached to each landmark */}
-                <EditMarker 
-                    landmarks={this.state.landmarks}
-                    layerlandmarks={this.state.layerlandmarks}
-                    content={landmark.content} 
-                    position={landmark.position}
-                    icontype={landmark.markertype}  
-                    lat = {landmark.latitude}
-                    lng = {landmark.longitude}
-                    id = {landmark.id}
-                    layer = {this.state.layer}
-                    layers = {this.state.layers}
-                    markerEdit={this.submitEdit}
-                    markerDelete={this.submitDelete}>
-                </EditMarker>
-                </React.Fragment>
-                </Popup>
-            </Marker>)
-     
-            // make copies of landmarks array
-            let fromLandmarks = [...this.state.layerlandmarks];
-            let toLandmarks = [...this.state.layerlandmarks]; 
-
-            fromLandmarks.pop()
-            fromLandmarks.sort((a, b) => a.position > b.position ? 1 : -1);
-            toLandmarks = toLandmarks.slice(1)
-            toLandmarks.sort((a, b) => a.position > b.position ? 1 : -1);
-
-            // range(length of fromLandmarks)
-            let range = Array(fromLandmarks.length).fill().map((x,i)=>i)
-
-            lines = range.map((i) => 
-                <Polyline 
-                        key={fromLandmarks.id} 
-                        positions={[[fromLandmarks[i].latitude, fromLandmarks[i].longitude], [toLandmarks[i].latitude, toLandmarks[i].longitude]]} 
-                        color={'red'} />)
-            // creates one line between each pair of markers
-
-        return (
-            <React.Fragment>
-                {content}
-                {lines}
-            </React.Fragment>
-        )
+            if (this.state.layerlandmarks) {
+                content = layerlandmarks.map((landmark, index) =>
+                <Marker key={landmark.id} position={[landmark.latitude, landmark.longitude]} icon={(landmark.markertype in iconRef) ? iconRef[landmark.markertype] : blueIcon} >
+                    <Popup 
+                    autoClose={false} 
+                    nametag={'marker'}
+                    minWidth={400} 
+                    maxWidth={2000}
+                    >
+                    <React.Fragment>
+                    {/* EditMarker is the popup attached to each landmark */}
+                    <EditMarker 
+                        landmarks={this.state.landmarks}
+                        layerlandmarks={this.state.layerlandmarks}
+                        content={landmark.content} 
+                        position={landmark.position}
+                        icontype={landmark.markertype}  
+                        lat = {landmark.latitude}
+                        lng = {landmark.longitude}
+                        id = {landmark.id}
+                        layer = {this.state.layer}
+                        layers = {this.state.layers}
+                        markerEdit={this.submitEdit}
+                        markerDelete={this.submitDelete}>
+                    </EditMarker>
+                    </React.Fragment>
+                    </Popup>
+                </Marker>)
         
+                // make copies of landmarks array
+                let fromLandmarks = [...this.state.layerlandmarks];
+                let toLandmarks = [...this.state.layerlandmarks]; 
+
+                    fromLandmarks.sort((a, b) => a.position > b.position ? 1 : -1);
+                    fromLandmarks.pop()
+                    toLandmarks.sort((a, b) => a.position > b.position ? 1 : -1);
+                    toLandmarks = toLandmarks.slice(1)
+
+                // range(length of fromLandmarks)
+                let range = Array(fromLandmarks.length).fill().map((x,i)=>i)
+
+                    lines = range.map((i) => 
+                        <Polyline 
+                                key={fromLandmarks.id} 
+                                positions={[[fromLandmarks[i].latitude, fromLandmarks[i].longitude], [toLandmarks[i].latitude, toLandmarks[i].longitude]]} 
+                                color={'red'} />)
+                    // creates one line between each pair of markers
+                    return (
+                        <React.Fragment>
+                            {content}
+                            {lines}
+                        </React.Fragment>
+                    )
+                }
+                else {
+                    return null
+                }
+            }  
     }
-}
 
 export default LayerContent

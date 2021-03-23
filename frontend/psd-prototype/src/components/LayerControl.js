@@ -1,21 +1,32 @@
 import React from 'react';
+import { render } from 'react-dom'
 import Grid from '@material-ui/core/Grid';
 import axiosInstance from '../axios'
+import Example from './example'
+import { DndProvider } from 'react-dnd'
+import { HTML5Backend } from 'react-dnd-html5-backend'
+import DND from './Container'
 require("./LayerControl.css");
 
 // edit/delete layer functionality
 export default class EditMarker extends React.Component{
-
+    constructor(props) {
+        super(props)
+        this.refSelect = React.createRef();
+    }
     state = {
         currentlayer: this.props.currentlayer,
         layers: this.props.layers,
-        layer_name: this.props.currentlayer.name,
-        layer_desc: this.props.currentlayer.description,
+        // layer_name: this.props.currentlayer.name,
+        // layer_desc: this.props.currentlayer.description,
+        landmarks: this.props.landmarks,
+        landmarksgrouped: this.props.landmarksgrouped,
+        layerlandmarks: [],
     }
 
-    // selects layer to be edited
+    // selects layer to be edited and changes layer landmarks to appropriate layer
     handleLayer = (e) => {
-        this.setState({currentlayer: e.target.value});
+        this.setState({currentlayer: e.target.value}, this.setState({layerlandmarks: this.state.landmarksgrouped[this.state.currentlayer]}));
     }
 
     // edits layer via PUT request
@@ -68,8 +79,9 @@ export default class EditMarker extends React.Component{
                     <select value = {this.state.currentlayer}
                         type="select"
                         name="selectLayer"
+                        onChange={this.handleLayer}
                         onFocus={this.handleLayer}
-                        onChange={this.handleLayer}>
+                        ref = {this.refSelect}>
                         { /* list all the layers*/ }
                         {
                             this.state.layers.map((e, i) => {
@@ -92,6 +104,18 @@ export default class EditMarker extends React.Component{
                             Description
                             <input type="string" name="description" value={this.state.layer_desc} onChange={e => this.setState({layer_desc: e.target.value})}/>
                         </label>
+                        <br></br><br></br>
+                        <label>
+                            Marker Order
+                            <DndProvider backend={HTML5Backend} >
+                                <DND 
+                                    layerlandmarks={this.state.landmarksgrouped[this.state.currentlayer]}
+                                    currentlayer={this.state.currentlayer}
+                                    rerenderParentCallback={this.props.rerenderParentCallback}
+                                ></DND>
+                            </DndProvider>
+                        </label>
+                        <br></br><br></br>
                         <button
                             onClick={() => this.editLayer(this.state.currentlayer)}
                         > Submit changes
