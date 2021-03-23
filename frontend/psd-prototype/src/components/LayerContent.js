@@ -100,8 +100,6 @@ export class LayerContent extends React.Component {
             }
         })
 
-
-
         // update position if the layer has changed
         let newposition = 0
         let updateOldLayer = false
@@ -109,7 +107,6 @@ export class LayerContent extends React.Component {
         if (oldlayer !== layer) {
             let positions = []
             let landmarksgrouped = groupBy([...this.props.landmarks], i => i.layer)
-
 
             if (landmarksgrouped[layer]) {
                 landmarksgrouped[layer].forEach((marker) => {
@@ -143,24 +140,22 @@ export class LayerContent extends React.Component {
             updatedLandmarks.splice(idx, 1, response.data)
 
             // set the state with the newly updated landmark
-            this.setState({landmarks: updatedLandmarks}, this.getLandmarks)
-        })
-        
-        // find all markers to update and send to updatePositions function
-        let markersToUpdate = []
-        this.state.layerlandmarks.forEach((marker) => {
-            if (marker.id != landmark_id) {
-                markersToUpdate.push(marker)
+            this.setState({landmarks: updatedLandmarks})
+
+            // find all markers to update and send to updatePositions function
+            let markersToUpdate = []
+            this.state.layerlandmarks.forEach((marker) => {
+                if (marker.id != landmark_id) {
+                    markersToUpdate.push(marker)
+                }
+            })
+            
+            if (updateOldLayer) {
+                this.setState({layerlandmarks: this.state.layerlandmarks.filter(landmark => landmark.id !== landmark_id)}, this.updatePositions(markersToUpdate))   // do not change, this is the correct order of things (probably)
+                updateOldLayer = false
             }
         })
-        
-        if (updateOldLayer) {
-            this.updatePositions(markersToUpdate)
-            this.setState({layerlandmarks: this.state.layerlandmarks.filter(landmark => landmark.id !== landmark_id)})
-            updateOldLayer = false
-        }
     };
-
 
     // updates positions of all markers after a marker's layer is changed
     updatePositions(array) {
@@ -178,7 +173,6 @@ export class LayerContent extends React.Component {
                         })
             })
     }
-    
 
     // function gets all landmarks 
     getLandmarks = () => {
@@ -217,12 +211,8 @@ export class LayerContent extends React.Component {
                 let markersToUpdate = [...this.state.layerlandmarks]
                 this.updatePositions(markersToUpdate)
             })
-
-            this.getLandmarks()
                         
-    }
-                    
-        
+    }   
 
     render() {
             let layerlandmarks = this.state.layerlandmarks
@@ -287,10 +277,7 @@ export class LayerContent extends React.Component {
                 else {
                     return null
                 }
-            }
-            
-        
-            
+            }  
     }
 
 export default LayerContent
