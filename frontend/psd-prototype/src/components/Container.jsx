@@ -10,6 +10,7 @@ export const Container = (props) => {
     {
         // get cards from layer's landmarks
         let options = ''
+        console.log(props.layerlandmarks)
         if (props.layerlandmarks) {
             options = props.layerlandmarks
             .sort((a,b) => a.position > b.position ? 1 : -1)

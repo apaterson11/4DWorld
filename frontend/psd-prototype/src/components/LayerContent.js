@@ -1,7 +1,8 @@
 import React from 'react';
 import axiosInstance from '../axios';
-import {Marker, Popup, Polyline, Polygon, Circle} from 'react-leaflet';
+import {Marker, Popup, Polygon, Circle} from 'react-leaflet';
 import EditMarker from './EditMarker';
+import Polyline from 'react-leaflet-arrowheads'
 
 import {
     army,
@@ -240,12 +241,28 @@ export class LayerContent extends React.Component {
 
     render() {
             let layerlandmarks = this.state.layerlandmarks
-            let content = ''
-            let lines = ''
+        
+            let markers = ''
+            let layercolour = '#000000'
+            for (var i = 0; i<this.state.layers.length; i++) {
+                // console.log(this.state.layers[i])
+                if ((parseInt(this.state.layers[i].id)) == parseInt(this.state.layer)) {
+                    if (this.state.layers[i].colour) {
+                        layercolour = this.state.layers[i].colour
+                    }
+                    //console.log(layercolour)
+                    //console.log()
+                    // tl = this layer
+                    
+                }    
+            }
+
+
+           
             
             if (this.state.layerlandmarks) {
                 // if there are any markers in this layer, show all markers
-                content = layerlandmarks.map((landmark, index) =>
+                markers = layerlandmarks.map((landmark, index) =>
                 <Marker key={landmark.id} position={[landmark.latitude, landmark.longitude]} icon={(landmark.markertype in iconRef) ? iconRef[landmark.markertype] : blueIcon} >
                     <Popup 
                     autoClose={false} 
@@ -286,23 +303,20 @@ export class LayerContent extends React.Component {
 
                 let content = ''
 
-                console.log(this.state.layer, layertype)
-
-                if (layertype == "NDR") {
-
-
-                    // make copies of landmarks array
-                    let fromLandmarks = [...this.state.layerlandmarks];
-                    let toLandmarks = [...this.state.layerlandmarks]; 
+                // console.log(this.state.layer, layertype)
+                // make copies of landmarks array
+                let fromLandmarks = [...this.state.layerlandmarks];
+                let toLandmarks = [...this.state.layerlandmarks]; 
 
 
                     
 
-                    fromLandmarks.sort((a, b) => a.position > b.position ? 1 : -1);
-                    fromLandmarks.pop()
-                    toLandmarks.sort((a, b) => a.position > b.position ? 1 : -1);
-                    toLandmarks = toLandmarks.slice(1)
+                fromLandmarks.sort((a, b) => a.position > b.position ? 1 : -1);
+                fromLandmarks.pop()
+                toLandmarks.sort((a, b) => a.position > b.position ? 1 : -1);
+                toLandmarks = toLandmarks.slice(1)
 
+                if (layertype == "NDR") {
                     // range(length of fromLandmarks)
                     let range = Array(fromLandmarks.length).fill().map((x,i)=>i)
 
@@ -310,11 +324,12 @@ export class LayerContent extends React.Component {
                             <Polyline 
                                     key={fromLandmarks.id} 
                                     positions={[[fromLandmarks[i].latitude, fromLandmarks[i].longitude], [toLandmarks[i].latitude, toLandmarks[i].longitude]]} 
-                                    color={'red'} />)
+                                    color={layercolour} 
+                                    
+                                    />)
                         // creates one line between each pair of markers
                 } else if (layertype == "FIL") {
-                
-                    console.log("is FIL")
+                    // console.log("is FIL")
                     let fillLandmarks = [...this.state.layerlandmarks];
 
 
@@ -334,7 +349,19 @@ export class LayerContent extends React.Component {
                     let testcenter = positions[1]
                     let test = ''
                     let test2 = ''
-                    content = <Polygon color={'black'} positions={positions}/>
+                    content = <Polygon color={layercolour} positions={positions}/>
+
+                } else if (layertype == "DIR"){
+                    
+                    //Range (length of fromlandmarks)
+                    let rangeDIR = Array(fromLandmarks.length).fill().map((x,i)=>i)
+                    
+                    content = rangeDIR.map((i) => 
+                    <Polyline 
+                            key={fromLandmarks.id} 
+                            positions={[[fromLandmarks[i].latitude, fromLandmarks[i].longitude], [toLandmarks[i].latitude, toLandmarks[i].longitude]]} 
+                            color={layercolour}
+                            arrowheads = {{size: '12px', frequency: '50px'}}  />) //Add arrows to the polylines between markers
                 }
                 // test2 = <Circle color={'purple'} center={[54, -4]} radius={1000000}/>
                 // const fillcolour = {color: 'blue'}
@@ -351,6 +378,7 @@ export class LayerContent extends React.Component {
                     return null
                 }
             }
+
             
         
             

@@ -11,7 +11,7 @@ import {CirclePicker, GithubPicker, CompactPicker} from 'react-color';
 require("./LayerControl.css");
 
 // edit/delete layer functionality
-export default class EditMarker extends React.Component{
+export default class LayerControl extends React.Component{
     constructor(props) {
         super(props)
         this.refSelect = React.createRef();
@@ -19,13 +19,10 @@ export default class EditMarker extends React.Component{
     state = {
         currentlayer: this.props.currentlayer,
         layers: this.props.layers,
-        // layer_name: this.props.currentlayer.name,   // busted
-        // layer_desc: this.props.currentlayer.description,    // busted
-        // layer_type: this.props.currentlayer.type,   // bust
-        layer_name: '',
-        layer_desc: '',
-        layer_type: '',
-        layer_colour: '',
+        layer_name: this.props.currentlayer.name, 
+        layer_desc: this.props.currentlayer.description,   
+        layer_type: this.props.currentlayer.type,  
+        layer_colour: this.props.currentlayer.colour,
         landmarks: this.props.landmarks,
         landmarksgrouped: this.props.landmarksgrouped,
         layerlandmarks: [],
@@ -33,26 +30,48 @@ export default class EditMarker extends React.Component{
 
     componentDidMount() {
 
-        for (var i = 0; i<this.state.layers.length; i++) {
-            console.log(this.state.layers[i])
-            console.log(this.state.currentlayer)
-            if ((parseInt(this.state.layers[i].id)) == parseInt(this.state.currentlayer)) {
-                console.log(this.state.layers[i].type)
-                // tl = this layer
-                let tl = this.state.layers[i]
-                console.log(tl.name)
-                this.setState({layer_name: tl.name, layer_desc: tl.description, layer_type: tl.type, layer_colour: tl.colour})
-            }
-        }
+        console.log(this.props.currentlayer)
+
+        // for (var i = 0; i<this.state.layers.length; i++) {
+        //     console.log(this.state.layers[i])
+        //     console.log(this.state.currentlayer)
+        //     if ((parseInt(this.state.layers[i].id)) == parseInt(this.state.currentlayer)) {
+        //         console.log(this.state.layers[i].type)
+        //         // tl = this layer
+        //         let tl = this.state.layers[i]
+        //         console.log(tl.name)
+        //         console.log(tl)
+        //         this.setState({layer_name: tl.name, layer_desc: tl.description, layer_type: tl.type, layer_colour: tl.colour})
+        //     }
+        // }
     }
 
     // selects layer to be edited and changes layer landmarks to appropriate layer
     handleLayer = (e) => {
-        this.setState({currentlayer: e.target.value}, this.setState({layerlandmarks: this.state.landmarksgrouped[this.state.currentlayer]}));
 
+        // for (var i = 0; i<this.state.layers.length; i++) {
+        //     // console.log(this.state.layers[i])
+        //     // console.log(this.state.currentlayer)
+        //     if ((parseInt(this.state.layers[i].id)) == parseInt(e.target.value)) {
+        //         console.log(this.state.layers[i].type)
+        //         // tl = this layer
+        //         let tl = this.state.layers[i]
+        //         this.setState({layer_name: tl.name, layer_desc: tl.description, layer_type: tl.type, layer_colour: tl.colour})
+        //     }
+        // }
+
+        this.state.layers.forEach(item => {
+            console.log(item.id, e.target.value)
+            if (parseInt(item.id) == parseInt(e.target.value)) {
+                console.log("matched ",item.id, e.target.value)
+                this.setState({layer_name: item.name, layer_desc: item.description, layer_type: item.type, layer_colour: item.colour})
+                this.setState({currentlayer: item}, this.setState({layerlandmarks: this.state.landmarksgrouped[item.id]}))
+            }
+        })
     
-        let tl = this.state.currentlayer
-        this.setState({layer_name: tl.name, layer_desc: tl.description, layer_type: tl.type, layer_colour: tl.colour})
+        // let tl = this.state.currentlayer
+        // console.log(this.state.currentlayer)
+        
             
         
     }
@@ -114,7 +133,7 @@ export default class EditMarker extends React.Component{
                 {/* dropdown layer select menu */}
                 <Grid item>
                     <p>Select Layer:</p>
-                    <select value = {this.state.currentlayer}
+                    <select value = {this.state.currentlayer.id}
                         type="select"
                         name="selectLayer"
                         onChange={this.handleLayer}
@@ -122,7 +141,7 @@ export default class EditMarker extends React.Component{
                         ref = {this.refSelect}>
                         { /* list all the layers*/ }
                         {
-                            this.state.layers.map((e, i) => {
+                            this.state.layers.map(e => {
                             return (
                                     <option key={e.id} value={e.id}>{e.name}</option>
                                 );
@@ -149,8 +168,7 @@ export default class EditMarker extends React.Component{
                             type="select"
                             name="selectLayerType"
                             onChange={this.handleType}
-                            onFocus={this.handleType}
-                            ref = {this.refSelect}>
+                            onFocus={this.handleType}>
                             <option value="">Select display type:</option>
                             <option value="NDR">Non-directional</option>
                             <option value="DIR">Directional</option>
@@ -166,7 +184,7 @@ export default class EditMarker extends React.Component{
                             <u>Marker Order</u>
                             <DndProvider backend={HTML5Backend} >
                                 <DND 
-                                    layerlandmarks={this.state.landmarksgrouped[this.state.currentlayer]}
+                                    layerlandmarks={this.state.landmarksgrouped[this.state.currentlayer.id]}
                                     currentlayer={this.state.currentlayer}
                                     rerenderParentCallback={this.props.rerenderParentCallback}
                                 ></DND>
@@ -174,11 +192,11 @@ export default class EditMarker extends React.Component{
                         </label>
                         <br></br><br></br>
                         <button
-                            onClick={() => this.editLayer(this.state.currentlayer)}
+                            onClick={() => this.editLayer(this.state.currentlayer.id)}
                         > Submit changes
                         </button>
                         <button
-                            onClick={() => this.removeLayerFromState(this.state.currentlayer)}
+                            onClick={() => this.removeLayerFromState(this.state.currentlayer.id)}
                         > Delete layer
                         </button>
                     </form>
