@@ -1,11 +1,10 @@
 import React from 'react';
 import axiosInstance from '../axios';
-import {Marker, Popup, Polyline} from 'react-leaflet';
+import {Marker, Popup, Polyline, Polygon, Circle} from 'react-leaflet';
 import EditMarker from './EditMarker';
 
 import {
     army,
-    PinkArmy,
     battle,
 	blueIcon,
     city,
@@ -17,12 +16,15 @@ import {
     religious,
     trading,
     village,
+    PinkArmy,
     GreenArmy
 } from './Icons';
+// S
+// import { Polygon } from 'leaflet';
 
 const iconRef = {"army": army,
                  "PinkArmy": PinkArmy,
-                 "GreenArmy": GreenArmy,   
+                 "GreenArmy": GreenArmy,
                  "battle": battle, 
                  "city": city, 
                  "disease": disease,
@@ -35,14 +37,12 @@ const iconRef = {"army": army,
                  "village": village
                  };
 
-                 
-
 // groups layer landmarks
 const groupBy = (array, fn) => array.reduce((result, item) => {
     const key = fn(item);
     if (!result[key]) result[key] = [];
     result[key].push(item);
-    return result
+    return result;
 }, {});
 
 
@@ -70,6 +70,7 @@ export class LayerContent extends React.Component {
     // fetches all markers when page is loaded
     componentDidMount() {
         this.fetchData()
+        console.log("this.state.layer",this.state.layer)
     }
 
     fetchData() {
@@ -106,6 +107,8 @@ export class LayerContent extends React.Component {
             }
         })
 
+
+
         // update position if the layer has changed
         let newposition = 0
         let updateOldLayer = false
@@ -113,11 +116,11 @@ export class LayerContent extends React.Component {
         if (oldlayer !== layer) {
             let positions = []
             let landmarksgrouped = groupBy([...this.props.landmarks], i => i.layer)
-            // console.log(landmarksgrouped[layer])
-            // console.log(landmarksgrouped[oldlayer])
+
 
             if (landmarksgrouped[layer]) {
                 landmarksgrouped[layer].forEach((marker) => {
+                    
                     positions.push(parseInt(marker.position))
                 })
                 newposition = (Math.max(...positions) + 1)
@@ -148,27 +151,28 @@ export class LayerContent extends React.Component {
             updatedLandmarks.splice(idx, 1, response.data)
 
             // set the state with the newly updated landmark
-            this.setState({landmarks: updatedLandmarks})
-
-            // find all markers to update and send to updatePositions function
-            let markersToUpdate = []
-            this.state.layerlandmarks.forEach((marker) => {
-                if (marker.id != landmark_id) {
-                    markersToUpdate.push(marker)
-                }
-            })
-            
-            if (updateOldLayer) {
-                this.setState({layerlandmarks: this.state.layerlandmarks.filter(landmark => landmark.id !== landmark_id)}, this.updatePositions(markersToUpdate))   // do not change, this is the correct order of things (probably)
-                updateOldLayer = false
+            this.setState({landmarks: updatedLandmarks}, this.getLandmarks)
+        })
+        
+        // find all markers to update and send to updatePositions function
+        let markersToUpdate = []
+        this.state.layerlandmarks.forEach((marker) => {
+            if (marker.id != landmark_id) {
+                markersToUpdate.push(marker)
             }
         })
+        
+        if (updateOldLayer) {
+            this.updatePositions(markersToUpdate)
+            this.setState({layerlandmarks: this.state.layerlandmarks.filter(landmark => landmark.id !== landmark_id)})
+            updateOldLayer = false
+        }
     };
+
 
     // updates positions of all markers after a marker's layer is changed
     updatePositions(array) {
         array.forEach((marker, index) => {
-            console.log(marker, index)
             const response = axiosInstance.put(`/landmarks/${marker.id}/`, {
                             content: marker.content,
                             markertype: marker.markertype,
@@ -182,8 +186,11 @@ export class LayerContent extends React.Component {
                         })
             })
     }
+    
 
     // function gets all landmarks 
+
+
     getLandmarks = () => {
         const results = [];
         //const allmarkers = [];
@@ -201,6 +208,7 @@ export class LayerContent extends React.Component {
         // this.setState({landmarks: allmarkers})
          // rerender ProtoMap to display change in layers
     }
+    
 
     // used for passing through to editmarker.js
     submitDelete = (id) => {
@@ -215,28 +223,28 @@ export class LayerContent extends React.Component {
         const response = axiosInstance.delete(`/landmarks/${landmark_id}/`)
             .then(response => {
                 // filter out the landmark that's been deleted from the state
-                //console.log(this.state.landmarks)
-                console.log(this.state.layerlandmarks)
                 this.setState({
                     landmarks: this.state.landmarks.filter(landmark => landmark.id !== landmark_id),
                     layerlandmarks: this.state.layerlandmarks.filter(landmark => landmark.id !== landmark_id)
                 })
-                //console.log(this.state.landmarks)
-                console.log(this.state.layerlandmarks)
                 // this.getLandmarks()
                 let markersToUpdate = [...this.state.layerlandmarks]
                 this.updatePositions(markersToUpdate)
             })
+
+        
                         
-    }   
+    }
+                    
+        
 
     render() {
             let layerlandmarks = this.state.layerlandmarks
             let content = ''
             let lines = ''
-
-            // content renders all the landmarks onto the map 
+            
             if (this.state.layerlandmarks) {
+                // if there are any markers in this layer, show all markers
                 content = layerlandmarks.map((landmark, index) =>
                 <Marker key={landmark.id} position={[landmark.latitude, landmark.longitude]} icon={(landmark.markertype in iconRef) ? iconRef[landmark.markertype] : blueIcon} >
                     <Popup 
@@ -265,35 +273,87 @@ export class LayerContent extends React.Component {
                     </Popup>
                 </Marker>)
         
-                // make copies of landmarks array
-                let fromLandmarks = [...this.state.layerlandmarks];
-                let toLandmarks = [...this.state.layerlandmarks]; 
+
+                // determine the type of this layer to determine the content to show
+
+                let layertype = ''
+
+                for (var i = 0; i<this.state.layers.length; i++) {
+                    if ((this.state.layers[i].id) == (this.state.layer)) {
+                        layertype = this.state.layers[i].type
+                    }
+                }
+
+                let content = ''
+
+                console.log(this.state.layer, layertype)
+
+                if (layertype == "NDR") {
+
+
+                    // make copies of landmarks array
+                    let fromLandmarks = [...this.state.layerlandmarks];
+                    let toLandmarks = [...this.state.layerlandmarks]; 
+
+
+                    
 
                     fromLandmarks.sort((a, b) => a.position > b.position ? 1 : -1);
                     fromLandmarks.pop()
                     toLandmarks.sort((a, b) => a.position > b.position ? 1 : -1);
                     toLandmarks = toLandmarks.slice(1)
 
-                // range(length of fromLandmarks)
-                let range = Array(fromLandmarks.length).fill().map((x,i)=>i)
+                    // range(length of fromLandmarks)
+                    let range = Array(fromLandmarks.length).fill().map((x,i)=>i)
 
-                    lines = range.map((i) => 
-                        <Polyline 
-                                key={fromLandmarks.id} 
-                                positions={[[fromLandmarks[i].latitude, fromLandmarks[i].longitude], [toLandmarks[i].latitude, toLandmarks[i].longitude]]} 
-                                color={'red'} />)
-                    // creates one line between each pair of markers
+                        content = range.map((i) => 
+                            <Polyline 
+                                    key={fromLandmarks.id} 
+                                    positions={[[fromLandmarks[i].latitude, fromLandmarks[i].longitude], [toLandmarks[i].latitude, toLandmarks[i].longitude]]} 
+                                    color={'red'} />)
+                        // creates one line between each pair of markers
+                } else if (layertype == "FIL") {
+                
+                    console.log("is FIL")
+                    let fillLandmarks = [...this.state.layerlandmarks];
+
+
+                    fillLandmarks.sort((a, b) => a.position > b.position ? 1 : -1);
+
+
+                    let range2 = Array(fillLandmarks.length).fill().map((x,i)=>i)
+                    //console.log(range2)
+                    // range2.push(landmarks.length)
+                    let positions = range2.map((i) => [fillLandmarks[i].latitude, fillLandmarks[i].longitude])
+
+                    
+                    // positions.concat([landmarks[0].latitude, landmarks[0].longitude])
+                    // positions.push([landmarks[((landmarks.length)-1)].latitude, landmarks[((landmarks.length)-1)].longitude])
+                    // console.log(positions[parseInt(positions.length)])
+                    // console.log(positions)
+                    let testcenter = positions[1]
+                    let test = ''
+                    let test2 = ''
+                    content = <Polygon color={'black'} positions={positions}/>
+                }
+                // test2 = <Circle color={'purple'} center={[54, -4]} radius={1000000}/>
+                // const fillcolour = {color: 'blue'}
+                
+
                     return (
                         <React.Fragment>
+                            {markers}
                             {content}
-                            {lines}
                         </React.Fragment>
                     )
                 }
                 else {
                     return null
                 }
-            }  
+            }
+            
+        
+            
     }
 
 export default LayerContent

@@ -54,8 +54,8 @@ export const Container = (props) => {
                             })
             })
 
-            const renderCard = (card, index) => {
-                return (<Card key={card.id} index={index} id={card.id} text={card.text} moveCard={moveCard}/>);
+            const renderCard = (card, i) => {
+                return (<Card key={card.id} index={i} id={card.id} text={i+1 + ": " + card.text} moveCard={moveCard}/>);
             };
 
             return (<>

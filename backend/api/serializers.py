@@ -4,7 +4,6 @@ from rest_framework.serializers import ModelSerializer
 from api.models import City, Country, Landmark, LandmarkImage, Map, MapStyle, Profile, Project, State, Layer
 
 
-
 class RegisterUserSerializer(ModelSerializer):
     class Meta:
         model = User
@@ -29,7 +28,7 @@ class UserProjectsSerializer(ModelSerializer):
     class Meta:
         model = Project
         fields = ('id', 'title', 'description', 'creator', 'group')
-    
+
     def create(self, validated_data):
         user = self.context.get('request').user.profile
         project = Project(**validated_data)
@@ -61,7 +60,7 @@ class CreateLandmarkSerializer(ModelSerializer):
 class LayerSerializer(ModelSerializer):
     class Meta:
         model = Layer
-        fields = ('id', 'name', 'description')
+        fields = ('id', 'name', 'description', 'type', 'colour')
 
 
 class UserDetailsSerializer(ModelSerializer):
@@ -109,7 +108,8 @@ class CountrySerializer(ModelSerializer):
 class StateSerializer(ModelSerializer):
     class Meta:
         model = State
-        fields = ('id', 'name', 'country', 'state_code', 'latitude', 'longitude')
+        fields = ('id', 'name', 'country',
+                  'state_code', 'latitude', 'longitude')
 
 
 class CitySerializer(ModelSerializer):

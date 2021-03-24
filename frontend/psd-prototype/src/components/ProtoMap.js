@@ -132,8 +132,6 @@ class ProtoMap extends React.Component {
  
     render() {
         const {fetched, landmarks, popup} = this.state 
-        let content = ''
-        let lines = ''
         let renderlayers = ''
         let layerselect = ''
         let landmarksgrouped = groupBy([...this.state.landmarks], i => i.layer)
@@ -175,7 +173,7 @@ class ProtoMap extends React.Component {
                     <React.Fragment>
                         <div className = 'select-layer'>
                         <p>Select layer: </p>
-                        <select onFocus={this.handleLayer} onChange={this.handleLayer} ref={this.refLayerSelect}>
+                        <select value={this.state.currentlayer} onFocus={this.handleLayer} onChange={this.handleLayer} ref={this.refLayerSelect}>
                             {layerselect}
                         </select>
                         </div>
