@@ -3,7 +3,7 @@ import { Map, TileLayer, LayersControl, LayerGroup } from "react-leaflet";
 import { useParams } from "react-router-dom";
 import Control from "@skyeer/react-leaflet-custom-control";
 import axiosInstance from "../../axios";
-import { LayerContent } from "../LayerContent";
+import { LayerContent } from "../LayerContent_copy";
 import Popup from "reactjs-popup";
 import LayerControl from "../LayerControl";
 import LayerAdd from "../LayerAdd";

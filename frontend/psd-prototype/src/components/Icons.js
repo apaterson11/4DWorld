@@ -1,5 +1,7 @@
 import L from 'leaflet';
 import ArmyImage from '../markers/army.png';
+import PinkArmyImage from '../markers/Pink_Army.png'
+import GreenArmyImage from '../markers/Green_Army.png'
 import BattleImage from '../markers/battle.png';
 import CityImage from '../markers/city.png';
 import DiseaseImage from '../markers/disease.png';
@@ -10,10 +12,27 @@ import KnowledgeImage from '../markers/knowledge.png';
 import ReligiousImage from '../markers/religious.png';
 import TradingImage from '../markers/trading.png';
 import VillageImage from '../markers/village.png';
+import NodeImage from '../markers/node.png';
+
+
 
 export const army = new L.Icon({
 	iconUrl: ArmyImage,
 	iconSize: [60, 98],
+	iconAnchor: [30, 98],
+	popupAnchor: [1, -34],
+});
+
+export const PinkArmy = new L.Icon({
+	iconUrl: PinkArmyImage,
+	iconSize: [60,98],
+	iconAnchor: [30, 98],
+	popupAnchor: [1, -34],
+});
+
+export const GreenArmy = new L.Icon({
+	iconUrl: GreenArmyImage,
+	iconSize: [60,98],
 	iconAnchor: [30, 98],
 	popupAnchor: [1, -34],
 });
@@ -100,4 +119,12 @@ export const village = new L.Icon({
 	iconAnchor: [30, 98],
 	popupAnchor: [1, -34],
 });
+
+export const node = new L.Icon({
+	iconUrl: NodeImage,
+	iconSize: [20, 20],
+	iconAnchor: [10, 10],
+	popupAnchor: [0, -8],
+});
+
 

@@ -1,36 +1,11 @@
 import React from "react";
-import {
-  Map,
-  TileLayer,
-  Marker,
-  Polyline,
-  LayersControl,
-  LayerGroup,
-  Circle,
-} from "react-leaflet";
+import { Map, TileLayer, LayersControl, LayerGroup } from "react-leaflet";
 import Control from "@skyeer/react-leaflet-custom-control";
 import axiosInstance from "../axios";
-import { LayerContent, getLandmarks, addMarker } from "./LayerContent";
-import { Button, MenuItem, InputLabel, Select } from "@material-ui/core/";
-import Grid from "@material-ui/core/Grid";
+import { LayerContent } from "./LayerContent";
 import Popup from "reactjs-popup";
 import LayerControl from "./LayerControl";
 import LayerAdd from "./LayerAdd";
-
-import {
-  army,
-  battle,
-  blueIcon,
-  city,
-  disease,
-  fortress,
-  individual,
-  industry,
-  knowledge,
-  religious,
-  trading,
-  village,
-} from "./Icons";
 
 require("./LayerControl.css");
 require("./ProtoMap.css");
@@ -40,27 +15,22 @@ const DEFAULT_VIEWPORT = {
   zoom: 13,
 };
 
-// icons for markers
-const iconRef = {
-  army: army,
-  battle: battle,
-  city: city,
-  disease: disease,
-  fortress: fortress,
-  individual: individual,
-  industry: industry,
-  knowledge: knowledge,
-  religious: religious,
-  trading: trading,
-  village: village,
-};
+const groupBy = (array, fn) =>
+  array.reduce((result, item) => {
+    const key = fn(item);
+    if (!result[key]) result[key] = [];
+    result[key].push(item);
+    return result;
+  }, {});
 
 class ProtoMap extends React.Component {
   constructor(props) {
     super(props);
     this.handleLayer = this.handleLayer.bind(this);
+    this.updateOnDelete = this.updateOnDelete.bind(this);
     this.refLayerSelect = React.createRef(); // reference used to set current layer
     this.refAddMarkerButton = React.createRef(); // reference used to control add marker button
+    this.rerenderParentCallback = this.rerenderParentCallback.bind(this);
   }
 
   state = {
@@ -70,31 +40,48 @@ class ProtoMap extends React.Component {
     viewport: DEFAULT_VIEWPORT,
     markertype: "default",
     landmarks: [],
+    landmarksgrouped: [],
     layers: [],
     layerlandmarks: [],
-    currentlayer: "",
     layer_name: "",
     layer_desc: "",
     canClick: false, // add marker functionality, changes when "add marker" button is clicked
+    currentlayer: "",
   };
 
-  componentDidMount() {
-    /* Fetch the list of landmarks on component loading */
-    axiosInstance
-      .get("/landmarks/")
-      .then((response) =>
-        this.setState({ landmarks: response.data, fetched: true })
-      );
-    axiosInstance
-      .get("/layers/")
-      .then((response) =>
-        this.setState({ layers: response.data, fetched: true })
-      );
+  componentDidUpdate(prevProps, prevState) {
+    this.refLayerSelect.current.focus();
   }
 
-  // handleClick = () => {
-  //     this.setState({ viewport: DEFAULT_VIEWPORT })
-  // }
+  rerenderParentCallback() {
+    axiosInstance.get("/landmarks/").then(
+      (response) => this.setState({ landmarks: response.data, fetched: true }),
+      axiosInstance
+        .get("/layers/")
+        .then((response) =>
+          this.setState({ layers: response.data, fetched: true })
+        )
+    );
+    this.forceUpdate();
+  }
+
+  componentDidMount() {
+    axiosInstance.get("/landmarks/").then(
+      (response) => this.setState({ landmarks: response.data, fetched: true }),
+      axiosInstance
+        .get("/layers/")
+        .then((response) =>
+          this.setState({ layers: response.data, fetched: true })
+        )
+    );
+    if (this.state.layers) {
+      this.setState({ currentlayer: this.state.layers[0] });
+    }
+  }
+
+  updateOnDelete(newlandmarks) {
+    this.setState({ landmarks: newlandmarks });
+  }
 
   // function to enter into the "add marker" state and indicate to user that button is active
   prepAddMarker = (e) => {
@@ -102,16 +89,26 @@ class ProtoMap extends React.Component {
     e.target.style.background = this.state.canClick ? "#b8bfba" : "white";
   };
 
+  handleClick = () => {
+    console.log("this.state.landmarks = ", this.state.landmarks);
+  };
+
   // function adds marker to map on click via post request
   addMarker = (e) => {
-    this.refLayerSelect.current.focus(); // get current layer
+    this.setState({ canClick: false });
 
     /* Adds a new landmark to the map at a given latitude and longitude, via a POST request */
     const { lat, lng } = e.latlng;
-    const pos = this.state.landmarks.length;
+
+    let currentlayerlandmarks = this.state.landmarks.filter(
+      (landmark) =>
+        parseInt(landmark.layer) == parseInt(this.state.currentlayer.id)
+    );
+    const pos = currentlayerlandmarks ? currentlayerlandmarks.length : 0; // current concurrency issue here where if post request has not finished, length is not updated - if user clicks fast enough, will get same position
+
     const response = axiosInstance
       .post("/landmarks/", {
-        layer: this.state.currentlayer,
+        layer: this.state.currentlayer.id,
         content: "sample text",
         latitude: lat,
         longitude: lng,
@@ -120,9 +117,9 @@ class ProtoMap extends React.Component {
       })
       .then((response) => {
         let newLandmarks = [...this.state.landmarks]; // copy original state
-        newLandmarks.push(response.data); // add the new landmark to the copy
+        newLandmarks.push(response.data);
         this.setState({ landmarks: newLandmarks }); // update the state with the new landmark
-        this.refAddMarkerButton.click(); // reset add marker button
+        this.setState({ canClick: true });
       });
   };
 
@@ -155,23 +152,40 @@ class ProtoMap extends React.Component {
 
   // displays correct layers in dropdown layer select menu
   handleLayer(e) {
-    this.setState({ currentlayer: e.target.value });
+    this.setState({
+      landmarksgrouped: groupBy([...this.state.landmarks], (i) => i.layer),
+    });
+    this.state.layers.forEach((item) => {
+      if (item.id == e.target.value) {
+        this.setState(
+          { currentlayer: item },
+          this.setState({
+            layerlandmarks: this.state.landmarksgrouped[item.id],
+          })
+        );
+      }
+    });
   }
 
   render() {
     const { fetched, landmarks, popup } = this.state;
     let content = "";
     let lines = "";
+    let renderlayers = "";
+    let layerselect = "";
+    let landmarksgrouped = "";
+    landmarksgrouped = groupBy([...this.state.landmarks], (i) => i.layer);
 
     // toggle layer visibility menu
-    let renderlayers = "";
-    renderlayers = this.state.layers.map((e, key) => (
+    renderlayers = this.state.layers.map((e, index) => (
       <LayersControl.Overlay key={e.id} checked name={e.name}>
         <LayerGroup>
           <LayerContent
+            key={e.id}
             layer={e.id}
+            landmarksgrouped={landmarksgrouped}
+            layerlandmarks={landmarksgrouped[e.id]}
             landmark_id={this.state.id}
-            layerlandmarks={this.state.layerlandmarks}
             content={this.state.content}
             latitude={this.props.latitude}
             longitude={this.props.longitude}
@@ -179,13 +193,14 @@ class ProtoMap extends React.Component {
             position={this.state.position}
             layers={this.state.layers}
             landmarks={this.state.landmarks}
+            rerenderParentCallback={this.rerenderParentCallback}
+            updateOnDelete={this.updateOnDelete}
           ></LayerContent>
         </LayerGroup>
       </LayersControl.Overlay>
     ));
 
     // layer select dropdown menu
-    let layerselect = "";
     layerselect = this.state.layers.map((e, key) => (
       <option key={e.id} value={e.id}>
         {e.name}
@@ -197,7 +212,15 @@ class ProtoMap extends React.Component {
         onViewportChanged={this.onViewportChanged}
         viewport={this.state.viewport}
         center={[this.props.latitude, this.props.longitude]}
-        onClick={this.state.canClick ? this.addMarker : undefined}
+        onClick={(e) =>
+          this.state.canClick
+            ? this.addMarker(
+                e,
+                this.state.layerlandmarks,
+                this.state.currentlayer
+              )
+            : undefined
+        }
         zoom={4}
         maxBounds={[
           [90, -180],
@@ -217,14 +240,16 @@ class ProtoMap extends React.Component {
         {/* select layer dropdown menu */}
         <Control position="topright">
           <React.Fragment>
-            <select
-              value={this.state.currentlayer}
-              onFocus={this.handleLayer}
-              onChange={this.handleLayer}
-              ref={this.refLayerSelect}
-            >
-              {layerselect}
-            </select>
+            <div className="select-layer">
+              <p>Select layer: </p>
+              <select
+                onFocus={this.handleLayer}
+                onChange={this.handleLayer}
+                ref={this.refLayerSelect}
+              >
+                {layerselect}
+              </select>
+            </div>
           </React.Fragment>
         </Control>
 
@@ -239,7 +264,14 @@ class ProtoMap extends React.Component {
           <span>
             <LayerControl
               layers={this.state.layers}
-              currentlayer={this.state.currentlayer}
+              currentlayer={
+                this.state.currentlayer
+                  ? this.state.currentlayer
+                  : this.state.layers[0]
+              }
+              landmarksgrouped={landmarksgrouped}
+              landmarks={this.state.landmarks}
+              rerenderParentCallback={this.rerenderParentCallback}
             />
           </span>
         </Popup>
@@ -270,7 +302,7 @@ class ProtoMap extends React.Component {
 
         {/* reset view button - will this ever be fixed? only time will tell */}
         <Control position="bottomright">
-          <button className="btn-resetview" onClick={this.createLines}>
+          <button className="btn-resetview" onClick={this.handleClick}>
             Reset View
           </button>
         </Control>

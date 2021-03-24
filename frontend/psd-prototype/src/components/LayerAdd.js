@@ -6,8 +6,27 @@ require("./LayerControl.css");
 // for adding layers
 export default class EditMarker extends React.Component {
   state = {
+    layers: this.props.layers,
     layer_name: "",
     layer_desc: "",
+  };
+
+  handleLayer = (e) => {
+    this.setState({ currentlayer: e.target.value.id });
+  };
+
+  // adds layer via POST request
+  addLayer = () => {
+    const response = axiosInstance
+      .post(`/layers/`, {
+        name: this.state.layer_name,
+        description: this.state.layer_desc,
+      })
+      .then((response) => {
+        let newLayers = [...this.state.layers]; // copy original state
+        newLayers.push(response.data); // add the new layer to the copy
+        this.setState({ layers: newLayers }); // update the state with the new layer
+      });
   };
 
   render() {
@@ -41,17 +60,7 @@ export default class EditMarker extends React.Component {
                   }
                 />
               </label>
-              <button
-                type="button"
-                onClick={() =>
-                  this.props.addLayer(
-                    this.state.layer_name,
-                    this.state.layer_desc
-                  )
-                }
-              >
-                Submit
-              </button>
+              <button onClick={() => this.addLayer()}> Submit</button>
             </form>
           </Grid>
         </Grid>

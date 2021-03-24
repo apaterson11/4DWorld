@@ -41,6 +41,7 @@ class MapStyle(models.Model):
     def __str__(self):
         return self.name
 
+
 def get_default_style():
     return MapStyle.objects.get(name='OpenStreetMap: Mapnik (Default)')
 
@@ -68,6 +69,14 @@ class Layer(models.Model):
     name = models.TextField(default="")
     description = models.TextField(default="")
     map = models.ForeignKey(Map, on_delete=models.CASCADE, null=True, blank=True)  # should not be nullable later on
+    colour = models.TextField(default="#000000")
+
+    DIRECTIONAL = 'DIR'
+    FILL = 'FIL'
+    NON_DIRECTIONAL = 'NDR'
+    type_choices = [(DIRECTIONAL, 'Directional'), (FILL, 'Fill'),
+                    (NON_DIRECTIONAL, 'Non-directional')]
+    type = models.TextField(default=NON_DIRECTIONAL, choices=type_choices)
 
     def __str__(self):
         return str(self.id)
@@ -79,8 +88,8 @@ class Landmark(models.Model):
     longitude = models.FloatField()
     markertype = models.TextField(default="")
     position = models.IntegerField(default=-1)
-    layer = models.ForeignKey(Layer, on_delete=models.CASCADE,
-                              related_name="layer", null=True, default=1)
+    layer = models.ForeignKey(
+        Layer, on_delete=models.CASCADE, related_name="layer", null=True, default=1)
     map = models.ForeignKey(
         Map, on_delete=models.CASCADE, related_name='landmarks', null=True, blank=True
     )
@@ -93,6 +102,7 @@ class LandmarkImage(models.Model):
     landmark = models.ForeignKey(Landmark, on_delete=models.CASCADE,
                                  related_name="landmark", parent_link=True, null=False, default=None)
     image = models.ImageField(max_length=1000, upload_to='images/', null=False, default=None)
+    image_name = models.CharField(default="", max_length=64)
 
     def __str__(self):
         return str(self.landmark.id)

@@ -70,7 +70,7 @@ class UserProjectsSerializer(ModelSerializer):
 class LandmarkImageSerializer(ModelSerializer):
     class Meta:
         model = LandmarkImage
-        fields = ('id', 'landmark', 'image')
+        fields = ('id', 'landmark', 'image', 'image_name')
 
 
 class CreateLandmarkSerializer(ModelSerializer):
@@ -83,7 +83,7 @@ class CreateLandmarkSerializer(ModelSerializer):
 class LayerSerializer(ModelSerializer):
     class Meta:
         model = Layer
-        fields = ('id', 'name', 'description', 'map')
+        fields = ('id', 'name', 'description', 'type', 'colour', 'map')
 
 
 class UserDetailsSerializer(ModelSerializer):
@@ -134,11 +134,11 @@ class CountrySerializer(ModelSerializer):
 class StateSerializer(ModelSerializer):
     class Meta:
         model = State
-        fields = ('id', 'name', 'country', 'state_code', 'latitude', 'longitude')
+        fields = ('id', 'name', 'country',
+                  'state_code', 'latitude', 'longitude')
 
 
 class CitySerializer(ModelSerializer):
     class Meta:
         model = City
         fields = ('id', 'name', 'country', 'state', 'latitude', 'longitude')
-

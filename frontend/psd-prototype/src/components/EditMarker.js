@@ -1,6 +1,13 @@
-import React from "react";
+import React, { Component, PropTypes } from "react";
 import { Button, MenuItem, InputLabel, Select } from "@material-ui/core/";
+import CssBaseline from "@material-ui/core/CssBaseline";
+import TextField from "@material-ui/core/TextField";
+import Paper from "@material-ui/core/Paper";
 import Grid from "@material-ui/core/Grid";
+import Typography from "@material-ui/core/Typography";
+import { withStyles } from "@material-ui/core/styles";
+import { Link } from "react-router-dom";
+import { withRouter } from "react-router-dom";
 import RichTextEditor from "react-rte";
 import axiosInstance from "../axios";
 import ImageGallery from "react-image-gallery";
@@ -8,6 +15,11 @@ require("./EditMarker.css");
 
 // popup attached to landmark
 export default class EditMarker extends React.Component {
+  constructor(props) {
+    super(props);
+    this.refImageSelect = React.createRef(); // reference used to set current image
+  }
+
   state = {
     landmarks: this.props.landmarks,
     layerlandmarks: this.props.layerlandmarks,
@@ -19,6 +31,7 @@ export default class EditMarker extends React.Component {
     value: RichTextEditor.createValueFromString(this.props.content, "html"),
     selectedFile: null,
     images: [],
+    items: [],
     imagesEmptyText: null,
     schemas: [],
     layers: this.props.layers,
@@ -69,6 +82,11 @@ export default class EditMarker extends React.Component {
     );
   };
 
+  // passes back to removeMarkerFromState in LayerContent.js
+  handleDelete = () => {
+    this.props.markerDelete(this.props.id);
+  };
+
   // handleChange = (event) => {
   //     this.setState({icontype: event.target.value})
   // }
@@ -94,6 +112,7 @@ export default class EditMarker extends React.Component {
       this.state.selectedFile,
       this.state.selectedFile.name
     );
+    formData.append("image_name", this.state.selectedFile.name);
     formData.append("landmark", this.props.id);
 
     const config = {
@@ -108,26 +127,15 @@ export default class EditMarker extends React.Component {
     });
   };
 
-  // removes image from the landmark
+  // removes landmark from state
   removeImage = (image_id) => {
     /* Deletes the given image from the state, by sending a DELETE request to the API */
     const response = axiosInstance
       .delete(`/landmark-images/${image_id}/`)
       .then((response) => {
         // filter out the images that have been deleted from the state
-        let imgs = this.state.images.filter((img) => img.id !== image_id);
-        this.setState({
-          images: imgs,
-          currentImage: imgs.length > 0 ? imgs[0] : "",
-        });
+        this.getImages();
       });
-  };
-
-  mapImagesForGallery = () => {
-    return this.state.images.map((obj) => ({
-      original: `${obj.image}`,
-      thumbnail: `${obj.image}`,
-    }));
   };
 
   // get images for each landmark
@@ -147,19 +155,27 @@ export default class EditMarker extends React.Component {
               id: item.id,
               landmark: item.landmark,
               image: item.image,
+              image_name: item.image_name,
             });
           }
-          //maps results so that they can be chosen to delete
-          this.setState({ images: items });
-          this.setState({ currentImage: this.state.images[0] });
+
+          // maps results so that they can be displayed in image gallery
+          this.setState({
+            items: results.map((obj) => ({
+              original: `${obj.image}`,
+              thumbnail: `${obj.image}`,
+            })),
+          });
         })
       );
-  };
 
-  setCurrentImage = (e) =>
-    this.setState({
-      currentImage: this.state.images.find((img) => img.id == e.target.value),
-    });
+    this.setState({ images: items });
+    if (this.state.images.length > 0) {
+      this.setState({ currentImage: this.state.images[0] });
+    } else {
+      this.setState({ currentImage: "" });
+    }
+  };
 
   render() {
     const toolbarConfig = {
@@ -187,15 +203,82 @@ export default class EditMarker extends React.Component {
       ],
     };
 
-    let hasImages = this.state.images.length > 0;
+    // conditional rendering depending on whether or not any images have been uploaded to landmark
+    let imageGalleryMessage = "";
+    let imagelabel = "";
+    let imageselect = "";
+    let deleteimage = "";
+    let deletebutton = "";
+    let deletelabel = "";
+
+    if (this.state.images.length == 0) {
+      imageGalleryMessage = "";
+      imageselect = "";
+      deleteimage = "";
+      deletebutton = "";
+      imagelabel = "";
+      deletelabel = "";
+    } else {
+      imagelabel = <InputLabel id="label">Images</InputLabel>;
+      imageGalleryMessage = (
+        <ImageGallery
+          items={this.state.items}
+          showIndex={false}
+          showBullets={true}
+          infinite={true}
+          showThumbnails={false}
+          showFullscreenButton={true}
+          showGalleryFullscreenButton={false}
+          showPlayButton={false}
+          showGalleryPlayButton={false}
+          showNav={true}
+          isRTL={false}
+          lazyLoad={false}
+          slideDuration={450}
+          slideInterval={2000}
+          slideOnThumbnailOver={false}
+          useWindowKeyDown={true}
+        />
+      );
+
+      imageselect = this.state.images.map((e, key) => (
+        <option key={e.id} value={e.id}>
+          {e.image_name}
+        </option>
+      ));
+
+      deletelabel = <InputLabel id="label">Delete Image</InputLabel>;
+
+      deleteimage = (
+        <select
+          onFocus={(e) => this.setState({ currentImage: e.target.value })}
+          onChange={(e) => this.setState({ currentImage: e.target.value })}
+          required
+        >
+          <option value="" selected disabled>
+            Select an image...
+          </option>
+          {imageselect}
+        </select>
+      );
+      deletebutton = (
+        <button
+          disabled={!this.state.currentImage}
+          onClick={() => this.removeImage(this.state.currentImage)}
+        >
+          Delete
+        </button>
+      );
+    }
 
     return (
       <React.Fragment>
         <Grid container spacing={2} direction="column">
-          <Grid item>{"position = " + this.props.position}</Grid>
-
           {/* rich text editor for editing text content */}
           <Grid item>
+            {/* temporary position label for debugging purposes */}
+            <InputLabel>Position = {this.state.position}</InputLabel>
+            <br></br>
             <InputLabel id="label">Content</InputLabel>
             <RichTextEditor
               toolbarConfig={toolbarConfig}
@@ -208,63 +291,30 @@ export default class EditMarker extends React.Component {
           {/* image gallery */}
           <Grid item>
             <Grid>
-              {hasImages && (
-                <React.Fragment>
-                  <InputLabel id="label">Images</InputLabel>
-                  <ImageGallery
-                    items={this.mapImagesForGallery()}
-                    showIndex={false}
-                    showBullets={true}
-                    infinite={true}
-                    showThumbnails={false}
-                    showFullscreenButton={true}
-                    showGalleryFullscreenButton={false}
-                    showPlayButton={false}
-                    showGalleryPlayButton={false}
-                    showNav={true}
-                    isRTL={false}
-                    lazyLoad={false}
-                    slideDuration={450}
-                    slideInterval={2000}
-                    slideOnThumbnailOver={false}
-                    useWindowKeyDown={true}
-                  />
-                </React.Fragment>
-              )}
+              {imagelabel}
+              {imageGalleryMessage}
             </Grid>
           </Grid>
 
-          {/* delete image button - only render delete button if there are images */}
-          {hasImages && (
-            <Grid item>
-              <Grid>
-                <InputLabel id="label">Delete Image</InputLabel>
-
-                <select
-                  value={this.state.currentImage.id}
-                  onChange={this.setCurrentImage}
-                >
-                  {this.state.images.map((e, key) => (
-                    <option key={e.id} value={e.id}>
-                      {e.image}
-                    </option>
-                  ))}
-                </select>
-
-                <button
-                  onClick={() => this.removeImage(this.state.currentImage.id)}
-                >
-                  Delete
-                </button>
-              </Grid>
+          {/* delete image button */}
+          <Grid item>
+            <Grid>
+              {deletelabel}
+              {deleteimage}
+              {deletebutton}
             </Grid>
-          )}
+          </Grid>
 
           {/* upload image button */}
           <Grid item>
             <InputLabel id="label">Upload new image</InputLabel>
-            <input type="file" onChange={this.fileSelectedHandler} />
-            <button onClick={this.uploadImage}>Upload</button>
+            <input type="file" onChange={this.fileSelectedHandler} required />
+            <button
+              disabled={!this.state.selectedFile}
+              onClick={this.uploadImage}
+            >
+              Upload
+            </button>
           </Grid>
 
           {/* icon type */}
@@ -276,8 +326,12 @@ export default class EditMarker extends React.Component {
               onChange={(e) => this.setState({ icontype: e.target.value })}
             >
               <MenuItem value={"default"}>Default</MenuItem>
-              <MenuItem value={"individual"}>Significant Individual</MenuItem>
+              <MenuItem value={"node"}>Border Node</MenuItem>
               <MenuItem value={"army"}>Army</MenuItem>
+              <MenuItem value={"PinkArmy"}>Pink Army</MenuItem>
+              <MenuItem value={"GreenArmy"}>Green Army</MenuItem>
+
+              <MenuItem value={"individual"}>Significant Individual</MenuItem>
               <MenuItem value={"knowledge"}>Knowledge Site</MenuItem>
               <MenuItem value={"trading"}>Trading Site</MenuItem>
               <MenuItem value={"religious"}>Religious Site</MenuItem>
@@ -312,15 +366,6 @@ export default class EditMarker extends React.Component {
                   onChange={(e) => this.setState({ lng: e.target.value })}
                 />
               </label>
-              <label>
-                Position (ordering)
-                <input
-                  type="number"
-                  name="pos"
-                  value={this.state.position}
-                  onChange={(e) => this.setState({ position: e.target.value })}
-                />
-              </label>
             </form>
           </Grid>
 
@@ -341,7 +386,7 @@ export default class EditMarker extends React.Component {
           {/* delete and submit changes */}
           <Grid item>
             <Button
-              onClick={() => this.props.markerDelete(this.props.id)}
+              onClick={this.handleDelete}
               size="small"
               variant="outlined"
               color="secondary"

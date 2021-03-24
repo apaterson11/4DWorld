@@ -5,7 +5,6 @@ body {
   height: 100%;
   width: 100%;
 }
-
 #map,
 #mapUI {
   width: inherit;
@@ -33,9 +32,9 @@ body {
 .layerControlPopup {
   position: relative;
   top: 10px;
-  left: 150px;
+  left: 450px;
   z-index: 402;
-  width: 200px;
+  width: 500px;
   height: auto;
   background: white;
   font-family: sans-serif;
@@ -50,13 +49,16 @@ body {
   margin: 5px;
 }
 .layerControlPopup h3 {
-  margin-top: 0;
+  margin-top: 1;
   padding-left: 5px;
 }
 .layerControlPopup p {
   padding-left: 5px;
 }
 .layerControlPopup select {
-  display: block;
+  display: inline-block;
   margin: 0 auto;
+}
+.layerControlPopup input {
+  margin: 5px;
 }
