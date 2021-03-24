@@ -47,7 +47,6 @@ class ProtoMap extends React.Component {
         layer_desc: "",
         canClick: false,    // add marker functionality, changes when "add marker" button is clicked
         currentlayer: '',
-        position_count: 0,
     }
 
     componentDidUpdate(prevProps, prevState) {
@@ -63,14 +62,15 @@ class ProtoMap extends React.Component {
     componentDidMount() {
         axiosInstance.get('/landmarks/').then(response => this.setState({landmarks: response.data, fetched: true}),
         axiosInstance.get('/layers/').then(response => this.setState({layers:response.data, fetched: true}))) 
+        if (this.state.layers) {
+            this.setState({currentlayer: this.state.layers[0]})
+        }
     }
 
     updateOnDelete(newlandmarks) {
-        // console.log(this.state.landmarks)
-        // console.log("new this.state.landmarks (protomap) = ",this.state.landmarks)
         this.setState({landmarks: newlandmarks})
-        console.log("updateOnDelete called")
     }
+
     // function to enter into the "add marker" state and indicate to user that button is active
     prepAddMarker = (e) => {
         this.setState({ canClick: !this.state.canClick})
@@ -80,53 +80,15 @@ class ProtoMap extends React.Component {
     handleClick = () => {
         console.log("this.state.landmarks = ",this.state.landmarks)
     }
-    // // function adds marker to map on click via post request
-    // addMarker = (e, layerlandmarks, currentlayer) => {
-
-    //     /* Adds a new landmark to the map at a given latitude and longitude, via a POST request */
-    //     const { lat, lng } = e.latlng;
-
-    //     //let currentlayerlandmarks = this.state.landmarks.filter(landmark => parseInt(landmark.layer) == parseInt(this.state.currentlayer.id))
-    //     console.log(layerlandmarks)
-
-    //     const pos = ((layerlandmarks && JSON.stringify(layerlandmarks) !== []) ? (layerlandmarks.length) : 0)  // current concurrency issue here where if post request has not finished, length is not updated - if user clicks fast enough, will get same position
-
-    //     this.setState({position_count: this.state.position_count + 1})
-    //     // this.state.landmarks.forEach((marker, index) => {
-    //     //     const response = axiosInstance.patch(`/landmarks/${marker.id}/`, {
-    //     //                     position: index,
-    //     //                 }).then(response => {
-                            
-    //     //                 })
-    //     //     })
-
-    //     const response = axiosInstance.post('/landmarks/', {
-    //         layer: currentlayer.id,
-    //         content: 'sample text',
-    //         latitude: lat,
-    //         longitude: lng,
-    //         markertype: 'default',
-    //         position: pos,
-    //     }).then(response => {
-    //         let newLandmarks = [...this.state.landmarks] // copy original state
-    //         newLandmarks.push(response.data);
-    //         this.setState({landmarks: newLandmarks}) // update the state with the new landmark
-    //     })
-        
-        
-    // };
 
     // function adds marker to map on click via post request
     addMarker = (e) => {
         this.setState({canClick: false})
 
-        console.log(this.state.landmarks)
-
         /* Adds a new landmark to the map at a given latitude and longitude, via a POST request */
         const { lat, lng } = e.latlng;
 
         let currentlayerlandmarks = this.state.landmarks.filter(landmark => parseInt(landmark.layer) == parseInt(this.state.currentlayer.id))
-
         const pos = ((currentlayerlandmarks) ? (currentlayerlandmarks.length) : 0)  // current concurrency issue here where if post request has not finished, length is not updated - if user clicks fast enough, will get same position
 
         const response = axiosInstance.post('/landmarks/', {
@@ -174,7 +136,7 @@ class ProtoMap extends React.Component {
         this.setState({landmarksgrouped: groupBy([...this.state.landmarks], i => i.layer)})
         this.state.layers.forEach(item => {
             if (item.id == e.target.value) {
-                this.setState({currentlayer: item}, this.setState({layerlandmarks: this.state.landmarksgrouped[this.state.currentlayer.id]}))
+                this.setState({currentlayer: item}, this.setState({layerlandmarks: this.state.landmarksgrouped[item.id]}))
             }
         })
     }
@@ -241,7 +203,7 @@ class ProtoMap extends React.Component {
                     closeOnDocumentClick
                 >
                     <span>
-                        <LayerControl layers = {this.state.layers} currentlayer = {this.state.currentlayer} landmarksgrouped = {landmarksgrouped} landmarks = {this.state.landmarks} rerenderParentCallback={this.rerenderParentCallback}/>
+                        <LayerControl layers = {this.state.layers} currentlayer = {(this.state.currentlayer) ? this.state.currentlayer : this.state.layers[0]} landmarksgrouped = {landmarksgrouped} landmarks = {this.state.landmarks} rerenderParentCallback={this.rerenderParentCallback}/>
                     </span>
                 </Popup>
                 
