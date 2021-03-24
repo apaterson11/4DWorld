@@ -5,6 +5,7 @@ import EditMarker from './EditMarker';
 
 import {
     army,
+    PinkArmy,
     battle,
 	blueIcon,
     city,
@@ -15,10 +16,13 @@ import {
     knowledge,
     religious,
     trading,
-    village
+    village,
+    GreenArmy
 } from './Icons';
 
-const iconRef = {"army": army, 
+const iconRef = {"army": army,
+                 "PinkArmy": PinkArmy,
+                 "GreenArmy": GreenArmy,   
                  "battle": battle, 
                  "city": city, 
                  "disease": disease,
@@ -30,6 +34,8 @@ const iconRef = {"army": army,
                  "trading": trading, 
                  "village": village
                  };
+
+                 
 
 // groups layer landmarks
 const groupBy = (array, fn) => array.reduce((result, item) => {
