@@ -54,7 +54,7 @@ export class LayerContent extends React.Component {
     }
 
     state = {
-                landmarks: [],
+                landmarks: this.props.landmarks,
                 layerlandmarks: this.props.layerlandmarks,
                 currentlandmarks: [],
                 landmarksgrouped: this.props.landmarksgrouped,
@@ -194,19 +194,19 @@ export class LayerContent extends React.Component {
 
     getLandmarks = () => {
         const results = [];
-        //const allmarkers = [];
+        const allmarkers = [];
         const response = axiosInstance.get('/landmarks/', {
         }).then(response => response.data.forEach(item => {
             if (item.layer === this.state.layer) {
                 results.push(item);
             }
-            //allmarkers.push(item);
+            allmarkers.push(item);
             results.sort((a, b) => a.position > b.position ? 1 : -1)
         }),
             this.setState({layerlandmarks: results},this.props.rerenderParentCallback())
         )
 
-        // this.setState({landmarks: allmarkers})
+        this.setState({landmarks: allmarkers})
          // rerender ProtoMap to display change in layers
     }
     
@@ -231,6 +231,7 @@ export class LayerContent extends React.Component {
                 // this.getLandmarks()
                 let markersToUpdate = [...this.state.layerlandmarks]
                 this.updatePositions(markersToUpdate)
+                this.props.updateOnDelete(this.state.landmarks)
             })
 
         
@@ -250,16 +251,10 @@ export class LayerContent extends React.Component {
                     if (this.state.layers[i].colour) {
                         layercolour = this.state.layers[i].colour
                     }
-                    //console.log(layercolour)
-                    //console.log()
-                    // tl = this layer
                     
                 }    
             }
 
-
-           
-            
             if (this.state.layerlandmarks) {
                 // if there are any markers in this layer, show all markers
                 markers = layerlandmarks.map((landmark, index) =>

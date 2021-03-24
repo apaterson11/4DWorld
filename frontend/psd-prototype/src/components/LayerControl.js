@@ -28,52 +28,15 @@ export default class LayerControl extends React.Component{
         layerlandmarks: [],
     }
 
-    componentDidMount() {
-
-        console.log(this.props.currentlayer)
-
-        // for (var i = 0; i<this.state.layers.length; i++) {
-        //     console.log(this.state.layers[i])
-        //     console.log(this.state.currentlayer)
-        //     if ((parseInt(this.state.layers[i].id)) == parseInt(this.state.currentlayer)) {
-        //         console.log(this.state.layers[i].type)
-        //         // tl = this layer
-        //         let tl = this.state.layers[i]
-        //         console.log(tl.name)
-        //         console.log(tl)
-        //         this.setState({layer_name: tl.name, layer_desc: tl.description, layer_type: tl.type, layer_colour: tl.colour})
-        //     }
-        // }
-    }
-
     // selects layer to be edited and changes layer landmarks to appropriate layer
     handleLayer = (e) => {
-
-        // for (var i = 0; i<this.state.layers.length; i++) {
-        //     // console.log(this.state.layers[i])
-        //     // console.log(this.state.currentlayer)
-        //     if ((parseInt(this.state.layers[i].id)) == parseInt(e.target.value)) {
-        //         console.log(this.state.layers[i].type)
-        //         // tl = this layer
-        //         let tl = this.state.layers[i]
-        //         this.setState({layer_name: tl.name, layer_desc: tl.description, layer_type: tl.type, layer_colour: tl.colour})
-        //     }
-        // }
-
         this.state.layers.forEach(item => {
-            console.log(item.id, e.target.value)
             if (parseInt(item.id) == parseInt(e.target.value)) {
-                console.log("matched ",item.id, e.target.value)
                 this.setState({layer_name: item.name, layer_desc: item.description, layer_type: item.type, layer_colour: item.colour})
                 this.setState({currentlayer: item}, this.setState({layerlandmarks: this.state.landmarksgrouped[item.id]}))
             }
         })
-    
-        // let tl = this.state.currentlayer
-        // console.log(this.state.currentlayer)
-        
-            
-        
+
     }
 
     handleType = (e) => {
@@ -137,8 +100,7 @@ export default class LayerControl extends React.Component{
                         type="select"
                         name="selectLayer"
                         onChange={this.handleLayer}
-                        onFocus={this.handleLayer}
-                        ref = {this.refSelect}>
+                        onFocus={this.handleLayer}>
                         { /* list all the layers*/ }
                         {
                             this.state.layers.map(e => {
@@ -155,11 +117,11 @@ export default class LayerControl extends React.Component{
                     <form> 
                         <label>
                             Name
-                            <input type="string" name="name" value={""} onChange={e => this.setState({layer_name: e.target.value})}/>
+                            <input type="string" name="name" value={this.state.layer_name} onChange={e => this.setState({layer_name: e.target.value})}/>
                         </label>
                         <label>
                             Description
-                            <input type="string" name="description" value={""} onChange={e => this.setState({layer_desc: e.target.value})}/>
+                            <input type="string" name="description" value={this.state.layer_desc} onChange={e => this.setState({layer_desc: e.target.value})}/>
                         </label>
                         <br></br><br></br>
 
@@ -181,7 +143,7 @@ export default class LayerControl extends React.Component{
                         </p>
                         <br></br>
                         <label>
-                            <u>Marker Order</u>
+                            Marker Order
                             <DndProvider backend={HTML5Backend} >
                                 <DND 
                                     layerlandmarks={this.state.landmarksgrouped[this.state.currentlayer.id]}
