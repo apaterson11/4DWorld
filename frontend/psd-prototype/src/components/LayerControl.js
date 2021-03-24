@@ -9,7 +9,7 @@ import DND from './Container'
 require("./LayerControl.css");
 
 // edit/delete layer functionality
-export default class EditMarker extends React.Component{
+export default class LayerControl extends React.Component{
     constructor(props) {
         super(props)
         this.refSelect = React.createRef();
