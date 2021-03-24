@@ -48,7 +48,9 @@ class ProtoMap extends React.Component {
     }
 
     componentDidUpdate(prevProps, prevState) {
+        console.log("didUpdate")
         this.refLayerSelect.current.focus() 
+        console.log(this.state.currentlayer)
     }
 
     rerenderParentCallback() {
@@ -65,6 +67,10 @@ class ProtoMap extends React.Component {
         axiosInstance.get('/landmarks/').then(response => this.setState({landmarks: response.data, fetched: true}))
     }
 
+    handleClick = () => {
+        // debug test stuff
+        console.log("current layer = ",this.state.currentlayer)
+    }
     // function to enter into the "add marker" state and indicate to user that button is active
     prepAddMarker = (e) => {
         this.setState({ canClick: !this.state.canClick})
@@ -122,18 +128,26 @@ class ProtoMap extends React.Component {
       };
     
     // displays correct layers in dropdown layer select menu
+
     handleLayer(e) {
+        console.log("handleLayer called")
+        console.log(e.target.value)
+        console.log(this.state.layers)
         this.state.layers.forEach(item => {
+        
             if (item.id == e.target.value) {
                 this.setState({currentlayer: item});
+                console.log("matched item=",item)
             }
         })
     }
  
+    // handleLayer(e) {
+    //     this.setState({currentlayer: e.target.value});
+    // }
+
     render() {
         const {fetched, landmarks, popup} = this.state 
-        let content = ''
-        let lines = ''
         let renderlayers = ''
         let layerselect = ''
         let landmarksgrouped = groupBy([...this.state.landmarks], i => i.layer)
@@ -191,7 +205,7 @@ class ProtoMap extends React.Component {
                     closeOnDocumentClick
                 >
                     <span>
-                        <LayerControl layers = {this.state.layers} currentlayer = {this.state.currentlayer} landmarksgrouped = {landmarksgrouped} landmarks = {this.state.landmarks} rerenderParentCallback={this.rerenderParentCallback}/>
+                        <LayerControl layers = {this.state.layers} currentlayer = {(this.state.currentlayer) ? this.state.currentlayer : this.state.layers[0]} landmarksgrouped = {landmarksgrouped} landmarks = {this.state.landmarks} rerenderParentCallback={this.rerenderParentCallback}/>
                     </span>
                 </Popup>
                 
