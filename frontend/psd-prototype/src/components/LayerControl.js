@@ -15,6 +15,7 @@ export default class LayerControl extends React.Component{
     constructor(props) {
         super(props)
         this.refSelect = React.createRef();
+        // this.onReorder = this.onReorder.bind(this);
     }
     state = {
         currentlayer: this.props.currentlayer,
@@ -73,6 +74,21 @@ export default class LayerControl extends React.Component{
             })
         })
     }; 
+
+    // onReorder = (cards) => {
+    //     // reorder markers based on order of cards
+    //     let marker = ''
+    //     if (cards) {
+    //         cards.forEach((card, index) => {
+    //             marker = cards[index]
+    //             const response = axiosInstance.patch(`/landmarks/${marker.id}/`, {
+    //                             position: index,
+    //                         }).then(response => {
+    //                             //props.rerenderParentCallback()
+    //                         })
+    //         })
+    //     }
+    // }
 
     // deletes layer via DELETE request
     removeLayerFromState = (layer_id) => {
@@ -149,14 +165,11 @@ export default class LayerControl extends React.Component{
                                     layerlandmarks={this.state.landmarksgrouped[this.state.currentlayer.id]}
                                     currentlayer={this.state.currentlayer}
                                     rerenderParentCallback={this.props.rerenderParentCallback}
+                                    edit={this.editLayer}
                                 ></DND>
                             </DndProvider>
                         </label>
                         <br></br><br></br>
-                        <button
-                            onClick={() => this.editLayer(this.state.currentlayer.id)}
-                        > Submit changes
-                        </button>
                         <button
                             onClick={() => this.removeLayerFromState(this.state.currentlayer.id)}
                         > Delete layer
