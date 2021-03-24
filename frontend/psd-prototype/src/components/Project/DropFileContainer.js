@@ -51,8 +51,9 @@ export default function DropFileContainer() {
 
   const classes = useStyles();
   const [students, setStudents] = React.useState([
-    {/*First: "john", Last: "doe", Email: "test@email.com", Role: "manager", Status:"Active"*/}
+  {/*GUID: "1234567", First: "john", Last: "doe", Email: "test@email.com", Role: "manager", Status:"Active"*/}
   ]);
+
 
   return (
 
@@ -99,23 +100,25 @@ export default function DropFileContainer() {
 
             <ul>
                 {students.map((s) => (
-                <li key={s.Email}>
-                    <strong>{s.First}</strong> {s.Last} {s.Email} {s.Role} {s.Status}
+                <li key={s.GUID}>
+                    <strong>{s.GUID}</strong>{s.First} {s.Last} {s.Email} {s.Role} {s.Status}
                     {s.Group1} {s.Group2} {s.Group3}
                     {s.Project1} {s.Project2} {s.Project3}
                 </li>
                 ))}
             </ul>
 
+
             {/*
             <ul>
                 {students.map((student) => (
                 <li key={student.email}>
                     <strong>{student.name}</strong>: {student.email}
+                    {student.GUID}
                 </li>
                 ))}
             </ul>
-            */}
+                */}
 
           </CardContent>
         </Card>
