@@ -20,6 +20,8 @@ import {
     PinkArmy,
     GreenArmy
 } from './Icons';
+// S
+// import { Polygon } from 'leaflet';
 
 const iconRef = {"army": army,
                  "PinkArmy": PinkArmy,
@@ -253,9 +255,6 @@ export class LayerContent extends React.Component {
                 }    
             }
 
-
-           
-            
             if (this.state.layerlandmarks) {
                 // if there are any markers in this layer, show all markers
                 markers = layerlandmarks.map((landmark, index) =>
