@@ -8,7 +8,7 @@ import Logout from './components/Auth/Logout'
 import Register from './components/Auth/Register'
 import ProtoMap from './components/ProtoMap'
 import Dashboard from './components/Profile/Dashboard'
-import ResetPassword from './components/PasswordReset'
+import ResetPasswordRequest from './components/PasswordResetRequest'
 import CreateProject from './components/Project/CreateProject'
 import EditMap from "./components/Map/EditMap";
 import ViewMap from "./components/Map/ViewMap";
@@ -72,7 +72,7 @@ function App(props) {
           <Header isAuthenticated={isAuthenticated} />
           <Switch>
             <Route exact path="/" component={About}/>
-            <Route exact path="/change-password" component={ResetPassword}/>
+            <Route exact path="/change-password" component={ResetPasswordRequest}/>
             <Route exact path="/demo-map/" render={() => (
               <ProtoMap latitude={defaultLocation.defaultLat} longitude={defaultLocation.defaultLon}/>
             )} />
