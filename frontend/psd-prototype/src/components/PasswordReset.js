@@ -59,15 +59,15 @@ class ResetPassword extends React.Component {
         errors["password2"] = "Please confirm password";
     }
 
-    // if (password != password2){
-    //     isValid = false;
-    //     errors["password2"] = "That does not match";
-    // }
+    if (password != password2){
+        isValid = false;
+        errors["password2"] = "That does not match";
+    }
   
-    //   if (!input["email"]) {
-    //     isValid = false;
-    //     errors["email"] = "Please enter a valid email Address.";
-    //   }
+      if (!input["email"]) {
+        isValid = false;
+        errors["email"] = "Please enter a valid email Address.";
+      }
   
       if (typeof input["email"] !== "undefined") {
           
@@ -158,25 +158,3 @@ export default ResetPassword;
 //         console.log('this is' , email.value)
 //     }
 
-//     render(){
-//     return (
-//         <div className='container mt-5'>
-//             <h1>Request password Reset:</h1>
-//             <form>
-//                 <div className='form-group'>
-//                     <input
-//                    className= 'form-control'
-//                    ref={(c) => this.email = c}
-//                    type='email'
-//                    placeholder='email'
-//                    name='email'
-//                    required
-//                     />
-//                 </div>
-//                 <button type="button" onClick={this.onSubmit}>Submit</button>
-//             </form>
-//         </div>
-//     ); 
-//   }
-// }
-// }
