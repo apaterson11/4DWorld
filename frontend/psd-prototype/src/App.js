@@ -9,6 +9,7 @@ import Logout from './components/Auth/Logout'
 import Register from './components/Auth/Register'
 import ProtoMap from './components/ProtoMap'
 import Dashboard from './components/Profile/Dashboard'
+import ResetPassword from './components/PasswordReset'
 import CreateProject from './components/Project/CreateProject'
 import { UserContext, IsAuthenticated } from './Context'
 import axiosInstance from './axios'
@@ -62,6 +63,7 @@ function App(props) {
           <Header isAuthenticated={isAuthenticated} />
           <Switch>
             <Route exact path="/" component={About}/>
+            <Route exact path="/change-password" component={ResetPassword}/>
             <Route exact path="/demo-map/" render={() => (
               <ProtoMap latitude={defaultLocation.defaultLat} longitude={defaultLocation.defaultLon}/>
             )} />
