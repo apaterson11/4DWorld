@@ -46,6 +46,7 @@ class ProtoMap extends React.Component {
         layer_name: "",
         layer_desc: "",
         canClick: false,    // add marker functionality, changes when "add marker" button is clicked
+        addMarkerState: false,
         currentlayer: '',
     }
 
@@ -73,12 +74,19 @@ class ProtoMap extends React.Component {
 
     // function to enter into the "add marker" state and indicate to user that button is active
     prepAddMarker = (e) => {
-        this.setState({ canClick: !this.state.canClick})
+        this.setState({canClick: !this.state.canClick})
+        this.setState({addMarkerState: !this.state.addMarkerState})
         e.target.style.background = this.state.canClick ? '#b8bfba' : 'white'
     }
     
+    // prevents user from clicking through edit layer and add layer buttons
     handleClick = () => {
-        console.log("this.state.landmarks = ",this.state.landmarks)
+        if (this.state.canClick == true) {
+            this.setState({canClick: false})
+        }
+        else if (this.state.addMarkerState == true) {
+            this.setState({canClick: true})
+        }
     }
 
     // function adds marker to map on click via post request
@@ -197,7 +205,7 @@ class ProtoMap extends React.Component {
                 {/* edit layer button */}
                 <Popup
                     trigger={open => (
-                    <button className="layerControl">Edit Layer</button>
+                    <button type="button" className="layerControl" onMouseEnter={this.handleClick} onMouseLeave={this.handleClick}>Edit Layer</button>
                     )}
                     position="bottom right"
                     closeOnDocumentClick
@@ -210,9 +218,8 @@ class ProtoMap extends React.Component {
                 {/* add layer button */}
                 <Popup
                     trigger={open => (
-                    <button className="layerControl">Add Layer</button>)}
+                    <button type="button" className="layerControl" onMouseEnter={this.handleClick} onMouseLeave={this.handleClick}>Add Layer</button>)}
                     position="bottom right"
-                    // on={'hover'}
                 >
                     <span>
                         <LayerAdd layers = {this.state.layers}/>
