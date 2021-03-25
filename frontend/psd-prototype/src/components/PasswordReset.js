@@ -33,11 +33,12 @@ class ResetPassword extends React.Component {
         input["password2"] = "";
         this.setState({input:input});
         alert('Valid');
+        //Soon to change this to alter the DB 
     }
   }
   
 
-  // Validates email address is in the right format = exists
+  // Validates email address is in the right format + does it exist
   // checks if password1 and two are the same 
   validate(){
       let input = this.state.input;
@@ -46,6 +47,7 @@ class ResetPassword extends React.Component {
 
       var password = document.getElementById("password").value;
       var password2 = document.getElementById("password2").value;
+      var emailval = document.getElementById("email").value
 
       if (!input["password"]){
           isValid = false;
@@ -57,15 +59,15 @@ class ResetPassword extends React.Component {
         errors["password2"] = "Please confirm password";
     }
 
-    if (password != password2){
-        isValid = false;
-        errors["password2"] = "That does not match";
-    }
+    // if (password != password2){
+    //     isValid = false;
+    //     errors["password2"] = "That does not match";
+    // }
   
-      if (!input["email"]) {
-        isValid = false;
-        errors["email"] = "Please enter a valid email Address.";
-      }
+    //   if (!input["email"]) {
+    //     isValid = false;
+    //     errors["email"] = "Please enter a valid email Address.";
+    //   }
   
       if (typeof input["email"] !== "undefined") {
           
@@ -75,7 +77,13 @@ class ResetPassword extends React.Component {
           errors["email"] = "Please enter a valid email address.";
         }
       }
-    
+      axiosInstance.post('/ajax/check_email/', {email: emailval}).then(res => {
+          if ((res.data.exists) == false) {
+              isValid=false
+              errors["email"] = "email does not exist"
+            } 
+      })
+      
       this.setState({
         errors: errors
       });      
