@@ -94,6 +94,7 @@ export default class EditMarker extends React.Component {
       this.state.selectedFile,
       this.state.selectedFile.name
     );
+    formData.append("image_name", this.state.selectedFile.name);
     formData.append("landmark", this.props.id);
 
     const config = {
@@ -147,6 +148,7 @@ export default class EditMarker extends React.Component {
               id: item.id,
               landmark: item.landmark,
               image: item.image,
+              image_name: item.image_name,
             });
           }
           //maps results so that they can be chosen to delete
@@ -158,7 +160,10 @@ export default class EditMarker extends React.Component {
 
   setCurrentImage = (e) =>
     this.setState({
-      currentImage: this.state.images.find((img) => img.id == e.target.value),
+      currentImage: this.state.images.find((img) => {
+        console.log(e);
+        return img.id == e.target.value;
+      }),
     });
 
   render() {
@@ -235,7 +240,7 @@ export default class EditMarker extends React.Component {
           </Grid>
 
           {/* delete image button - only render delete button if there are images */}
-          {hasImages && (
+          {hasImages && this.state.currentImage && (
             <Grid item>
               <Grid>
                 <InputLabel id="label">Delete Image</InputLabel>
@@ -263,8 +268,13 @@ export default class EditMarker extends React.Component {
           {/* upload image button */}
           <Grid item>
             <InputLabel id="label">Upload new image</InputLabel>
-            <input type="file" onChange={this.fileSelectedHandler} />
-            <button onClick={this.uploadImage}>Upload</button>
+            <input type="file" onChange={this.fileSelectedHandler} required />
+            <button
+              disabled={!this.state.selectedFile}
+              onClick={this.uploadImage}
+            >
+              Upload
+            </button>
           </Grid>
 
           {/* icon type */}
@@ -276,8 +286,11 @@ export default class EditMarker extends React.Component {
               onChange={(e) => this.setState({ icontype: e.target.value })}
             >
               <MenuItem value={"default"}>Default</MenuItem>
-              <MenuItem value={"individual"}>Significant Individual</MenuItem>
+              <MenuItem value={"node"}>Border Node</MenuItem>
               <MenuItem value={"army"}>Army</MenuItem>
+              <MenuItem value={"PinkArmy"}>Pink Army</MenuItem>
+              <MenuItem value={"GreenArmy"}>Green Army</MenuItem>
+              <MenuItem value={"individual"}>Significant Individual</MenuItem>
               <MenuItem value={"knowledge"}>Knowledge Site</MenuItem>
               <MenuItem value={"trading"}>Trading Site</MenuItem>
               <MenuItem value={"religious"}>Religious Site</MenuItem>

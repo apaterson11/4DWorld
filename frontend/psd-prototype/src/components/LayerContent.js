@@ -49,10 +49,6 @@ const groupBy = (array, fn) =>
   }, {});
 
 export class LayerContent extends React.Component {
-  constructor(props) {
-    super(props);
-  }
-
   state = {
     landmarks: this.props.landmarks,
     layerlandmarks: this.props.layerlandmarks,
@@ -223,7 +219,6 @@ export class LayerContent extends React.Component {
   }
 
   // function gets all landmarks
-
   getLandmarks = () => {
     const results = [];
     const allmarkers = [];

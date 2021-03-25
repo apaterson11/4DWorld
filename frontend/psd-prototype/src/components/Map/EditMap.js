@@ -12,6 +12,14 @@ import Spinner from "../Spinner";
 require("../LayerControl.css");
 require("../ProtoMap.css");
 
+const groupBy = (array, fn) =>
+  array.reduce((result, item) => {
+    const key = fn(item);
+    if (!result[key]) result[key] = [];
+    result[key].push(item);
+    return result;
+  }, {});
+
 function EditMap(props) {
   const [state, setState] = useState({
     markertype: "default",
@@ -34,6 +42,7 @@ function EditMap(props) {
 
   useEffect(() => {
     // get project information
+    console.log("RENDERING");
     axiosInstance
       .get(`/projects/${projectID}`)
       .then((response) => {
@@ -75,13 +84,16 @@ function EditMap(props) {
 
   // function to enter into the "add marker" state and indicate to user that button is active
   const prepAddMarker = (e) => {
-    setCanClick(!canClick);
-    e.target.style.background = canClick ? "#b8bfba" : "white";
+    setCanClick((prevState) => {
+      setCanClick(!prevState);
+      e.target.style.background = !prevState ? "#b8bfba" : "white";
+    });
   };
 
   // function adds marker to map on click via post request
   const addMarker = (e) => {
     /* Adds a new landmark to the map at a given latitude and longitude, via a POST request */
+    setCanClick(false);
     const { lat, lng } = e.latlng;
     const pos = landmarks.length;
     const response = axiosInstance
@@ -98,11 +110,15 @@ function EditMap(props) {
         let newLandmarks = [...landmarks]; // copy original state
         newLandmarks.push(response.data); // add the new landmark to the copy
         setLandmarks(newLandmarks); // update the state with the new landmark
+        setCanClick(true);
+        rerenderParentCallback();
       });
   };
 
+  const updateOnDelete = (newlandmarks) => setLandmarks(newlandmarks);
+
   // function adds new layer through "add layer" button
-  const addLayer = (name, description) => {
+  const addNewLayer = (name, description) => {
     const response = axiosInstance
       .post(`/layers/`, {
         name: name,
@@ -117,40 +133,69 @@ function EditMap(props) {
   };
 
   // function deletes layer through "edit layer" function
-  const removeLayerFromState = (layer_id) => {
-    /* Deletes the given landmark from the state, by sending a DELETE request to the API */
-    const response = axiosInstance
-      .delete(`/layers/${layer_id}/`)
-      .then((response) => {
-        // filter out the landmark that's been deleted from the state
-        setLayers(layers.filter((layer) => layer.id !== layer_id));
-      });
-  };
+  // const removeLayerFromState = (layer_id) => {
+  //   /* Deletes the given landmark from the state, by sending a DELETE request to the API */
+  //   const response = axiosInstance
+  //     .delete(`/layers/${layer_id}/`)
+  //     .then((response) => {
+  //       // filter out the landmark that's been deleted from the state
+  //       setLayers(layers.filter((layer) => layer.id !== layer_id));
+  //     });
+  // };
 
   // displays correct layers in dropdown layer select menu
   const handleLayer = (e) => {
     setCurrentLayer(e.target.value);
   };
 
+  const rerenderParentCallback = () => {
+    const landmarkRequest = axiosInstance.get(
+      `/landmarks?map_id=${project.map.id}`
+    );
+    const layerRequest = axiosInstance.get(`/layers?map_id=${project.map.id}`);
+
+    Promise.all([landmarkRequest, layerRequest]).then((response) => {
+      setLandmarks(response[0].data);
+      setLayers(response[1].data);
+      setFetching(false);
+    });
+
+    // axiosInstance.get("/landmarks/").then((response) => {
+    //   setLandmarks(response.data);
+
+    //   axiosInstance.get("/layers/").then((response) => {
+    //     setLayers(response.data);
+    //     setFetching(false);
+    //   });
+    // });
+    // forceUpdate();
+  };
+
   // toggle layer visibility menu
-  const renderlayers = layers.map((e, key) => (
-    <LayersControl.Overlay key={e.id} checked name={e.name}>
-      <LayerGroup>
-        <LayerContent
-          layer={e.id}
-          landmark_id={state.id}
-          layerlandmarks={state.layerlandmarks}
-          content={state.content}
-          latitude={props.latitude}
-          longitude={props.longitude}
-          markertype={state.markertype}
-          position={state.position}
-          layers={layers}
-          landmarks={landmarks}
-        ></LayerContent>
-      </LayerGroup>
-    </LayersControl.Overlay>
-  ));
+  const renderlayers = layers.map((e, key) => {
+    return (
+      <LayersControl.Overlay key={e.id} checked name={e.name}>
+        <LayerGroup>
+          <LayerContent
+            key={e.id}
+            layer={e.id}
+            landmark_id={state.id}
+            landmarksgrouped={groupBy([...landmarks], (i) => i.layer)}
+            layerlandmarks={groupBy([...landmarks], (i) => i.layer)[e.id]}
+            content={state.content}
+            latitude={project.map.latitude}
+            longitude={project.map.longitude}
+            markertype={state.markertype}
+            position={state.position}
+            layers={layers}
+            landmarks={landmarks}
+            rerenderParentCallback={rerenderParentCallback}
+            updateOnDelete={updateOnDelete}
+          ></LayerContent>
+        </LayerGroup>
+      </LayersControl.Overlay>
+    );
+  });
 
   return (
     <React.Fragment>
@@ -186,7 +231,6 @@ function EditMap(props) {
                 ref={refLayerSelect}
               >
                 {layers.map((e, key) => {
-                  console.log(e);
                   return (
                     <option key={e.id} value={e.id}>
                       {e.name}
@@ -204,7 +248,16 @@ function EditMap(props) {
             closeOnDocumentClick
           >
             <span>
-              <LayerControl layers={layers} currentlayer={currentLayer} />
+              {/* <LayerControl layers={layers} currentlayer={currentLayer} /> */}
+              <LayerControl
+                layers={layers}
+                currentlayer={
+                  state.currentlayer ? state.currentlayer : layers[0]
+                }
+                landmarksgrouped={groupBy([...landmarks], (i) => i.layer)}
+                landmarks={landmarks}
+                rerenderParentCallback={rerenderParentCallback}
+              />
             </span>
           </Popup>
 
@@ -215,7 +268,7 @@ function EditMap(props) {
             closeOnDocumentClick
           >
             <span>
-              <LayerAdd layers={layers} addLayer={addLayer} />
+              <LayerAdd layers={layers} addNewLayer={addNewLayer} />
             </span>
           </Popup>
 

@@ -30,6 +30,10 @@ export default class EditMarker extends React.Component {
   };
 
   render() {
+    let addFunc = this.props.addNewLayer
+      ? this.props.addNewLayer
+      : this.addLayer;
+
     return (
       <div className="layerControlPopup">
         <h3>Layer Add</h3>
@@ -60,7 +64,13 @@ export default class EditMarker extends React.Component {
                   }
                 />
               </label>
-              <button onClick={() => this.addLayer()}> Submit</button>
+              <button
+                onClick={() =>
+                  addFunc(this.state.layer_name, this.state.layer_desc)
+                }
+              >
+                Submit
+              </button>
             </form>
           </Grid>
         </Grid>

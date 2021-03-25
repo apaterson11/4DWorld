@@ -1,13 +1,6 @@
-import React, { Component, PropTypes } from "react";
+import React from "react";
 import { Button, MenuItem, InputLabel, Select } from "@material-ui/core/";
-import CssBaseline from "@material-ui/core/CssBaseline";
-import TextField from "@material-ui/core/TextField";
-import Paper from "@material-ui/core/Paper";
 import Grid from "@material-ui/core/Grid";
-import Typography from "@material-ui/core/Typography";
-import { withStyles } from "@material-ui/core/styles";
-import { Link } from "react-router-dom";
-import { withRouter } from "react-router-dom";
 import RichTextEditor from "react-rte";
 import axiosInstance from "../axios";
 import ImageGallery from "react-image-gallery";
@@ -15,11 +8,6 @@ require("./EditMarker.css");
 
 // popup attached to landmark
 export default class EditMarker extends React.Component {
-  constructor(props) {
-    super(props);
-    this.refImageSelect = React.createRef(); // reference used to set current image
-  }
-
   state = {
     landmarks: this.props.landmarks,
     layerlandmarks: this.props.layerlandmarks,
@@ -31,7 +19,6 @@ export default class EditMarker extends React.Component {
     value: RichTextEditor.createValueFromString(this.props.content, "html"),
     selectedFile: null,
     images: [],
-    items: [],
     imagesEmptyText: null,
     schemas: [],
     layers: this.props.layers,
@@ -330,7 +317,6 @@ export default class EditMarker extends React.Component {
               <MenuItem value={"army"}>Army</MenuItem>
               <MenuItem value={"PinkArmy"}>Pink Army</MenuItem>
               <MenuItem value={"GreenArmy"}>Green Army</MenuItem>
-
               <MenuItem value={"individual"}>Significant Individual</MenuItem>
               <MenuItem value={"knowledge"}>Knowledge Site</MenuItem>
               <MenuItem value={"trading"}>Trading Site</MenuItem>
