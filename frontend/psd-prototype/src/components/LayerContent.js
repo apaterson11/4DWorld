@@ -19,6 +19,7 @@ import {
   village,
   PinkArmy,
   GreenArmy,
+  node
 } from "./Icons";
 // S
 // import { Polygon } from 'leaflet';
@@ -37,6 +38,7 @@ const iconRef = {
   religious: religious,
   trading: trading,
   village: village,
+  node: node
 };
 
 // groups layer landmarks
