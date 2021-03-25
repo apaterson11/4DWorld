@@ -1,81 +1,147 @@
-import { useEffect, useCallback, useState, memo } from "react";
-import { Card } from "./Card";
+import React, { Component } from "react";
 import axiosInstance from "../axios";
-import update from "immutability-helper";
-const style = {
-  width: 495,
+import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+
+// a little function to help us with reordering the result
+const reorder = (list, startIndex, endIndex) => {
+  const result = Array.from(list);
+  const [removed] = result.splice(startIndex, 1);
+  result.splice(endIndex, 0, removed);
+
+  return result;
 };
 
-export const Container = (props) => {
-  // get cards from layer's landmarks
-  let options = "";
-  if (props.layerlandmarks) {
-    options = props.layerlandmarks
-      .sort((a, b) => (a.position > b.position ? 1 : -1))
-      .map((e) => ({
-        id: parseInt(`${e.id}`),
-        text: `${e.content}`.slice(0, 90),
-      }));
+const grid = 8;
+
+const getItemStyle = (isDragging, draggableStyle) => ({
+  // some basic styles to make the items look a bit nicer
+  userSelect: "none",
+  padding: grid * 2,
+  margin: `0 0 ${grid}px 0`,
+
+  // change background colour if dragging
+  background: isDragging ? "lightgreen" : "white",
+
+  // styles we need to apply on draggables
+  ...draggableStyle
+});
+
+const getListStyle = isDraggingOver => ({
+  background: isDraggingOver ? "#F8F8F8" : "#F8F8F8",
+  padding: grid,
+  overflow: "auto",
+  "max-height": 300,
+  width: 250,
+});
+
+export default class DnD extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      items: []
+    };
+    this.onDragEnd = this.onDragEnd.bind(this);
   }
 
-  const [cards, setCards] = useState(options);
+  componentDidMount() {
+      this.getItems()
+  }
 
-  // update displayed cards when current layer changes
-  useEffect(() => setCards(options), [props.currentlayer]);
-
-  // handle cards being moved around
-  const moveCard = useCallback(
-    (dragIndex, hoverIndex) => {
-      const dragCard = cards[dragIndex];
-
-      setCards(
-        update(cards, {
-          $splice: [
-            [dragIndex, 1],
-            [hoverIndex, 0, dragCard],
-          ],
-        })
-      );
-    },
-    [cards]
-  );
-
-  useEffect(() => {
-    // reorder markers based on order of cards
-    if (cards) {
-      cards.forEach((card, index) => {
-        let marker = cards[index];
-        const response = axiosInstance
-          .patch(`/landmarks/${marker.id}/`, {
-            position: index,
-          })
-          .then((response) => {
-            props.rerenderParentCallback();
-          });
-      });
+  componentDidUpdate(prevProps) {
+    if (prevProps || prevProps.currentlayer.id === undefined) {
+        if (prevProps.currentlayer.id !== this.props.currentlayer.id) {
+            this.getItems()
+        }
     }
-    // if no cards (i.e. no markers), return nothing
+  }
+
+  getItems = () => {
+    // console.log(this.state.landmarksgrouped[this.state.currentlayer.id])
+    let options = "";
+    if (this.props.layerlandmarks) {
+      options = this.props.layerlandmarks
+        .sort((a, b) => (a.position > b.position ? 1 : -1))
+        .map((e, index) => ({
+          id: `${e.id}`,
+          content: `${index+1}: ${e.content}`.slice(0, 90),
+        }));
+        this.setState({items: options})
+    }
     else {
-      return null;
+        this.setState({items: []})
     }
-  }, [cards]);
+  }
 
-  const renderCard = (card, i) => {
-    return (
-      <Card
-        key={card.id}
-        index={i}
-        id={card.id}
-        text={i + 1 + ": " + card.text}
-        moveCard={moveCard}
-      />
+  onDragEnd(result) {
+    // dropped outside the list
+    if (!result.destination) {
+      return;
+    }
+
+    const items = reorder(
+      this.state.items,
+      result.source.index,
+      result.destination.index
     );
-  };
 
-  return (
-    <>
-      <div style={style}>{cards.map((card, i) => renderCard(card, i))}</div>
-    </>
-  );
-};
-export default memo(Container);
+    items.forEach((item, index) => {
+        let marker = items[index];
+        if (index == items.length -1) {
+            const response = axiosInstance.patch(`/landmarks/${marker.id}/`, {
+                position: index,
+              }).then((response) => {
+                this.props.rerenderParentCallback()
+              });
+        }
+        else {
+            const response = axiosInstance.patch(`/landmarks/${marker.id}/`, {
+                position: index,
+              })
+        }
+        
+      });
+
+    this.setState({
+      items
+    });
+
+  }
+
+  // Normally you would want to split things out into separate components.
+  // But in this example everything is just done in one place for simplicity
+  render() {
+    return (
+      <DragDropContext onDragEnd={this.onDragEnd}>
+        <Droppable droppableId="droppable">
+          {(provided, snapshot) => (
+            <div
+              {...provided.droppableProps}
+              ref={provided.innerRef}
+              style={getListStyle(snapshot.isDraggingOver)}
+            >
+              {this.state.items.map((item, index) => (
+                <Draggable key={item.id} draggableId={item.id} index={index}>
+                  {(provided, snapshot) => (
+                    <div
+                      ref={provided.innerRef}
+                      {...provided.draggableProps}
+                      {...provided.dragHandleProps}
+                      style={getItemStyle(
+                        snapshot.isDragging,
+                        provided.draggableProps.style
+                      )}
+                    >
+                      {item.content}
+                    </div>
+                  )}
+                </Draggable>
+              ))}
+              {provided.placeholder}
+            </div>
+          )}
+        </Droppable>
+      </DragDropContext>
+    );
+  }
+}
+
