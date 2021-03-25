@@ -33,6 +33,7 @@ function EditMap(props) {
   const [layers, setLayers] = useState([]);
   const [mapStyle, setMapStyle] = useState();
   const [canClick, setCanClick] = useState(false);
+  const [addMarkerState, setAddMarkerState] = useState(false);
   const [currentLayer, setCurrentLayer] = useState(null);
   const [fetching, setFetching] = useState(true);
   const [addLayerPopupOpen, setAddLayerPopupOpen] = useState(false);
@@ -88,6 +89,19 @@ function EditMap(props) {
       setCanClick(!prevState);
       e.target.style.background = !prevState ? "#b8bfba" : "white";
     });
+    setAddMarkerState((prevState) => {
+      setAddMarkerState(!prevState);
+    });
+  };
+
+  // prevents user from clicking through edit layer and add layer buttons
+  const handleClick = () => {
+    if (canClick == true) {
+      setCanClick(false);
+    }
+    else if (addMarkerState == true) {
+      setCanClick(true);
+    }
   };
 
   // function adds marker to map on click via post request
@@ -243,9 +257,10 @@ function EditMap(props) {
 
           {/* edit layer button */}
           <Popup
-            trigger={() => <button className="layerControl">Edit Layer</button>}
+            trigger={() => <button className="layerControl" onMouseEnter={handleClick} onMouseLeave={handleClick}>Edit Layer</button>}
             position="bottom right"
             closeOnDocumentClick
+
           >
             <span>
               {/* <LayerControl layers={layers} currentlayer={currentLayer} /> */}
@@ -263,7 +278,7 @@ function EditMap(props) {
 
           {/* add layer button */}
           <Popup
-            trigger={() => <button className="layerControl">Add Layer</button>}
+            trigger={() => <button className="layerControl" onMouseEnter={handleClick} onMouseLeave={handleClick}>Add Layer</button>}
             position="bottom right"
             closeOnDocumentClick
           >
