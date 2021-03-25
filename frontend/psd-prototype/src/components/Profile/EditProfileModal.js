@@ -1,31 +1,29 @@
-import React from 'react';
-import Button from '@material-ui/core/Button';
-import TextField from '@material-ui/core/TextField';
-import Dialog from '@material-ui/core/Dialog';
-import DialogActions from '@material-ui/core/DialogActions';
-import DialogContent from '@material-ui/core/DialogContent';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import Slide from '@material-ui/core/Slide'
-
+import React from "react";
+import Button from "@material-ui/core/Button";
+import TextField from "@material-ui/core/TextField";
+import Dialog from "@material-ui/core/Dialog";
+import DialogActions from "@material-ui/core/DialogActions";
+import DialogContent from "@material-ui/core/DialogContent";
+import DialogTitle from "@material-ui/core/DialogTitle";
+import Slide from "@material-ui/core/Slide";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
-    return <Slide direction="up" ref={ref} {...props} />;
-  })
+  return <Slide direction="up" ref={ref} {...props} />;
+});
 
 export default function EditProfileModal(props) {
-
   const handleChange = (e) => {
     props.setNewProfile({
       ...props.newProfile,
-      [e.target.name]: e.target.value.trim()
-    })
-  }
+      [e.target.name]: e.target.value.trim(),
+    });
+  };
 
   return (
     <div>
-      <Dialog 
-        open={props.open} 
-        onClose={props.onClose} 
+      <Dialog
+        open={props.open}
+        onClose={props.onClose}
         TransitionComponent={Transition}
         maxWidth="xs"
         aria-labelledby="editProfileForm"
@@ -40,6 +38,15 @@ export default function EditProfileModal(props) {
             fullWidth
             name="newName"
             defaultValue={props.userDetails.name}
+            onChange={handleChange}
+          />
+          <TextField
+            margin="dense"
+            id="surname"
+            label="Surname"
+            fullWidth
+            name="newSurname"
+            defaultValue={props.userDetails.surname}
             onChange={handleChange}
           />
           <TextField

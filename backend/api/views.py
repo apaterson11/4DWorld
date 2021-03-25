@@ -1,10 +1,12 @@
 from django.shortcuts import render
-from django.contrib.auth.models import Group
+from django.contrib.auth.models import Group, User
 from rest_framework import status, viewsets
+from rest_framework.decorators import action
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
+from api.mixins import FilterByMapMixin
 from api.models import City, Country, Landmark, LandmarkImage, Map, MapStyle, Project, Profile, State, Layer
 from api.serializers import (
     RegisterUserSerializer,
@@ -55,7 +57,32 @@ class GroupAPIView(viewsets.ModelViewSet):
         group.user_set.add(self.request.user)
 
 
-class LandmarkAPIView(viewsets.ModelViewSet):
+class DeleteUserFromGroup(APIView):
+
+    def post(self, request, *args, **kwargs):
+        group_id = kwargs.get('pk')
+        user_id = kwargs.get('user_pk')
+        try:
+            group = Group.objects.get(pk=group_id)
+            user = User.objects.get(pk=user_id)
+            group.user_set.add(user)
+            return Response({'success': True}, 200)
+        except (Group.DoesNotExist, User.DoesNotExist) as e:
+            return Response({'error': 'model not found'}, 404)    
+
+    def delete(self, request, *args, **kwargs):
+        group_id = kwargs.get('pk')
+        user_id = kwargs.get('user_pk')
+        try:
+            group = Group.objects.get(pk=group_id)
+            user = User.objects.get(pk=user_id)
+            group.user_set.remove(user)
+            return Response({'success': True}, 200)
+        except (Group.DoesNotExist, User.DoesNotExist) as e:
+            return Response({'error': 'model not found'}, 404)
+
+
+class LandmarkAPIView(FilterByMapMixin, viewsets.ModelViewSet):
     permission_classes = [AllowAny]
     serializer_class = LandmarkSerializer
     model = Landmark
@@ -69,12 +96,11 @@ class LandmarkImageAPIView(viewsets.ModelViewSet):
     queryset = LandmarkImage.objects.all()
 
 
-class LayerAPIView(viewsets.ModelViewSet):
+class LayerAPIView(FilterByMapMixin, viewsets.ModelViewSet):
     permission_classes = [AllowAny]
     serializer_class = LayerSerializer
     model = Layer
     queryset = Layer.objects.all()
-
 
 class ProjectAPIView(viewsets.ModelViewSet):
     permission_classes = [AllowAny]
@@ -132,8 +158,8 @@ class MapStylesAPIView(viewsets.ModelViewSet):
 class MapAPIView(viewsets.ModelViewSet):
     permission_classes = [AllowAny]
     serializer_class = MapSerializer
-    queryset = Map.objects.all()
     model = Map
+    queryset = Map.objects.all()
 
 
 class BlacklistTokenUpdateView(APIView):
