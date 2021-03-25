@@ -19,6 +19,7 @@ import {
   village,
   PinkArmy,
   GreenArmy,
+  node
 } from "./Icons";
 // S
 // import { Polygon } from 'leaflet';
@@ -37,6 +38,7 @@ const iconRef = {
   religious: religious,
   trading: trading,
   village: village,
+  node: node
 };
 
 // groups layer landmarks
@@ -65,12 +67,13 @@ export class LayerContent extends React.Component {
   };
 
   // fetches all markers when page is loaded
-  componentDidMount() {
-    this.fetchData();
-    console.log("this.state.layer", this.state.layer);
-  }
+//   componentDidMount() {
+//     this.fetchData();
+//     console.log("this.state.layer", this.state.layer);
+//   }
 
   fetchData() {
+    console.log("fetch data")
     this.getLandmarks();
   }
 
@@ -137,7 +140,6 @@ export class LayerContent extends React.Component {
     // update position if the layer has changed
     let newposition = 0;
     let updateOldLayer = false;
-    this.getLandmarks();
     if (oldlayer !== layer) {
       let positions = [];
       let landmarksgrouped = groupBy([...this.props.landmarks], (i) => i.layer);
@@ -178,7 +180,7 @@ export class LayerContent extends React.Component {
         updatedLandmarks.splice(idx, 1, response.data);
 
         // set the state with the newly updated landmark
-        this.setState({ landmarks: updatedLandmarks }, this.getLandmarks);
+        this.setState({ landmarks: updatedLandmarks });
       });
 
     // find all markers to update and send to updatePositions function
@@ -202,20 +204,14 @@ export class LayerContent extends React.Component {
 
   // updates positions of all markers after a marker's layer is changed
   updatePositions(array) {
-    array.forEach((marker, index) => {
-      const response = axiosInstance
-        .put(`/landmarks/${marker.id}/`, {
-          content: marker.content,
-          markertype: marker.markertype,
-          latitude: marker.latitude,
-          longitude: marker.longitude,
-          layer: marker.layer,
-          position: index,
-        })
-        .then((response) => {
-          this.getLandmarks();
+        array.forEach((marker, index) => {
+        const response = axiosInstance
+            .patch(`/landmarks/${marker.id}/`, {
+            position: index,
+            })
         });
-    });
+        console.log("updatePositions")
+        this.getLandmarks()
   }
 
   // function gets all landmarks
@@ -262,7 +258,6 @@ export class LayerContent extends React.Component {
             (landmark) => landmark.id !== landmark_id
           ),
         });
-        // this.getLandmarks()
         let markersToUpdate = [...this.state.layerlandmarks];
         this.updatePositions(markersToUpdate);
         this.props.updateOnDelete(this.state.landmarks);

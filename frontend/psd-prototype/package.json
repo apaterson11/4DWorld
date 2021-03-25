@@ -17,6 +17,7 @@
     "leaflet": "^1.7.1",
     "mui-datatables": "^3.7.6",
     "react": "^17.0.1",
+    "react-beautiful-dnd": "^13.1.0",
     "react-color": "^2.19.3",
     "react-dnd": "^14.0.1",
     "react-dnd-html5-backend": "^14.0.0",

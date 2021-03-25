@@ -48,13 +48,19 @@ class ProtoMap extends React.Component {
     canClick: false, // add marker functionality, changes when "add marker" button is clicked
     addMarkerState: false,
     currentlayer: "",
+    loadCurrentLayer: false,
   };
 
-  componentDidUpdate(prevProps, prevState) {
-    this.refLayerSelect.current.focus();
-  }
+//   componentDidUpdate(prevProps, prevState) {
+//       if (this.state.loadCurrentLayer === false) {
+//             this.refLayerSelect.current.focus();
+//             this.setState({loadCurrentLayer: true})
+//       }
+    
+//   }
 
   rerenderParentCallback() {
+      console.log("callback")
     axiosInstance.get("/landmarks/").then(
       (response) => this.setState({ landmarks: response.data, fetched: true }),
       axiosInstance
@@ -72,12 +78,9 @@ class ProtoMap extends React.Component {
       axiosInstance
         .get("/layers/")
         .then((response) =>
-          this.setState({ layers: response.data, fetched: true })
+          this.setState({ layers: response.data, fetched: true }, () => {this.setState({ currentlayer: this.state.layers[0] })})
         )
     );
-    if (this.state.layers) {
-      this.setState({ currentlayer: this.state.layers[0] });
-    }
   }
 
   updateOnDelete(newlandmarks) {

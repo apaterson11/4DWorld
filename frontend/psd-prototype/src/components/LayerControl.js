@@ -20,6 +20,7 @@ export default class LayerControl extends React.Component {
     landmarks: this.props.landmarks,
     landmarksgrouped: this.props.landmarksgrouped,
     layerlandmarks: [],
+    items: [],
   };
 
   // selects layer to be edited and changes layer landmarks to appropriate layer
@@ -36,7 +37,7 @@ export default class LayerControl extends React.Component {
           { currentlayer: item },
           this.setState({
             layerlandmarks: this.state.landmarksgrouped[item.id],
-          })
+          }),
         );
       }
     });
@@ -198,9 +199,8 @@ export default class LayerControl extends React.Component {
                 Marker Order
                 <DndProvider backend={HTML5Backend}>
                   <DND
-                    layerlandmarks={
-                      this.state.landmarksgrouped[this.state.currentlayer.id]
-                    }
+                    layerlandmarks={this.state.landmarksgrouped[this.state.currentlayer.id]}
+                    items={this.state.items}
                     currentlayer={this.state.currentlayer}
                     rerenderParentCallback={this.props.rerenderParentCallback}
                   ></DND>
