@@ -32,7 +32,7 @@ class ResetPassword extends React.Component {
         input["password"] = "";
         input["password2"] = "";
         this.setState({input:input});
-        alert('Valid');
+        //alert('Valid');
         //Soon to change this to alter the DB 
     }
   }
@@ -79,6 +79,7 @@ class ResetPassword extends React.Component {
       }
       axiosInstance.post('/ajax/check_email/', {email: emailval}).then(res => {
           if ((res.data.exists) == false) {
+              console.log(res)
               isValid=false
               errors["email"] = "email does not exist"
             } 

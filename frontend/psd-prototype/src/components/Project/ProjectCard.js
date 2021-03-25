@@ -1,45 +1,80 @@
-import React from 'react';
-import Button from '@material-ui/core/Button'
-import CardContent from '@material-ui/core/CardContent';
-import CardActions from '@material-ui/core/CardActions';
-import Card from '@material-ui/core/Card';
-import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
-import {Link} from 'react-router-dom';
+import React from "react";
+import Button from "@material-ui/core/Button";
+import CardActionArea from "@material-ui/core/CardActionArea";
+import CardContent from "@material-ui/core/CardContent";
+import CardActions from "@material-ui/core/CardActions";
+import Card from "@material-ui/core/Card";
+import Typography from "@material-ui/core/Typography";
+import { makeStyles } from "@material-ui/core/styles";
+import { Link } from "react-router-dom";
+import EditIcon from "@material-ui/icons/Edit";
+import VisibilityIcon from "@material-ui/icons/Visibility";
 
 const useStyles = makeStyles({
-    card: {
-        minWidth: "180px",
-        minHeight: "150px",
-        margin: "0 10px 20px 10px"
-    }
+  card: {
+    margin: "5px",
+  },
+  row: {
+    display: "flex",
+    verticalAlign: "middle",
+    justifyContent: "center",
+    background: "#EDF0F3",
+    color: "white",
+  },
 });
 
-
 function ProjectCard(props) {
-    const classes = useStyles()
-    
-    const handleClick = (e) => {
-        console.log('clicked')
-    } 
+  const classes = useStyles();
 
-    return (
-        <Card className={classes.card}>
-            <CardContent>
-                <Typography gutterBottom variant="h6" component="h5">
-                    <Link to="demo-map">{props.title}</Link>
-                </Typography>
-            </CardContent>
-            <CardActions>
-                <Button size="small" color="primary" onClick={handleClick}>
-                    Edit
-                </Button>
-                <Button size="small" color="primary" onClick={handleClick}>
-                    View
-                </Button>
-            </CardActions>
-        </Card>
-    )
+  const onClick = () => {
+    props.setClickedProject(props.project);
+    props.setOpen(true);
+  };
+
+  return (
+    <>
+      <Card className={classes.card} variant="outlined">
+        <CardActionArea onClick={onClick}>
+          <CardContent>
+            <Typography gutterBottom variant="h5" component="h2">
+              {props.project.title}
+            </Typography>
+            <Typography variant="body2" color="textSecondary" component="p">
+              {props.project.description
+                ? props.project.description
+                : "No description"}
+            </Typography>
+          </CardContent>
+        </CardActionArea>
+        <CardActions className={classes.row}>
+          <div>
+            <Link
+              to={{
+                pathname: `/projects/edit/${props.project.id}`,
+                project: props.project,
+              }}
+            >
+              <Button size="small" color="primary" startIcon={<EditIcon />}>
+                Edit
+              </Button>
+            </Link>
+          </div>
+          <div>
+            <Link
+              to={{
+                pathname: `/projects/view/${props.project.id}`,
+                project: props.project,
+              }}
+            >
+              <Button size="small" color="primary" endIcon={<VisibilityIcon />}>
+                View
+              </Button>
+            </Link>
+          </div>
+        </CardActions>
+      </Card>
+    </>
+  );
 }
 
-export default ProjectCard
+export default ProjectCard;

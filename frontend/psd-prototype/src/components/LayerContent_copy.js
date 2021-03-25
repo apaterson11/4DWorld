@@ -1,8 +1,7 @@
 import React from "react";
 import axiosInstance from "../axios";
-import { Marker, Popup, Polygon, Circle } from "react-leaflet";
-import EditMarker from "./EditMarker";
-import Polyline from "react-leaflet-arrowheads";
+import { Marker, Popup, Polyline, Polygon } from "react-leaflet";
+import EditMarker from "./EditMarker_copy";
 
 import {
   army,
@@ -20,8 +19,6 @@ import {
   PinkArmy,
   GreenArmy,
 } from "./Icons";
-// S
-// import { Polygon } from 'leaflet';
 
 const iconRef = {
   army: army,
@@ -64,10 +61,8 @@ export class LayerContent extends React.Component {
     position: this.props.position,
   };
 
-  // fetches all markers when page is loaded
   componentDidMount() {
     this.fetchData();
-    console.log("this.state.layer", this.state.layer);
   }
 
   fetchData() {
@@ -156,7 +151,6 @@ export class LayerContent extends React.Component {
       newposition = this.state.position;
     }
 
-    // update marker
     const response = axiosInstance
       .put(`/landmarks/${landmark_id}/`, {
         content: content,
@@ -164,7 +158,7 @@ export class LayerContent extends React.Component {
         latitude: lat,
         longitude: lng,
         layer: layer,
-        position: newposition,
+        position: position,
       })
       .then((response) => {
         let updatedLandmarks = [...this.state.landmarks]; // copy original state
@@ -198,6 +192,7 @@ export class LayerContent extends React.Component {
       });
       updateOldLayer = false;
     }
+    this.props.rerenderParentCallback();
   };
 
   // updates positions of all markers after a marker's layer is changed
@@ -270,10 +265,10 @@ export class LayerContent extends React.Component {
   };
 
   render() {
-    let layerlandmarks = this.state.layerlandmarks;
-
+    const layerlandmarks = this.state.layerlandmarks;
     let markers = "";
     let layercolour = "#000000";
+
     for (var i = 0; i < this.state.layers.length; i++) {
       // console.log(this.state.layers[i])
       if (parseInt(this.state.layers[i].id) == parseInt(this.state.layer)) {
@@ -282,7 +277,6 @@ export class LayerContent extends React.Component {
         }
       }
     }
-
     if (this.state.layerlandmarks) {
       // if there are any markers in this layer, show all markers
       markers = layerlandmarks.map((landmark, index) => (

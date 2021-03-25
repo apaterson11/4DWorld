@@ -15,6 +15,7 @@
     "immutability-helper": "^3.1.1",
     "jwt-decode": "^3.1.2",
     "leaflet": "^1.7.1",
+    "mui-datatables": "^3.7.6",
     "react": "^17.0.1",
     "react-color": "^2.19.3",
     "react-dnd": "^14.0.1",
