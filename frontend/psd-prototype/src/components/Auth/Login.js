@@ -174,7 +174,7 @@ class Login extends React.Component {
                 <Grid item xs>
                   {<Link href="/change-password" variant="body2">
                     Forgot password?
-                  </Link> }
+                  </Link> }np
                 </Grid>
                 <Grid item>
                   <Link to='/register'>
