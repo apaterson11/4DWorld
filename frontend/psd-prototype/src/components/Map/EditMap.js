@@ -3,7 +3,7 @@ import { Map, TileLayer, LayersControl, LayerGroup } from "react-leaflet";
 import { useParams } from "react-router-dom";
 import Control from "@skyeer/react-leaflet-custom-control";
 import axiosInstance from "../../axios";
-import { LayerContent } from "../LayerContent_copy";
+import { LayerContent } from "../LayerContent";
 import Popup from "reactjs-popup";
 import LayerControl from "../LayerControl";
 import LayerAdd from "../LayerAdd";
@@ -32,6 +32,7 @@ function EditMap(props) {
   const [landmarks, setLandmarks] = useState();
   const [layers, setLayers] = useState([]);
   const [mapStyle, setMapStyle] = useState();
+  const [map, setMap] = useState();
   const [canClick, setCanClick] = useState(false);
   const [addMarkerState, setAddMarkerState] = useState(false);
   const [currentLayer, setCurrentLayer] = useState(null);
@@ -47,6 +48,7 @@ function EditMap(props) {
     axiosInstance
       .get(`/projects/${projectID}`)
       .then((response) => {
+        console.log(projectID)
         setProject(response.data);
         setViewport({
           center: [response.data.map.latitude, response.data.map.longitude],
@@ -56,6 +58,7 @@ function EditMap(props) {
       })
       .then((response) => {
         // get the landmarks
+        setMap(response.map)
         const landmarkRequest = axiosInstance.get(
           `/landmarks?map_id=${response.map.id}`
         );
@@ -203,6 +206,7 @@ function EditMap(props) {
             position={state.position}
             layers={layers}
             landmarks={landmarks}
+            map={map}
             rerenderParentCallback={rerenderParentCallback}
             updateOnDelete={updateOnDelete}
           ></LayerContent>
