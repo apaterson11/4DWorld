@@ -29,17 +29,38 @@ class ResetPassword extends React.Component {
         console.log(this.state);
         let input = {};
         input["email"] = "";
-        //input["password"] = "";
-        //input password_2
+        input["password"] = "";
+        input["password2"] = "";
         this.setState({input:input});
-        alert('Valid Email');
+        alert('Valid');
     }
   }
   
+
+  // Validates email address is in the right format = exists
+  // checks if password1 and two are the same 
   validate(){
       let input = this.state.input;
       let errors = {};
       let isValid = true;
+
+      var password = document.getElementById("password").value;
+      var password2 = document.getElementById("password2").value;
+
+      if (!input["password"]){
+          isValid = false;
+          errors["password"] = "Please enter a new password";
+      }
+
+      if (!input["password2"]){
+        isValid = false;
+        errors["password2"] = "Please confirm password";
+    }
+
+    if (password != password2){
+        isValid = false;
+        errors["password2"] = "That does not match";
+    }
   
       if (!input["email"]) {
         isValid = false;
@@ -66,6 +87,7 @@ class ResetPassword extends React.Component {
       <div>
         <h1>Reset Password Request</h1>
         <form onSubmit={this.handleSubmit}> 
+          
           <div class="form-group">
             <label for="email">Email Address:</label>
             <input 
@@ -79,7 +101,37 @@ class ResetPassword extends React.Component {
               required
                />
               <div className="text-error">{this.state.errors.email}</div>
-          </div>
+              </div>
+
+            <div class="form-group">
+            <label for="Password">New Password:</label>
+            <input 
+              type="text" 
+              name="password" 
+              value={this.state.input.password}
+              onChange={this.handleChange}
+              class="form-control" 
+              placeholder="New password" 
+              id="password" />
+  
+              <div className="text-error">{this.state.errors.password}</div>
+              </div>
+
+              <div class="form-group">
+            <label for="Password2">Confirm Password:</label>
+            <input 
+              type="text" 
+              name="password2" 
+              value={this.state.input.password2}
+              onChange={this.handleChange}
+              class="form-control" 
+              placeholder="Confirm password" 
+              id="password2" />
+  
+              <div className="text-error">{this.state.errors.password2}</div>
+              </div>
+
+
           <button type="submit" value="Submit" class="btn btn-success">Submit</button>
         </form>
       </div>
