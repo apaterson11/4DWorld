@@ -21,7 +21,7 @@ class Project(models.Model):
         Profile, on_delete=models.SET_NULL, related_name='projects', null=True
     )
     group = models.ForeignKey(
-        Group, on_delete=models.SET_NULL, related_name='projects', null=True
+        Group, on_delete=models.SET_DEFAULT, related_name='projects', null=True, default=''
     )
 
     def __str__(self):
@@ -29,7 +29,6 @@ class Project(models.Model):
 
     class Meta:
         ordering = (Lower('title'),)
-
 
 class MapStyle(models.Model):
     name = models.CharField(max_length=64, db_index=True)
