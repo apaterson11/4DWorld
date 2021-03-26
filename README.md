@@ -2,7 +2,7 @@
 
 4DWorld was created by CS23. It is a interactive mapping tool.
 
-## Installation
+## Installation and Setup
 
 On the backend folder(cs23-main/backend) please use the package manager [pip](https://pip.pypa.io/en/stable/) to install 
 
