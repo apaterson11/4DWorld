@@ -12,6 +12,7 @@ import KnowledgeImage from '../markers/knowledge.png';
 import ReligiousImage from '../markers/religious.png';
 import TradingImage from '../markers/trading.png';
 import VillageImage from '../markers/village.png';
+import NodeImage from '../markers/node.png';
 
 
 
@@ -118,4 +119,12 @@ export const village = new L.Icon({
 	iconAnchor: [30, 98],
 	popupAnchor: [1, -34],
 });
+
+export const node = new L.Icon({
+	iconUrl: NodeImage,
+	iconSize: [20, 20],
+	iconAnchor: [10, 10],
+	popupAnchor: [0, -8],
+});
+
 

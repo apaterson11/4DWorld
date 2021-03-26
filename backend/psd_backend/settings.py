@@ -30,6 +30,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'api',
     'rest_framework_simplejwt.token_blacklist',
+    'django_extensions'
 ]
 
 MIDDLEWARE = [
@@ -120,14 +121,15 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
     ),    
 }
 
 CORS_ALLOWED_ORIGINS = ['http://localhost:3000']
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=10),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=5),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=15),
     'ROTATE_REFRESH_TOKENS': False,
     'BLACKLIST_AFTER_ROTATION': True,
     'UPDATE_LAST_LOGIN': False,
@@ -153,7 +155,15 @@ SIMPLE_JWT = {
     'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
 }
 
-### not sure if we need the following just following a tutorial lol ###
+#Possibly useful for reset password
+DJOSER = {
+    'PASSWORD_RESET_CONFIRM_URL': '#/password/reset/confirm/{uid}/{token}',
+    'ACTIVATION_URL': '#/activate/{uid}/{token}',
+    'SEND_ACTIVATION_EMAIL': True,
+    'SERIALIZERS': {},
+}
+
+
 STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]

@@ -1,53 +1,65 @@
-import React, { useState, useEffect } from 'react'
-import Typography from '@material-ui/core/Typography';
-import axiosInstance from '../axios'
+import React, { useContext, useEffect } from "react";
+import { Map, TileLayer } from "react-leaflet";
+import opacity from "../opacity.png";
+import { IsAuthenticated, UserContext } from "../Context";
+import { Link } from "react-router-dom";
 
-import { makeStyles } from '@material-ui/core/styles';
-import Grid from '@material-ui/core/Grid';
+require("./About.css");
 
-import FormLabel from '@material-ui/core/FormLabel';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import RadioGroup from '@material-ui/core/RadioGroup';
-import Radio from '@material-ui/core/Radio';
-import Paper from '@material-ui/core/Paper';
+function HomeMap() {
+  const { userDetails, setUserDetails } = useContext(UserContext);
+  const { isAuthenticated, setIsAuthenticated } = useContext(IsAuthenticated);
 
-import TextCard from './TextCard';
-import Footer from './Footer';
+  useEffect(() => {
+    if (userDetails === undefined) {
+      const details = JSON.parse(localStorage.getItem("userDetails"));
+      if (!details) {
+        setIsAuthenticated(false);
+      } else {
+        setUserDetails(details);
+        setIsAuthenticated(true);
+      }
+    }
+  }, [userDetails]);
 
-const useStyles = makeStyles((theme) => ({
-    root: {
-      flexGrow: 1,
-    },
-    paper: {
-        
-      height: 200,
-      width: 100,
-    },
-    control: {
-      padding: theme.spacing(2),
-    },
-  }));
-  
-  export default function SpacingGrid() {
-    const [spacing, setSpacing] = React.useState(2);
-    const classes = useStyles();
-  
-  
-    return (
-    //   <Grid container className={classes.root} spacing={2} justify="center">
-    //     <Grid item xs={"auto"}>
-    //       <Grid container justify="center" spacing={spacing}>
-    //         {[0, 1, 2, 3].map((value) => (
-    //           <Grid key={value} item>
-                <TextCard 
-                header="Hello World"
-                subheader="minimum styling subheader"
-                body="This is the body of the text, test"/>
-    //           </Grid>
-    //         ))}
-    //       </Grid>
-    //     </Grid>
-        
-    //   </Grid>
-    );
-  }
+  return (
+    <Map
+      center={[50, -40]}
+      zoom={4}
+      maxBounds={[
+        [90, -180],
+        [-90, 180],
+      ]}
+    >
+      <div className="title">
+        <h1 className="titleh1">4DWorld</h1>
+        <h3 className="titleh3">Not much to see here... go get started!</h3>
+        {isAuthenticated ? (
+          <Link to="/dashboard/" className="btn">
+            Dashboard
+          </Link>
+        ) : (
+          <Link to="/login/" className="btn">
+            Login
+          </Link>
+        )}
+      </div>
+      <TileLayer
+        url={opacity}
+        minZoom={3}
+        maxZoom={18}
+        noWrap={true}
+        zIndex={1}
+      ></TileLayer>
+      <TileLayer
+        url="http://{s}.tile.osm.org/{z}/{x}/{y}.png"
+        minZoom={3}
+        maxZoom={18}
+        noWrap={true}
+        zIndex={0}
+      />
+    </Map>
+  );
+}
+
+export default HomeMap;

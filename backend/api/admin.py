@@ -4,6 +4,7 @@ from api.models import (
     Country,
     Landmark,
     LandmarkImage,
+    Layer,
     Map,
     MapStyle,
     Profile,
@@ -17,11 +18,15 @@ class LandmarkImageAdmin(admin.StackedInline):
 @admin.register(Landmark)
 class LandmarkAdmin(admin.ModelAdmin):
     inlines = [LandmarkImageAdmin]
-    list_display = ('content', 'latitude', 'longitude')
+    list_display = ('content', 'latitude', 'longitude', 'layer', 'map')
+
+@admin.register(Layer)
+class LayerAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'description', 'map')
 
 @admin.register(LandmarkImage)
 class LandmarkImageAdmin(admin.ModelAdmin):
-    pass
+    list_display = ('id', 'landmark', 'image')
 
 admin.site.register(City)
 admin.site.register(Country)
