@@ -78,8 +78,14 @@ export class LayerContent extends React.Component {
     this.getLandmarks();
   }
 
+  componentDidMount() {
+    this.fetchData();
+  }
+
   // refetches updated markers when they are changed
   componentDidUpdate(prevProps, prevState) {
+    // console.log(prevProps.layerlandmarks)
+    // console.log(this.props.layerlandmarks)
     if (this.props.layerlandmarks && prevProps.layerlandmarks) {
       if (
         JSON.stringify(prevProps.layerlandmarks) !==
@@ -94,38 +100,11 @@ export class LayerContent extends React.Component {
     }
   }
 
-  submitEdit = (
-    layer,
-    content,
-    icontype,
-    lat,
-    lng,
-    id,
-    pos,
-    layerlandmarks
-  ) => {
-    this.updateLandmarks(
-      layer,
-      content,
-      icontype,
-      lat,
-      lng,
-      id,
-      pos,
-      layerlandmarks
-    );
+  submitEdit = (layer,content,icontype,lat,lng,id,pos,layerlandmarks) => {
+    this.updateLandmarks(layer,content,icontype,lat,lng,id,pos,layerlandmarks);
   };
 
-  updateLandmarks = (
-    layer,
-    content,
-    markertype,
-    lat,
-    lng,
-    landmark_id,
-    position,
-    layerlandmarks
-  ) => {
+  updateLandmarks = (layer,content,markertype,lat,lng,landmark_id,position,layerlandmarks) => {
     /* Updates the landmarks by sending a PUT request to the API,
            and updating the state in the then() callback
         */
@@ -147,7 +126,6 @@ export class LayerContent extends React.Component {
 
       if (landmarksgrouped[layer]) {
         landmarksgrouped[layer].forEach((marker) => {
-          console.log(marker)
           positions.push(parseInt(marker.position));
         });
         newposition = Math.max(...positions) + 1;
@@ -183,37 +161,45 @@ export class LayerContent extends React.Component {
 
         // set the state with the newly updated landmark
         this.setState({ landmarks: updatedLandmarks });
-      });
 
-    // find all markers to update and send to updatePositions function
-    let markersToUpdate = [];
-    this.state.layerlandmarks.forEach((marker) => {
-      if (marker.id != landmark_id) {
-        markersToUpdate.push(marker);
-      }
-    });
+        // find all markers to update and send to updatePositions function
+        let markersToUpdate = [];
+        this.state.layerlandmarks.forEach((marker) => {
+          if (marker.id != landmark_id) {
+            markersToUpdate.push(marker);
+          }
+        });
 
-    if (updateOldLayer) {
-      this.updatePositions(markersToUpdate);
-      this.setState({
-        layerlandmarks: this.state.layerlandmarks.filter(
-          (landmark) => landmark.id !== landmark_id
-        ),
+        if (updateOldLayer) {
+          this.updatePositions(markersToUpdate);
+          this.setState({
+            layerlandmarks: this.state.layerlandmarks.filter(
+              (landmark) => landmark.id !== landmark_id
+            ),
+          });
+          updateOldLayer = false;
+        }
+        else {
+          this.props.rerenderParentCallback()
+        }
       });
-      updateOldLayer = false;
-    }
+    
   };
 
   // updates positions of all markers after a marker's layer is changed
   updatePositions(array) {
         array.forEach((marker, index) => {
-        const response = axiosInstance
-            .patch(`/landmarks/${marker.id}/`, {
-            position: index,
+          if (index == (array.length-1)) {
+            const response = axiosInstance.patch(`/landmarks/${marker.id}/`, {
+              position: index,
+            }).then(() => {
+              this.getLandmarks()
             })
+          }
+        const response = axiosInstance.patch(`/landmarks/${marker.id}/`, {
+            position: index,
+          })
         });
-        console.log("updatePositions")
-        this.getLandmarks()
   }
 
   // function gets all landmarks
@@ -272,7 +258,6 @@ export class LayerContent extends React.Component {
     let markers = "";
     let layercolour = "#000000";
     for (var i = 0; i < this.state.layers.length; i++) {
-      // console.log(this.state.layers[i])
       if (parseInt(this.state.layers[i].id) == parseInt(this.state.layer)) {
         if (this.state.layers[i].colour) {
           layercolour = this.state.layers[i].colour;
@@ -367,17 +352,12 @@ export class LayerContent extends React.Component {
         let range2 = Array(fillLandmarks.length)
           .fill()
           .map((x, i) => i);
-        //console.log(range2)
-        // range2.push(landmarks.length)
+
         let positions = range2.map((i) => [
           fillLandmarks[i].latitude,
           fillLandmarks[i].longitude,
         ]);
 
-        // positions.concat([landmarks[0].latitude, landmarks[0].longitude])
-        // positions.push([landmarks[((landmarks.length)-1)].latitude, landmarks[((landmarks.length)-1)].longitude])
-        // console.log(positions[parseInt(positions.length)])
-        // console.log(positions)
         let testcenter = positions[1];
         let test = "";
         let test2 = "";

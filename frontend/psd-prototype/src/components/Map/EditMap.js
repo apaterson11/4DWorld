@@ -311,7 +311,7 @@ function EditMap(props) {
             closeOnDocumentClick
           >
             <span>
-              <LayerAdd layers={layers} addNewLayer={addNewLayer} />
+              <LayerAdd layers={layers} map={map} addNewLayer={addNewLayer} />
             </span>
           </Popup>
 

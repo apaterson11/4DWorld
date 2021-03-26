@@ -68,7 +68,7 @@ class Map(models.Model):
 
 class Layer(models.Model):
     name = models.TextField(default="")
-    description = models.TextField(default="")
+    description = models.TextField(default="", null=True)
     map = models.ForeignKey(Map, on_delete=models.CASCADE, null=True, blank=True)  # should not be nullable later on
     colour = models.TextField(default="#000000")
 

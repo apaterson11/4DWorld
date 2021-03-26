@@ -268,6 +268,7 @@ export default class EditMarker extends React.Component {
             <br></br>
             <InputLabel id="label">Content</InputLabel>
             <RichTextEditor
+              className="rte"
               toolbarConfig={toolbarConfig}
               value={this.state.value}
               onChange={this.onChange}
