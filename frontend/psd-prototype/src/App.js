@@ -70,7 +70,7 @@ function App(props) {
         >
           <Header isAuthenticated={isAuthenticated} />
           <Switch>
-            <Route exact path="/" component={About} />
+            <Route exact path="/" component={About}/>
             <Route
               exact
               path="/demo-map/"

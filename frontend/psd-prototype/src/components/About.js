@@ -1,9 +1,6 @@
-import React, { useState, useEffect, useContext } from "react";
-import { makeStyles } from "@material-ui/core/styles";
-import { Map, TileLayer, Marker, Polygon } from "react-leaflet";
-import L from 'leaflet';
-import TextCard from "./TextCard";
-import Footer from "./Footer";
+import React from "react";
+import { Map, TileLayer } from "react-leaflet";
+import opacity from '../opacity.png'
 import { IsAuthenticated } from "../Context";
 
 require("./About.css");
@@ -18,7 +15,19 @@ class HomeMap extends React.Component {
     viewport: DEFAULT_VIEWPORT,
   };
 
+  constructor(props) {
+    super(props)
+  }
+
   render() {
+    let goButton = ''
+    console.log(this.props)
+    if (this.props.IsAuthenticated) {
+      goButton = <a href="/dashboard/" className="btn">Dashboard</a>
+    }
+    else {
+      goButton = <a href="/login/" className="btn">Login</a>
+    }
     return (
       <Map
           center={[50, -40]}
@@ -31,9 +40,10 @@ class HomeMap extends React.Component {
         <div className="title">
           <h1>4DWorld</h1>
           <h3>Not much to see here... go get started!</h3>
+          {goButton}
         </div>
       <TileLayer 
-        url="https://img2.pngio.com/opacity-png-png-image-opacity-png-1920_1280.png"
+        url={opacity}
         minZoom={3}
         maxZoom={18}
         noWrap={true}
