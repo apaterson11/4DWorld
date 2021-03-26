@@ -1,17 +1,18 @@
-import React, { useState, useEffect } from "react";
-import "./App.css";
-import { Route, BrowserRouter as Router, Switch } from "react-router-dom";
-import About from "./components/About";
-import Header from "./components/Header";
+import React, {useState, useEffect} from 'react';
+import './App.css';
+import {Route, BrowserRouter as Router, Switch} from 'react-router-dom';
+import About from './components/About'
+import Header from './components/Header'
+import Login from './components/Auth/Login'
+import Logout from './components/Auth/Logout'
+import Register from './components/Auth/Register'
+import ProtoMap from './components/ProtoMap'
+import Dashboard from './components/Profile/Dashboard'
+import ResetPasswordRequest from './components/PasswordResetRequest'
+import CreateProject from './components/Project/CreateProject'
 import EditMap from "./components/Map/EditMap";
 import ViewMap from "./components/Map/ViewMap";
 import Footer from "./components/Footer";
-import Login from "./components/Auth/Login";
-import Logout from "./components/Auth/Logout";
-import Register from "./components/Auth/Register";
-import ProtoMap from "./components/ProtoMap";
-import Dashboard from "./components/Profile/Dashboard";
-import CreateProject from "./components/Project/CreateProject";
 import { UserContext, IsAuthenticated } from "./Context";
 import axiosInstance from "./axios";
 import jwt from "jwt-decode";
@@ -72,18 +73,11 @@ function App(props) {
         >
           <Header isAuthenticated={isAuthenticated} />
           <Switch>
-            <Route exact path="/" component={About} />
-            <Route
-              exact
-              path="/demo-map/"
-              render={() => (
-                <ProtoMap
-                  latitude={defaultLocation.defaultLat}
-                  longitude={defaultLocation.defaultLon}
-                />
-              )}
-            /> */}
-            <Route exact path="/dashboard/" render={() => <Dashboard />} />
+            <Route exact path="/" component={About}/>
+            <Route exact path="/change-password" component={ResetPasswordRequest}/>
+            <Route exact path="/dashboard/" render={() => (
+              <Dashboard />
+            )} />
             <Route exact path="/projects/create/" component={CreateProject} />
             <Route exact path="/projects/edit/:projectID" component={EditMap} />
             <Route exact path="/projects/view/:projectID" component={ViewMap} />
