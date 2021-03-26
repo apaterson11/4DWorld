@@ -72,6 +72,7 @@ function EditMap(props) {
           (response) => {
             setLandmarks(response[0].data);
             setLayers(response[1].data);
+            // setCurrentLayer(layers[0])
             setMapStyle(response[2].data);
             setFetching(false);
           }
@@ -113,7 +114,10 @@ function EditMap(props) {
     /* Adds a new landmark to the map at a given latitude and longitude, via a POST request */
     setCanClick(false);
     const { lat, lng } = e.latlng;
-    const pos = landmarks.length;
+    let layerlandmarks = groupBy([...landmarks], (i) => i.layer)[currentLayer]
+    console.log(layerlandmarks)
+    console.log(currentLayer)
+    const pos = layerlandmarks ? layerlandmarks.length : 0;
     const response = axiosInstance
       .post("/landmarks/", {
         layer: currentLayer,
