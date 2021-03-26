@@ -79,7 +79,11 @@ function EditMap(props) {
         );
       })
       .catch((err) => {
-        history.push("/login");
+        if (err.response.status == 404) {
+          history.push("/dashboard");
+        } else if (err.response.status == 401) {
+          history.push("/login");
+        }
       });
   }, []);
 
@@ -114,9 +118,9 @@ function EditMap(props) {
     /* Adds a new landmark to the map at a given latitude and longitude, via a POST request */
     setCanClick(false);
     const { lat, lng } = e.latlng;
-    let layerlandmarks = groupBy([...landmarks], (i) => i.layer)[currentLayer]
-    console.log(layerlandmarks)
-    console.log(currentLayer)
+    let layerlandmarks = groupBy([...landmarks], (i) => i.layer)[currentLayer];
+    console.log(layerlandmarks);
+    console.log(currentLayer);
     const pos = layerlandmarks ? layerlandmarks.length : 0;
     const response = axiosInstance
       .post("/landmarks/", {

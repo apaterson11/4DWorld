@@ -77,7 +77,11 @@ function ViewMap(props) {
         );
       })
       .catch((err) => {
-        history.push("/login");
+        if (err.response.status == 404) {
+          history.push("/dashboard");
+        } else if (err.response.status == 401) {
+          history.push("/login");
+        }
       });
   }, []);
 
