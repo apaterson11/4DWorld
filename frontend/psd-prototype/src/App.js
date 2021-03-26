@@ -71,7 +71,7 @@ function App(props) {
           <Header isAuthenticated={isAuthenticated} />
           <Switch>
             <Route exact path="/" component={About}/>
-            <Route
+            {/* <Route
               exact
               path="/demo-map/"
               render={() => (
@@ -80,7 +80,7 @@ function App(props) {
                   longitude={defaultLocation.defaultLon}
                 />
               )}
-            />
+            /> */}
             <Route exact path="/dashboard/" render={() => <Dashboard />} />
             <Route exact path="/projects/create/" component={CreateProject} />
             <Route exact path="/projects/edit/:projectID" component={EditMap} />
