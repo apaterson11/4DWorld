@@ -28,10 +28,14 @@ class LayerAdmin(admin.ModelAdmin):
 class LandmarkImageAdmin(admin.ModelAdmin):
     list_display = ('id', 'landmark', 'image')
 
+@admin.register(Project)
+class ProjectAdmin(admin.ModelAdmin):
+    list_display = ('id', 'title', 'description', 'group', 'creator', 'hash_field')
+
+
 admin.site.register(City)
 admin.site.register(Country)
 admin.site.register(Map)
-admin.site.register(Project)
 admin.site.register(Profile)
 admin.site.register(State)
 admin.site.register(MapStyle)

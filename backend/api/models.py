@@ -1,3 +1,4 @@
+import uuid
 from django.db import models
 from django.db.models.functions import Lower
 from django.contrib.auth.models import Group, User
@@ -23,6 +24,7 @@ class Project(models.Model):
     group = models.ForeignKey(
         Group, on_delete=models.SET_DEFAULT, related_name='projects', null=True, default=''
     )
+    hash_field = models.UUIDField(default=uuid.uuid4, editable=False)
 
     def __str__(self):
         return self.title

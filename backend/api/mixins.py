@@ -1,4 +1,5 @@
 from rest_framework.response import Response
+from api.models import Project
 
 class FilterByMapMixin:
     """ Provides an override of the list() method of ModelViewSet
@@ -12,3 +13,13 @@ class FilterByMapMixin:
             data = self.serializer_class(qs, many=True).data
             return Response(data, 200)
         return super().list(request, *args, **kwargs)
+
+
+# class UUIDQueryParamMixin:
+    
+#     def retrieve(self, request, *args, **kwargs):
+#         uuid = request.get('uuid')
+#         if uuid is None:
+#             return super().retrieve(request, *args, **kwargs)
+#         else:
+#             pass

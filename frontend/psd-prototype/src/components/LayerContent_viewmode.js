@@ -19,7 +19,7 @@ import {
   village,
   PinkArmy,
   GreenArmy,
-  node
+  node,
 } from "./Icons";
 
 const iconRef = {
@@ -36,7 +36,7 @@ const iconRef = {
   religious: religious,
   trading: trading,
   village: village,
-  node: node
+  node: node,
 };
 
 // groups layer landmarks
@@ -66,13 +66,13 @@ export class LayerContent extends React.Component {
   };
 
   // fetches all markers when page is loaded
-//   componentDidMount() {
-//     this.fetchData();
-//     console.log("this.state.layer", this.state.layer);
-//   }
+  //   componentDidMount() {
+  //     this.fetchData();
+  //     console.log("this.state.layer", this.state.layer);
+  //   }
 
   fetchData() {
-    console.log("fetch data")
+    console.log("fetch data");
     this.getLandmarks();
   }
 
@@ -203,34 +203,35 @@ export class LayerContent extends React.Component {
 
   // updates positions of all markers after a marker's layer is changed
   updatePositions(array) {
-        array.forEach((marker, index) => {
-        const response = axiosInstance
-            .patch(`/landmarks/${marker.id}/`, {
-            position: index,
-            })
-        });
-        console.log("updatePositions")
-        this.getLandmarks()
+    array.forEach((marker, index) => {
+      const response = axiosInstance.patch(`/landmarks/${marker.id}/`, {
+        position: index,
+      });
+    });
+    console.log("updatePositions");
+    this.getLandmarks();
   }
 
   // function gets all landmarks
   getLandmarks = () => {
     const results = [];
     const allmarkers = [];
-    const response = axiosInstance.get(`/landmarks?map_id=${this.state.map.id}`, {}).then(
-      (response) =>
-        response.data.forEach((item) => {
-          if (item.layer === this.state.layer) {
-            results.push(item);
-          }
-          allmarkers.push(item);
-          results.sort((a, b) => (a.position > b.position ? 1 : -1));
-        }),
-      this.setState(
-        { layerlandmarks: results },
-        this.props.rerenderParentCallback()
-      )
-    );
+    const response = axiosInstance
+      .get(`/landmarks?map_id=${this.state.map.id}`, {})
+      .then(
+        (response) =>
+          response.data.forEach((item) => {
+            if (item.layer === this.state.layer) {
+              results.push(item);
+            }
+            allmarkers.push(item);
+            results.sort((a, b) => (a.position > b.position ? 1 : -1));
+          }),
+        this.setState(
+          { layerlandmarks: results },
+          this.props.rerenderParentCallback()
+        )
+      );
 
     this.setState({ landmarks: allmarkers });
     // rerender ProtoMap to display change in layers
@@ -308,6 +309,7 @@ export class LayerContent extends React.Component {
                 id={landmark.id}
                 layer={this.state.layer}
                 layers={this.state.layers}
+                uuid={this.props.uuid}
               ></EditMarker>
             </React.Fragment>
           </Popup>
