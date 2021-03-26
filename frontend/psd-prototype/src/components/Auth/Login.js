@@ -17,7 +17,7 @@ const styles = theme => ({
     height: '93vh',
   },
   image: {
-    backgroundImage: 'url(https://source.unsplash.com/random)',
+    backgroundImage: 'url(https://images.unsplash.com/photo-1553864250-05b20249ee0c?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=1000&q=80)',
     backgroundRepeat: 'no-repeat',
     backgroundColor:
       theme.palette.type === 'light' ? theme.palette.grey[50] : theme.palette.grey[900],
@@ -81,10 +81,7 @@ class Login extends React.Component {
     e.preventDefault()
     
     // send POST request to the JWT token endpoint
-    axiosInstance.post('token/', {
-      username: this.state.username,
-      password: this.state.password
-    }).then(response => {
+    .then(response => {
       localStorage.setItem('access_token', response.data.access)
       localStorage.setItem('refresh_token', response.data.refresh)
       localStorage.setItem('user', this.state.username)
@@ -172,9 +169,9 @@ class Login extends React.Component {
               </Button>
               <Grid container>
                 <Grid item xs>
-                  {<Link to="/change-password" variant="body2">
+                  {/* {<Link to="/change-password" variant="body2">
                     Forgot password?
-                  </Link> }
+                  </Link> } */}
                 </Grid>
                 <Grid item>
                   <Link to='/register'>
