@@ -84,8 +84,8 @@ export class LayerContent extends React.Component {
 
   // refetches updated markers when they are changed
   componentDidUpdate(prevProps, prevState) {
-    console.log(prevProps.layerlandmarks)
-    console.log(this.props.layerlandmarks)
+    // console.log(prevProps.layerlandmarks)
+    // console.log(this.props.layerlandmarks)
     if (this.props.layerlandmarks && prevProps.layerlandmarks) {
       if (
         JSON.stringify(prevProps.layerlandmarks) !==

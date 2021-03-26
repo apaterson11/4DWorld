@@ -8,7 +8,8 @@ export default class EditMarker extends React.Component {
   state = {
     layers: this.props.layers,
     layer_name: "",
-    layer_desc: "",
+    layer_desc: null,
+    map: this.props.map,
   };
 
   handleLayer = (e) => {
@@ -16,11 +17,17 @@ export default class EditMarker extends React.Component {
   };
 
   // adds layer via POST request
-  addLayer = () => {
+  addLayer = (layer_name, layer_desc) => {
+    if (layer_desc === null || layer_desc === '') {
+      layer_desc = 'default'
+    }
     const response = axiosInstance
       .post(`/layers/`, {
-        name: this.state.layer_name,
-        description: this.state.layer_desc,
+        name: layer_name,
+        description: layer_desc,
+        type: "NDR",
+        colour: "#000000",
+        map: this.state.map.id,
       })
       .then((response) => {
         let newLayers = [...this.state.layers]; // copy original state
@@ -30,9 +37,9 @@ export default class EditMarker extends React.Component {
   };
 
   render() {
-    let addFunc = this.props.addNewLayer
-      ? this.props.addNewLayer
-      : this.addLayer;
+    // let addFunc = this.props.addNewLayer // what is htis for?
+    //   ? this.props.addNewLayer
+    //   : this.addLayer;
 
     return (
       <div className="layerControlPopup">
@@ -66,7 +73,7 @@ export default class EditMarker extends React.Component {
               </label>
               <button
                 onClick={() =>
-                  addFunc(this.state.layer_name, this.state.layer_desc)
+                  this.addLayer(this.state.layer_name, this.state.layer_desc)
                 }
               >
                 Submit

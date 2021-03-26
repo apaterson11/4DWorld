@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, MenuItem, InputLabel, Select } from "@material-ui/core/";
+import { InputLabel } from "@material-ui/core/";
 import Grid from "@material-ui/core/Grid";
 import RichTextEditor from "react-rte";
 import axiosInstance from "../axios";
@@ -166,7 +166,7 @@ export default class EditMarker extends React.Component {
             {/* temporary position label for debugging purposes */}
             <br></br>
             <InputLabel id="label">Content</InputLabel>
-            <div dangerouslySetInnerHTML={{__html: this.state.content}}></div>
+            <div className="content" dangerouslySetInnerHTML={{__html: this.state.content}}></div>
           </Grid>
 
           {/* image gallery */}
