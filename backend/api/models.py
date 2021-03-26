@@ -24,7 +24,7 @@ class Project(models.Model):
     group = models.ForeignKey(
         Group, on_delete=models.SET_DEFAULT, related_name='projects', null=True, default=''
     )
-    hash_field = models.UUIDField(default=uuid.uuid4, editable=False)
+    hash_field = models.UUIDField(default=uuid.uuid4, editable=False, max_length=1000)
 
     def __str__(self):
         return self.title
