@@ -7,6 +7,8 @@ import CardContent from "@material-ui/core/CardContent";
 import Typography from "@material-ui/core/Typography";
 import axiosInstance from "../../axios";
 import Box from "@material-ui/core/Box";
+import { Button } from "@material-ui/core";
+import PublishIcon from "@material-ui/icons/Publish";
 
 export default class DropFileContainer extends React.Component {
   state = {
@@ -64,28 +66,57 @@ export default class DropFileContainer extends React.Component {
   // Input CSV file
   render() {
     return (
-      // <div className={classes.paper}>
-
-      <Card>
+      <Card style={{ margin: "5%" }}>
         <CardContent>
-          <Typography gutterBottom variant="h4" component="h2">
+          <Typography gutterBottom variant="h5" component="h5">
             CSV File Import
           </Typography>
 
           <div>
             <Box>
-              {/* <Typography variant="h6" component="h2" color="primary" align="center">
-                  Drop File Here
-                </Typography> */}
-
-              {/* upload image button */}
-              <input type="file" onChange={this.fileSelectedHandler} required />
-              <button
-                disabled={!this.state.selectedFile}
-                onClick={this.parseFile}
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                }}
               >
-                Upload
-              </button>
+                <label
+                  style={{
+                    border: "1px solid #ccc",
+                    display: "inline-block",
+                    padding: "6px 10px",
+                    cursor: "pointer",
+                    minWidth: "25%",
+                    textAlign: "center",
+                    borderRadius: "10%",
+                  }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-around",
+                    }}
+                  >
+                    <input
+                      type="file"
+                      onChange={this.fileSelectedHandler}
+                      required
+                      style={{ display: "none" }}
+                    />
+                    <PublishIcon /> Attach
+                  </div>
+                </label>
+                <Button
+                  disabled={!this.state.selectedFile}
+                  onClick={this.parseFile}
+                  variant="outlined"
+                  color="primary"
+                >
+                  Upload
+                </Button>
+              </div>
             </Box>
             <Toast />
           </div>
@@ -100,20 +131,8 @@ export default class DropFileContainer extends React.Component {
               </li>
             ))}
           </ul>
-
-          {/*
-              <ul>
-                  {students.map((student) => (
-                  <li key={student.email}>
-                      <strong>{student.name}</strong>: {student.email}
-                      {student.GUID}
-                  </li>
-                  ))}
-              </ul>
-                  */}
         </CardContent>
       </Card>
-      // </div>
     );
   }
 }
