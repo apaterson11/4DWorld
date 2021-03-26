@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useContext } from "react";
 import Button from "@material-ui/core/Button";
+import { useHistory } from "react-router-dom"
 import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import Dialog from "@material-ui/core/Dialog";
@@ -11,6 +12,7 @@ import Typography from "@material-ui/core/Typography";
 import Grid from "@material-ui/core/Grid";
 import Spinner from "../Spinner";
 import { Autocomplete } from "@material-ui/lab";
+import { UserContext } from "../../Context";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -27,7 +29,9 @@ const useStyles = makeStyles({
 });
 
 export default function ProjectDetailModal(props) {
+  const history = useHistory();
   const classes = useStyles();
+  const { userDetails, setUserDetails } = useContext(UserContext);
   const [title, setTitle] = useState(null);
   const [description, setDescription] = useState(null);
   const [group, setGroup] = useState('');
@@ -42,6 +46,13 @@ export default function ProjectDetailModal(props) {
   const [maxZoom, setMaxZoom] = useState(null);
 
   useEffect(() => {
+    if (userDetails === undefined) {
+      const details = JSON.parse(localStorage.getItem("userDetails"));
+      setUserDetails(details);
+    }
+  }, [userDetails]);
+
+  useEffect(() => {
     if (props.open) {
       let proj = props.project;
       setTitle(proj.title);
@@ -52,13 +63,29 @@ export default function ProjectDetailModal(props) {
       setLongitude(proj.map.longitude);
       setZoom(proj.map.zoom);
 
+      const details = JSON.parse(localStorage.getItem("userDetails"));
+      if (userDetails === undefined) {
+        if (details === null) {
+          // if it can't be recovered from localStorage, user needs to login again
+          return history.push("/login");
+      }
+      setUserDetails(details);
+    }
+
       axiosInstance.get(`/groups/${proj.group}/`).then((response) => {
         setGroup(response.data);
       });
-      axiosInstance.get(`/user-details/${proj.creator}`).then((response => {
-        console.log(response.data.user.groups)
-        setGroups(response.data.user.groups)
-      }));
+
+      axiosInstance
+      .get(`/user-details/${details.profile_id}`)
+      .then((response) => {
+        setGroups(
+          response.data.user.groups.sort((g1, g2) =>
+            g1.name > g2.name ? 1 : -1
+          )
+        );
+      });
+
       axiosInstance.get("/map-styles/").then((response) => {
         setMapOptions(response.data);
         let style = response.data.filter(
