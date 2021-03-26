@@ -63,9 +63,9 @@ function Dashboard() {
               <UserGroupsCard />
             </Grid>
 
-            <Grid item xs={12}>
+            {/* <Grid item xs={12}>
               <DropFileContainer />
-            </Grid>
+            </Grid> */}
           </Grid>
           <Grid
             item
