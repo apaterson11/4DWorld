@@ -64,6 +64,7 @@ export class LayerContent extends React.Component {
     lng: this.props.longitude,
     icontype: this.props.markertype,
     position: this.props.position,
+    map: this.props.map,
   };
 
   // fetches all markers when page is loaded
@@ -146,6 +147,7 @@ export class LayerContent extends React.Component {
 
       if (landmarksgrouped[layer]) {
         landmarksgrouped[layer].forEach((marker) => {
+          console.log(marker)
           positions.push(parseInt(marker.position));
         });
         newposition = Math.max(...positions) + 1;
@@ -218,7 +220,7 @@ export class LayerContent extends React.Component {
   getLandmarks = () => {
     const results = [];
     const allmarkers = [];
-    const response = axiosInstance.get("/landmarks/", {}).then(
+    const response = axiosInstance.get(`/landmarks?map_id=${this.state.map.id}`, {}).then(
       (response) =>
         response.data.forEach((item) => {
           if (item.layer === this.state.layer) {
