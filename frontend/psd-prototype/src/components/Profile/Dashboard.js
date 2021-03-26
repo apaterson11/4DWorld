@@ -6,7 +6,7 @@ import Paper from "@material-ui/core/Paper";
 import ProfileCard from "./ProfileCard";
 import ProjectContainer from "../Project/ProjectContainer";
 import UserGroupsCard from "./UserGroupsCard";
-import { UserContext } from "../../Context";
+import { IsAuthenticated, UserContext } from "../../Context";
 import Spinner from "../Spinner";
 
 const useStyles = makeStyles({
@@ -27,6 +27,7 @@ function Dashboard() {
   const classes = useStyles();
   const history = useHistory();
   const { userDetails, setUserDetails } = useContext(UserContext);
+  const { isAuthenticated, setIsAuthenticated } = useContext(IsAuthenticated);
 
   useEffect(() => {
     if (userDetails === undefined) {
@@ -35,6 +36,7 @@ function Dashboard() {
         history.push("/login");
       }
       setUserDetails(details);
+      setIsAuthenticated(true);
     }
   }, [userDetails]);
 
