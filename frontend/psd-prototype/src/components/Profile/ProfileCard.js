@@ -52,7 +52,7 @@ export default function ProfileCard() {
 
   const handleSubmit = () => {
     const response = axiosInstance
-      .put(`/user-details/${userDetails.profile_id}/`, {
+      .put(`/user-details/${userDetails.profile_id}/`, {  // Put request to update DB of any new changes to profile card 
         user: {
           first_name: newProfile.newName,
           last_name: newProfile.newSurname,
@@ -74,6 +74,7 @@ export default function ProfileCard() {
       });
   };
 
+  // generates profile card to display personal data given by the user, 
   return (
     <React.Fragment>
       <EditProfileModal

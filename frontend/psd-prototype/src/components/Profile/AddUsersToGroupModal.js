@@ -26,6 +26,7 @@ const useStyles = makeStyles({
 });
 
 export default function AddUsersToGroupModal(props) {
+
   const classes = useStyles();
   const [members, setMembers] = useState([]);
   const [allUsers, setAllUsers] = useState([]);
@@ -66,7 +67,7 @@ export default function AddUsersToGroupModal(props) {
   const addToGroup = (e) => {
     if (newMember !== null) {
       axiosInstance
-        .post(`/groups/${props.groupID}/user/${newMember.id}/`)
+        .post(`/groups/${props.groupID}/user/${newMember.id}/`) // adds new user to the group via a post Request
         .then((res) => {
           const newMembers = [...members];
           newMembers.push([
@@ -96,8 +97,8 @@ export default function AddUsersToGroupModal(props) {
 
   useEffect(() => {
     if (props.open) {
-      axiosInstance.get(`/groups/${props.groupID}`).then((response) => {
-        const memberData = response.data.members.map((member) => {
+      axiosInstance.get(`/groups/${props.groupID}`).then((response) => { 
+        const memberData = response.data.members.map((member) => { 
           return [
             member.email,
             member.first_name,
@@ -115,6 +116,8 @@ export default function AddUsersToGroupModal(props) {
     updateUserOptions();
   }, [members]);
 
+
+  //Displays Add Users Dialog
   return (
     <div>
       <Dialog

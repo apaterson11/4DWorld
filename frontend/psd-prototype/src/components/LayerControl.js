@@ -44,10 +44,12 @@ export default class LayerControl extends React.Component {
     });
   };
 
+  // updates layer type in state
   handleType = (e) => {
     this.setState({ layer_type: e.target.value });
   };
 
+  // updates content colour in state
   handleChangeComplete = (color) => {
     this.setState({ layer_colour: color.hex });
   };
@@ -63,8 +65,8 @@ export default class LayerControl extends React.Component {
       })
       .then((response) => {
         let newLayers = [...this.state.layers]; // copy original state
-        newLayers.push(response.data); // add the new layer to the copy
-        this.setState({ layers: newLayers }); // update the state with the new layer
+        newLayers.push(response.data); 
+        this.setState({ layers: newLayers }); // update the state with the layer changed
 
         let updatedLayers = [...this.state.layers]; // copy original state
 
@@ -121,7 +123,7 @@ export default class LayerControl extends React.Component {
             </select>
           </Grid>
 
-          {/* form for inputting new data and submitting results/deleting layer*/}
+          {/* form for inputting new data and submitting results/deleting layer */}
           <Grid item>
             <form>
               <label>
@@ -148,6 +150,7 @@ export default class LayerControl extends React.Component {
               </label>
               <br></br>
               <br></br>
+              {/* selection box for selecting how the content is presented */}
               Display type:
               <select
                 value={this.state.layer_type}
@@ -162,6 +165,7 @@ export default class LayerControl extends React.Component {
                 <option value="FIL">Area fill</option>
               </select>
               <p>
+                {/* colour selector for the content */}
                 Colour:
                 <CirclePicker
                   color={this.state.layer_colour}
@@ -196,6 +200,7 @@ export default class LayerControl extends React.Component {
                 />
               </p>
               <br></br>
+              {/* drag-and-drop reordering of markers */}
               <label>
                 Marker Order
                 <DndProvider backend={HTML5Backend}>

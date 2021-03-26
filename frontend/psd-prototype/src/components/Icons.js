@@ -1,3 +1,4 @@
+// imports icon images from markers folder and defines sizes etc
 import L from 'leaflet';
 import ArmyImage from '../markers/army.png';
 import PinkArmyImage from '../markers/Pink_Army.png'
@@ -14,7 +15,7 @@ import TradingImage from '../markers/trading.png';
 import VillageImage from '../markers/village.png';
 import NodeImage from '../markers/node.png';
 
-
+// exports icons to use in an iconReference in LayerContent
 
 export const army = new L.Icon({
 	iconUrl: ArmyImage,
@@ -88,16 +89,12 @@ export const industry = new L.Icon({
 	popupAnchor: [1, -34],
 });
 
-
-
-
 export const knowledge = new L.Icon({
 	iconUrl: KnowledgeImage,
 	iconSize: [60, 98],
 	iconAnchor: [30, 98],
 	popupAnchor: [1, -34],
 });
-
 
 export const religious = new L.Icon({
 	iconUrl: ReligiousImage,

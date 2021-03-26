@@ -21,8 +21,6 @@ import {
   GreenArmy,
   node
 } from "./Icons";
-// S
-// import { Polygon } from 'leaflet';
 
 const iconRef = {
   army: army,
@@ -50,6 +48,7 @@ const groupBy = (array, fn) =>
     return result;
   }, {});
 
+// class displays markers and layers on map
 export class LayerContent extends React.Component {
   state = {
     landmarks: this.props.landmarks,
@@ -67,14 +66,7 @@ export class LayerContent extends React.Component {
     map: this.props.map,
   };
 
-  // fetches all markers when page is loaded
-//   componentDidMount() {
-//     this.fetchData();
-//     console.log("this.state.layer", this.state.layer);
-//   }
-
   fetchData() {
-    console.log("fetch data")
     this.getLandmarks();
   }
 
@@ -84,8 +76,7 @@ export class LayerContent extends React.Component {
 
   // refetches updated markers when they are changed
   componentDidUpdate(prevProps, prevState) {
-    // console.log(prevProps.layerlandmarks)
-    // console.log(this.props.layerlandmarks)
+
     if (this.props.layerlandmarks && prevProps.layerlandmarks) {
       if (
         JSON.stringify(prevProps.layerlandmarks) !==
@@ -271,11 +262,8 @@ export class LayerContent extends React.Component {
         <Marker
           key={landmark.id}
           position={[landmark.latitude, landmark.longitude]}
-          icon={
-            landmark.markertype in iconRef
-              ? iconRef[landmark.markertype]
-              : blueIcon
-          }
+          icon={landmark.markertype in iconRef ? iconRef[landmark.markertype] : blueIcon}
+          // if a markertype is chosen, show that icon, otherwise show a default blue marker
         >
           <Popup
             autoClose={false}
@@ -316,7 +304,6 @@ export class LayerContent extends React.Component {
 
       let content = "";
 
-      // console.log(this.state.layer, layertype)
       // make copies of landmarks array
       let fromLandmarks = [...this.state.layerlandmarks];
       let toLandmarks = [...this.state.layerlandmarks];
@@ -325,9 +312,10 @@ export class LayerContent extends React.Component {
       fromLandmarks.pop();
       toLandmarks.sort((a, b) => (a.position > b.position ? 1 : -1));
       toLandmarks = toLandmarks.slice(1);
+      // this creates one line betweem every pair of markers
 
       if (layertype == "NDR") {
-        // range(length of fromLandmarks)
+        // display lines with no arrows (non-directional)
         let range = Array(fromLandmarks.length)
           .fill()
           .map((x, i) => i);
@@ -342,12 +330,12 @@ export class LayerContent extends React.Component {
             color={layercolour}
           />
         ));
-        // creates one line between each pair of markers
       } else if (layertype == "FIL") {
-        // console.log("is FIL")
+        // display an area fill (shaded polygon) between all markers
         let fillLandmarks = [...this.state.layerlandmarks];
 
         fillLandmarks.sort((a, b) => (a.position > b.position ? 1 : -1));
+        // sorts array of all landmarks by position
 
         let range2 = Array(fillLandmarks.length)
           .fill()
@@ -357,13 +345,11 @@ export class LayerContent extends React.Component {
           fillLandmarks[i].latitude,
           fillLandmarks[i].longitude,
         ]);
-
-        let testcenter = positions[1];
-        let test = "";
-        let test2 = "";
+        // positions = array of all marker [lat, long]s
+        
         content = <Polygon color={layercolour} positions={positions} />;
       } else if (layertype == "DIR") {
-        //Range (length of fromlandmarks)
+        // display lines with arrowheads (directional) between each pair of markers
         let rangeDIR = Array(fromLandmarks.length)
           .fill()
           .map((x, i) => i);
@@ -378,10 +364,8 @@ export class LayerContent extends React.Component {
             color={layercolour}
             arrowheads={{ size: "12px", frequency: "50px" }}
           />
-        )); //Add arrows to the polylines between markers
+        )); 
       }
-      // test2 = <Circle color={'purple'} center={[54, -4]} radius={1000000}/>
-      // const fillcolour = {color: 'blue'}
 
       return (
         <React.Fragment>

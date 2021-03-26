@@ -17,7 +17,7 @@ const useStyles = makeStyles({
   },
 });
 
-function CreateProject() {
+function CreateProject() { 
   const classes = useStyles();
   const { userDetails, setUserDetails } = useContext(UserContext);
   const history = useHistory();
@@ -89,6 +89,7 @@ function CreateProject() {
     history.push(`/projects/edit/${project.data.id}`);
   };
 
+  //Displays Empty Project form
   return (
     <>
       {mapOptions.length === 0 ||

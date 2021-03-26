@@ -29,7 +29,7 @@ const useStyles = makeStyles( (theme) => ({
 
 function CreateProjectForm(props) {
     const classes = useStyles()
-
+//Displays project form, This will have a list of the maps from populate_maps, Countries, project name, project description and Groups
     return (
         <>
         <Grid container>

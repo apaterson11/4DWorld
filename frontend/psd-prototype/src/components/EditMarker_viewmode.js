@@ -6,7 +6,7 @@ import axiosInstance from "../axios";
 import ImageGallery from "react-image-gallery";
 require("./EditMarker.css");
 
-// popup attached to landmark
+// popup attached to landmark (view mode)
 export default class EditMarker extends React.Component {
   state = {
     landmarks: this.props.landmarks,
@@ -129,12 +129,14 @@ export default class EditMarker extends React.Component {
         />
       );
 
+      // displays all images if there are any
       imageselect = this.state.images.map((e, key) => (
         <option key={e.id} value={e.id}>
           {e.image_name}
         </option>
       ));
 
+      // functionality for deleting an image from a landmark
       deletelabel = <InputLabel id="label">Delete Image</InputLabel>;
 
       deleteimage = (
@@ -164,7 +166,6 @@ export default class EditMarker extends React.Component {
         <Grid container spacing={2} direction="column">
           {/* rich text editor for editing text content */}
           <Grid item>
-            {/* temporary position label for debugging purposes */}
             <br></br>
             <InputLabel id="label">Content</InputLabel>
             <div
