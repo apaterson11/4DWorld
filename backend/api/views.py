@@ -1,7 +1,9 @@
+import json
 from django.shortcuts import render
 from django.contrib.auth.models import Group, User
 from rest_framework import status, viewsets
 from rest_framework.decorators import action
+from django.contrib.auth.hashers import make_password
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -112,7 +114,7 @@ class ProjectAPIView(viewsets.ModelViewSet):
     def get_queryset(self):
         # check kwargs
         uuid = self.request.GET.get('uuid')
-        if uuid:
+        if uuid is not None:
             return Project.objects.all()
             
         user = self.request.user
@@ -181,3 +183,28 @@ class BlacklistTokenUpdateView(APIView):
             return Response(status=status.HTTP_205_RESET_CONTENT)
         except Exception as e:
             return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+
+class CsvUploadView(APIView):
+    def post(self, request):
+        body = json.loads(request.body)
+        groups = body.get('groups')
+        username = body.get('username')
+        password = body.get('password')
+        email = body.get('email')
+
+        user, created = User.objects.get_or_create(
+            username=username, 
+            email=email
+        )
+        if created:
+            user.password = make_password(password)
+            user.save()
+        
+        for group in groups:
+            if len(group) > 0:
+                group_obj = Group.objects.get_or_create(name=group)[0]
+                group_obj.user_set.add(user)
+
+        return Response({}, 201)

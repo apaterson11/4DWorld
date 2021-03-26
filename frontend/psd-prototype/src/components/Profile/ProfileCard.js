@@ -52,7 +52,7 @@ export default function ProfileCard() {
 
   const handleSubmit = () => {
     const response = axiosInstance
-      .put(`/user-details/${userDetails.profile_id}:user/`, {
+      .put(`/user-details/${userDetails.profile_id}/`, {
         user: {
           first_name: newProfile.newName,
           last_name: newProfile.newSurname,

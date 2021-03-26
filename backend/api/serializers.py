@@ -1,6 +1,6 @@
 from django.contrib.auth.models import Group, User
 from rest_framework import serializers
-from rest_framework.serializers import ModelSerializer
+from rest_framework.serializers import ModelSerializer, Serializer
 from api.models import City, Country, Landmark, LandmarkImage, Map, MapStyle, Profile, Project, State, Layer
 
 
@@ -104,6 +104,7 @@ class UserSerializer(ModelSerializer):
 
 class ProfileDetailsSerializer(ModelSerializer):
     user = UserSerializer()
+    department = serializers.CharField(required=False)
     default_group = GroupSerializer(required=False)
 
     class Meta:

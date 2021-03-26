@@ -1,31 +1,18 @@
-import React, {Component} from "react";
+import React, { Component } from "react";
 import { Papa } from "papaparse";
-import { makeStyles } from '@material-ui/core/styles'
-import { ClassNames } from "@emotion/core";
-import Card from '@material-ui/core/Card';
-import CardActions from '@material-ui/core/CardActions';
-import CardContent from '@material-ui/core/CardContent';
-import Typography from '@material-ui/core/Typography';
-import TableContainer from '@material-ui/core/TableContainer';
-import Table from '@material-ui/core/Table';
-import TableBody from '@material-ui/core/TableBody';
+import Card from "@material-ui/core/Card";
+import Toast from "../Toast";
+import { toast } from "react-toastify";
+import CardContent from "@material-ui/core/CardContent";
+import Typography from "@material-ui/core/Typography";
 import axiosInstance from "../../axios";
-import Box from '@material-ui/core/Box';
+import Box from "@material-ui/core/Box";
 
-{/*{email: "fake@gmail.com", name: "fake"}*/};
-//
 export default class DropFileContainer extends React.Component {
   state = {
     students: [],
     data: [],
-    
-  }; 
-  
-
-  // const classes = useStyles();
-  // const [students, setStudents] = React.useState([
-  // {/*GUID: "1234567", First: "john", Last: "doe", Email: "test@email.com", Role: "manager", Status:"Active"*/}
-  // ]);
+  };
 
   // first half of image uploading
   fileSelectedHandler = (e) => {
@@ -34,84 +21,87 @@ export default class DropFileContainer extends React.Component {
     });
   };
 
-  // Parse CSV file 
+  // Parse CSV file
   parseFile = () => {
-      let updates = [];
-      console.log(this.state.selectedFile, "file");
-      var Papa = require("papaparse/papaparse.min.js");
-      Papa.parse(this.state.selectedFile, {
-        delimiter: "",
-        chunkSize: 3,
-        header: false,
-        skipEmptyLines: true,
-        complete: (responses) => {
-          console.log(responses.data.slice(1));
-          this.setState({data: responses.data})
-        }
-      });
+    var Papa = require("papaparse/papaparse.min.js");
+    Papa.parse(this.state.selectedFile, {
+      delimiter: "",
+      chunkSize: 3,
+      header: false,
+      skipEmptyLines: true,
+      complete: (responses) => {
+        this.setState({ data: responses.data });
+        const requests = this.state.data
+          .map((line, idx) => {
+            if (idx == 0) return; // skip the header row
+            let username = line[2].split("@")[0];
+            let groups = [line[5], line[6], line[7]];
 
-      data.forEach((line) => {
-        username = line[2].split('@')[0];
-
-        axiosInstance.post('register/', {
-          firstname: line[0]
-          lastname: line[1] 
-          email: line[2],
-          password: this.state.password //Either GUID/Email for passsword?
-      })
-      })
-  
+            return axiosInstance.post("csv-upload/", {
+              username: username,
+              email: line[2],
+              password: username, //Either GUID/Email for passsword?
+              groups: groups,
+            });
+          })
+          .filter((req) => req !== undefined);
+        Promise.all(requests).then((res) => {
+          if (res.every((r) => r.status == 201)) {
+            toast.success("CSV Upload successful", {
+              position: "top-right",
+              autoClose: 3000,
+              hideProgressBar: false,
+              closeOnClick: true,
+              pauseOnHover: true,
+              draggable: true,
+            });
+          }
+        });
+      },
+    });
   };
 
-
-
-  // Input CSV file 
+  // Input CSV file
   render() {
     return (
-
       // <div className={classes.paper}>
-          
-          <Card>
-            <CardContent>
 
-              <Typography gutterBottom variant="h4" component="h2">
-                  CSV File Import
-              </Typography>
+      <Card>
+        <CardContent>
+          <Typography gutterBottom variant="h4" component="h2">
+            CSV File Import
+          </Typography>
 
-              <div>
-              
-           
-              <Box>
-                {/* <Typography variant="h6" component="h2" color="primary" align="center">
+          <div>
+            <Box>
+              {/* <Typography variant="h6" component="h2" color="primary" align="center">
                   Drop File Here
                 </Typography> */}
 
-                  {/* upload image button */}
-                  <input type="file" onChange={this.fileSelectedHandler} required />
-                  <button
-                    disabled={!this.state.selectedFile}
-                    onClick={this.parseFile}
-                  >
-                    Upload
-                  </button>
-              </Box>
-  
-              </div>
+              {/* upload image button */}
+              <input type="file" onChange={this.fileSelectedHandler} required />
+              <button
+                disabled={!this.state.selectedFile}
+                onClick={this.parseFile}
+              >
+                Upload
+              </button>
+            </Box>
+            <Toast />
+          </div>
 
-              
+          <ul>
+            {this.state.students.map((s) => (
+              <li key={s.GUID}>
+                <strong>{s.GUID}</strong>
+                {s.First} {s.Last} {s.Email} {s.Role} {s.Status}
+                {s.Group1} {s.Group2} {s.Group3}
+                {s.Project1} {s.Project2} {s.Project3}
+              </li>
+            ))}
+          </ul>
 
-              <ul>
-                  {this.state.students.map((s) => (
-                  <li key={s.GUID}>
-                      <strong>{s.GUID}</strong>{s.First} {s.Last} {s.Email} {s.Role} {s.Status}
-                      {s.Group1} {s.Group2} {s.Group3}
-                      {s.Project1} {s.Project2} {s.Project3}
-                  </li>
-                  ))}
-              </ul>
-
-
-              {/*
+          {/*
               <ul>
                   {students.map((student) => (
                   <li key={student.email}>
@@ -121,12 +111,9 @@ export default class DropFileContainer extends React.Component {
                   ))}
               </ul>
                   */}
-
-            </CardContent>
-          </Card>
-      // </div> 
-
-
+        </CardContent>
+      </Card>
+      // </div>
     );
-}
+  }
 }
