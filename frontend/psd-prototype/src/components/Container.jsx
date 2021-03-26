@@ -23,10 +23,10 @@ const getItemStyle = (isDragging, draggableStyle) => ({
   background: isDragging ? "lightgreen" : "white",
 
   // styles we need to apply on draggables
-  ...draggableStyle
+  ...draggableStyle,
 });
 
-const getListStyle = isDraggingOver => ({
+const getListStyle = (isDraggingOver) => ({
   background: isDraggingOver ? "#F8F8F8" : "#F8F8F8",
   padding: grid,
   overflow: "auto",
@@ -38,20 +38,20 @@ export default class DnD extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      items: []
+      items: [],
     };
     this.onDragEnd = this.onDragEnd.bind(this);
   }
 
   componentDidMount() {
-      this.getItems()
+    this.getItems();
   }
 
   componentDidUpdate(prevProps) {
     if (prevProps || prevProps.currentlayer.id === undefined) {
-        if (prevProps.currentlayer.id !== this.props.currentlayer.id) {
-            this.getItems()
-        }
+      if (prevProps.currentlayer.id !== this.props.currentlayer.id) {
+        this.getItems();
+      }
     }
   }
 
@@ -63,14 +63,13 @@ export default class DnD extends Component {
         .sort((a, b) => (a.position > b.position ? 1 : -1))
         .map((e, index) => ({
           id: `${e.id}`,
-          content: `${index+1}: ${e.content}`.slice(0, 90),
+          content: `${index + 1}: ${e.content}`.slice(0, 90),
         }));
-        this.setState({items: options})
+      this.setState({ items: options });
+    } else {
+      this.setState({ items: [] });
     }
-    else {
-        this.setState({items: []})
-    }
-  }
+  };
 
   onDragEnd(result) {
     // dropped outside the list
@@ -85,26 +84,25 @@ export default class DnD extends Component {
     );
 
     items.forEach((item, index) => {
-        let marker = items[index];
-        if (index == items.length -1) {
-            const response = axiosInstance.patch(`/landmarks/${marker.id}/`, {
-                position: index,
-              }).then((response) => {
-                this.props.rerenderParentCallback()
-              });
-        }
-        else {
-            const response = axiosInstance.patch(`/landmarks/${marker.id}/`, {
-                position: index,
-              })
-        }
-        
-      });
-
-    this.setState({
-      items
+      let marker = items[index];
+      if (index == items.length - 1) {
+        const response = axiosInstance
+          .patch(`/landmarks/${marker.id}/`, {
+            position: index,
+          })
+          .then((response) => {
+            this.props.rerenderParentCallback();
+          });
+      } else {
+        const response = axiosInstance.patch(`/landmarks/${marker.id}/`, {
+          position: index,
+        });
+      }
     });
 
+    this.setState({
+      items,
+    });
   }
 
   // Normally you would want to split things out into separate components.
@@ -144,4 +142,3 @@ export default class DnD extends Component {
     );
   }
 }
-
