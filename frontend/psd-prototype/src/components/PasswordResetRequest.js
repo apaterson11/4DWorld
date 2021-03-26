@@ -32,7 +32,11 @@ class ResetPasswordRequest extends React.Component {
         // input["password"] = "";
         // input["password2"] = "";
         this.setState({input:input});
-        alert("valid email");
+        // axiosInstance.post('token/', {
+        //   username: this.state.username,
+        //   password: this.state.password
+        // })
+        
         }
     }
   

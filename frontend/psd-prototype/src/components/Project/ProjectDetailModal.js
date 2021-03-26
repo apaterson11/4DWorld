@@ -30,8 +30,10 @@ export default function ProjectDetailModal(props) {
   const classes = useStyles();
   const [title, setTitle] = useState(null);
   const [description, setDescription] = useState(null);
-  const [group, setGroup] = useState(null);
+  const [group, setGroup] = useState('');
+  const [groups, setGroups] = useState('');
   const [map, setMap] = useState(null);
+  const [creator, setCreator] = useState(null);
   const [latitude, setLatitude] = useState(null);
   const [longitude, setLongitude] = useState(null);
   const [mapOptions, setMapOptions] = useState([]);
@@ -44,14 +46,19 @@ export default function ProjectDetailModal(props) {
       let proj = props.project;
       setTitle(proj.title);
       setDescription(proj.description);
+      setCreator(proj.creator)
       setMap(proj.map);
       setLatitude(proj.map.latitude);
       setLongitude(proj.map.longitude);
       setZoom(proj.map.zoom);
 
       axiosInstance.get(`/groups/${proj.group}/`).then((response) => {
-        setGroup(response.data.name);
+        setGroup(response.data);
       });
+      axiosInstance.get(`/user-details/${proj.creator}`).then((response => {
+        console.log(response.data.user.groups)
+        setGroups(response.data.user.groups)
+      }));
       axiosInstance.get("/map-styles/").then((response) => {
         setMapOptions(response.data);
         let style = response.data.filter(
@@ -77,9 +84,11 @@ export default function ProjectDetailModal(props) {
   };
 
   const handleSubmit = (e) => {
+    console.log(group)
     const putProject = axiosInstance.put(`/projects/${props.project.id}/`, {
       title: title,
       description: description,
+      group: group.id,
     });
     const putMap = axiosInstance.put(`/maps/${map.id}/`, {
       project: props.project.id,
@@ -141,17 +150,29 @@ export default function ProjectDetailModal(props) {
                 name="description"
                 onChange={(e) => setDescription(e.target.value)}
               />
-              <TextField
-                margin="dense"
-                id="group"
+              <Grid item xs={8} md={6}>
+              <Autocomplete
+                id="group-combobox"
                 label="Group"
-                defaultValue={group}
+                options={groups}
+                getOptionLabel={(option) => option.name}
+                size="small"
                 fullWidth
-                name="group"
-                InputProps={{
-                  readOnly: true,
-                }}
+                defaultValue={group}
+                value={group ? group : null}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Group"
+                    variant="outlined"
+                    margin="dense"
+                  />
+                )}
+                onChange={(e, value) =>
+                  setGroup(value)
+                }
               />
+            </Grid>
               <Typography className={classes.padTop} variant="h5">
                 Project Map
               </Typography>

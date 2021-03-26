@@ -1,6 +1,6 @@
 import React from "react";
 import { Map, TileLayer } from "react-leaflet";
-import opacity from '../opacity.png'
+import opacity from "../opacity.png";
 import { IsAuthenticated } from "../Context";
 
 require("./About.css");
@@ -11,53 +11,51 @@ const DEFAULT_VIEWPORT = {
 };
 
 class HomeMap extends React.Component {
+  static contextType = IsAuthenticated;
   state = {
     viewport: DEFAULT_VIEWPORT,
+    isAuthenticated: this.context.isAuthenticated,
   };
 
-  constructor(props) {
-    super(props)
-  }
-
   render() {
-    let goButton = ''
-    console.log(this.props)
-    if (this.props.IsAuthenticated) {
-      goButton = <a href="/dashboard/" className="btn">Dashboard</a>
-    }
-    else {
-      goButton = <a href="/login/" className="btn">Login</a>
-    }
     return (
       <Map
-          center={[50, -40]}
-          zoom={4}
-          maxBounds={[
-            [90, -180],
-            [-90, 180],
-          ]}
-        >
+        center={[50, -40]}
+        zoom={4}
+        maxBounds={[
+          [90, -180],
+          [-90, 180],
+        ]}
+      >
         <div className="title">
           <h1 className="titleh1">4DWorld</h1>
           <h3 className="titleh3">Not much to see here... go get started!</h3>
-          {goButton}
+          {this.state.isAuthenticated ? (
+            <a href="/dashboard/" className="btn">
+              Dashboard
+            </a>
+          ) : (
+            <a href="/login/" className="btn">
+              Login
+            </a>
+          )}
         </div>
-      <TileLayer 
-        url={opacity}
-        minZoom={3}
-        maxZoom={18}
-        noWrap={true}
-        zIndex={1}>
-      </TileLayer>
-      <TileLayer
-            url="http://{s}.tile.osm.org/{z}/{x}/{y}.png"
-            minZoom={3}
-            maxZoom={18}
-            noWrap={true}
-            zIndex={0}
-          />
+        <TileLayer
+          url={opacity}
+          minZoom={3}
+          maxZoom={18}
+          noWrap={true}
+          zIndex={1}
+        ></TileLayer>
+        <TileLayer
+          url="http://{s}.tile.osm.org/{z}/{x}/{y}.png"
+          minZoom={3}
+          maxZoom={18}
+          noWrap={true}
+          zIndex={0}
+        />
       </Map>
-    )
+    );
   }
 }
 

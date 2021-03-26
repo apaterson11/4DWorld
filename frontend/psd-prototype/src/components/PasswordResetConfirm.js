@@ -113,4 +113,8 @@ class ResetPasswordConfirm extends React.Component {
   }
 }
   
+<<<<<<< HEAD
 export default ResetPasswordConfirm;
+=======
+export default ResetPassword;
+>>>>>>> master

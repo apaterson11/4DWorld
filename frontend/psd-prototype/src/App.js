@@ -9,7 +9,10 @@ import Register from './components/Auth/Register'
 import ProtoMap from './components/ProtoMap'
 import Dashboard from './components/Profile/Dashboard'
 import ResetPasswordRequest from './components/PasswordResetRequest'
+<<<<<<< HEAD
 import ResetPasswordConfirm from './components/PasswordResetConfirm'
+=======
+>>>>>>> master
 import CreateProject from './components/Project/CreateProject'
 import EditMap from "./components/Map/EditMap";
 import ViewMap from "./components/Map/ViewMap";

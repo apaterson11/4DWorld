@@ -81,10 +81,7 @@ class Login extends React.Component {
     e.preventDefault()
     
     // send POST request to the JWT token endpoint
-    axiosInstance.post('token/', {
-      username: this.state.username,
-      password: this.state.password
-    }).then(response => {
+    .then(response => {
       localStorage.setItem('access_token', response.data.access)
       localStorage.setItem('refresh_token', response.data.refresh)
       localStorage.setItem('user', this.state.username)
