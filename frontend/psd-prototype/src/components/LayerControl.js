@@ -23,6 +23,7 @@ export default class LayerControl extends React.Component {
     items: [],
   };
 
+ 
   // selects layer to be edited and changes layer landmarks to appropriate layer
   handleLayer = (e) => {
     this.state.layers.forEach((item) => {
@@ -209,16 +210,16 @@ export default class LayerControl extends React.Component {
               <br></br>
               <br></br>
               <button
-                onClick={() => this.editLayer(this.state.currentlayer.id)}
-              >
-                Submit changes
-              </button>
-              <button
                 onClick={() =>
                   this.removeLayerFromState(this.state.currentlayer.id)
                 }
               >
                 Delete layer
+              </button>
+              <button
+                onClick={() => this.editLayer(this.state.currentlayer.id)}
+              >
+                Submit changes
               </button>
             </form>
           </Grid>
