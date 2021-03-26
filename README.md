@@ -1,6 +1,6 @@
 # 4DWorld
 
-Foobar is a Python library for dealing with word pluralization.
+4DWorld was created by CS23. It is a interactive mapping tool.
 
 ## Installation
 
