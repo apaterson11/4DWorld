@@ -15,6 +15,7 @@ from api.views import (
     UserDetailsAPIView,
     UserRegisterView,
     LayerAPIView,
+    CsvUploadView
 )
 from api.views_ajax import check_email, check_username
 
@@ -34,6 +35,7 @@ router.register('maps', MapAPIView, basename='maps')
 urlpatterns = [
     path('groups/<int:pk>/user/<int:user_pk>/', DeleteUserFromGroup.as_view(), name='del-user-from-group'),
     path('register/', UserRegisterView.as_view(), name='register'),
+    path('csv-upload/', CsvUploadView.as_view(), name='csv-upload'),
     path('api-auth/', include('rest_framework.urls')),
     path('logout/blacklist/', BlacklistTokenUpdateView.as_view(), name='blacklist')
 ]
