@@ -1,10 +1,10 @@
 import React, {Component, useState, useEffect } from 'react'
 import axiosInstance from '../axios';
 
-//Seperate then passwordResetRequest because you need a token. Will have to send an email
+//Seperate then passwordResetRequest because you need a token. Looking into sending token when request button is clicked 
 //NB will delete this comment when it's done 
 
-class ResetPassword extends React.Component {
+class ResetPasswordConfirm extends React.Component {
     constructor() {
     super();
     this.state = {
@@ -32,11 +32,12 @@ class ResetPassword extends React.Component {
         input["password"] = "";
         input["password2"] = "";
         this.setState({input:input});
+        // This will need  a post request to change password of account
     }
   }
 
 
-  // checks if password1 and two are the same 
+  // checks if password1 and two are the same + if there is anything written in the inputs
   validate(){
       let input = this.state.input;
       let errors = {};
@@ -65,11 +66,15 @@ class ResetPassword extends React.Component {
       });      
       return isValid;
   }
-     
+ 
+  
+
+
+  //Form for inputting new password
   render() {
     return (
       <div>
-        <h1>Reset Password Request</h1>
+        <h1>Reset Password Request Confirm</h1>
         <form onSubmit={this.handleSubmit}> 
 
             <div class="form-group">
@@ -108,4 +113,4 @@ class ResetPassword extends React.Component {
   }
 }
   
-export default ResetPassword;
+export default ResetPasswordConfirm;

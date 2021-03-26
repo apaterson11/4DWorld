@@ -9,6 +9,7 @@ import Register from './components/Auth/Register'
 import ProtoMap from './components/ProtoMap'
 import Dashboard from './components/Profile/Dashboard'
 import ResetPasswordRequest from './components/PasswordResetRequest'
+import ResetPasswordConfirm from './components/PasswordResetConfirm'
 import CreateProject from './components/Project/CreateProject'
 import EditMap from "./components/Map/EditMap";
 import ViewMap from "./components/Map/ViewMap";
@@ -75,6 +76,7 @@ function App(props) {
           <Switch>
             <Route exact path="/" component={About}/>
             <Route exact path="/change-password" component={ResetPasswordRequest}/>
+            <Route exact path="/change-password/confirm" component={ResetPasswordConfirm}/>
             <Route exact path="/dashboard/" render={() => (
               <Dashboard />
             )} />
