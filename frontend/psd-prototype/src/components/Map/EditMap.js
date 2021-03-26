@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useContext } from "react";
 import { Map, TileLayer, LayersControl, LayerGroup } from "react-leaflet";
-import { useParams } from "react-router-dom";
+import { useParams, useHistory } from "react-router-dom";
 import Control from "@skyeer/react-leaflet-custom-control";
 import axiosInstance from "../../axios";
 import { LayerContent } from "../LayerContent";
@@ -41,14 +41,13 @@ function EditMap(props) {
   const refLayerSelect = useRef();
   const refAddMarkerButton = useRef();
   const { projectID } = useParams();
+  const history = useHistory();
 
   useEffect(() => {
     // get project information
-    console.log("RENDERING");
     axiosInstance
       .get(`/projects/${projectID}`)
       .then((response) => {
-        console.log(projectID)
         setProject(response.data);
         setViewport({
           center: [response.data.map.latitude, response.data.map.longitude],
@@ -58,7 +57,7 @@ function EditMap(props) {
       })
       .then((response) => {
         // get the landmarks
-        setMap(response.map)
+        setMap(response.map);
         const landmarkRequest = axiosInstance.get(
           `/landmarks?map_id=${response.map.id}`
         );
@@ -77,6 +76,9 @@ function EditMap(props) {
             setFetching(false);
           }
         );
+      })
+      .catch((err) => {
+        history.push("/login");
       });
   }, []);
 
@@ -101,8 +103,7 @@ function EditMap(props) {
   const handleClick = () => {
     if (canClick == true) {
       setCanClick(false);
-    }
-    else if (addMarkerState == true) {
+    } else if (addMarkerState == true) {
       setCanClick(true);
     }
   };
@@ -261,10 +262,17 @@ function EditMap(props) {
 
           {/* edit layer button */}
           <Popup
-            trigger={() => <button className="layerControl" onMouseEnter={handleClick} onMouseLeave={handleClick}>Edit Layer</button>}
+            trigger={() => (
+              <button
+                className="layerControl"
+                onMouseEnter={handleClick}
+                onMouseLeave={handleClick}
+              >
+                Edit Layer
+              </button>
+            )}
             position="bottom right"
             closeOnDocumentClick
-
           >
             <span>
               {/* <LayerControl layers={layers} currentlayer={currentLayer} /> */}
@@ -282,7 +290,15 @@ function EditMap(props) {
 
           {/* add layer button */}
           <Popup
-            trigger={() => <button className="layerControl" onMouseEnter={handleClick} onMouseLeave={handleClick}>Add Layer</button>}
+            trigger={() => (
+              <button
+                className="layerControl"
+                onMouseEnter={handleClick}
+                onMouseLeave={handleClick}
+              >
+                Add Layer
+              </button>
+            )}
             position="bottom right"
             closeOnDocumentClick
           >
