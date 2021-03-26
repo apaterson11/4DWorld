@@ -65,14 +65,7 @@ export class LayerContent extends React.Component {
     map: this.props.map,
   };
 
-  // fetches all markers when page is loaded
-  //   componentDidMount() {
-  //     this.fetchData();
-  //     console.log("this.state.layer", this.state.layer);
-  //   }
-
   fetchData() {
-    console.log("fetch data");
     this.getLandmarks();
   }
 
@@ -208,7 +201,6 @@ export class LayerContent extends React.Component {
         position: index,
       });
     });
-    console.log("updatePositions");
     this.getLandmarks();
   }
 
@@ -270,7 +262,6 @@ export class LayerContent extends React.Component {
     let markers = "";
     let layercolour = "#000000";
     for (var i = 0; i < this.state.layers.length; i++) {
-      // console.log(this.state.layers[i])
       if (parseInt(this.state.layers[i].id) == parseInt(this.state.layer)) {
         if (this.state.layers[i].colour) {
           layercolour = this.state.layers[i].colour;
@@ -284,11 +275,8 @@ export class LayerContent extends React.Component {
         <Marker
           key={landmark.id}
           position={[landmark.latitude, landmark.longitude]}
-          icon={
-            landmark.markertype in iconRef
-              ? iconRef[landmark.markertype]
-              : blueIcon
-          }
+          icon={landmark.markertype in iconRef ? iconRef[landmark.markertype] : blueIcon}
+          // if a markertype is chosen, show that icon, otherwise show a default blue marker
         >
           <Popup
             autoClose={false}
@@ -328,7 +316,6 @@ export class LayerContent extends React.Component {
 
       let content = "";
 
-      // console.log(this.state.layer, layertype)
       // make copies of landmarks array
       let fromLandmarks = [...this.state.layerlandmarks];
       let toLandmarks = [...this.state.layerlandmarks];
@@ -337,8 +324,12 @@ export class LayerContent extends React.Component {
       fromLandmarks.pop();
       toLandmarks.sort((a, b) => (a.position > b.position ? 1 : -1));
       toLandmarks = toLandmarks.slice(1);
+      // fromLandmarks = [marker 1, marker 2, ... marker n-1]
+      // toLandmarks = [marker 2, marker 3, ..., marker n]
+      // this creates one line betweem every pair of markers
 
       if (layertype == "NDR") {
+        // display lines with no arrows (non-directional)
         // range(length of fromLandmarks)
         let range = Array(fromLandmarks.length)
           .fill()
@@ -354,29 +345,26 @@ export class LayerContent extends React.Component {
             color={layercolour}
           />
         ));
-        // creates one line between each pair of markers
       } else if (layertype == "FIL") {
-        // console.log("is FIL")
+       // display an area fill (shaded polygon) between all markers
+
         let fillLandmarks = [...this.state.layerlandmarks];
 
         fillLandmarks.sort((a, b) => (a.position > b.position ? 1 : -1));
+        // sorts array of all landmarks by position
 
         let range2 = Array(fillLandmarks.length)
           .fill()
           .map((x, i) => i);
-        //console.log(range2)
-        // range2.push(landmarks.length)
         let positions = range2.map((i) => [
           fillLandmarks[i].latitude,
           fillLandmarks[i].longitude,
         ]);
+        // positions = array of all marker [lat, long]s
 
-        let testcenter = positions[1];
-        let test = "";
-        let test2 = "";
         content = <Polygon color={layercolour} positions={positions} />;
       } else if (layertype == "DIR") {
-        //Range (length of fromlandmarks)
+       // display lines with arrowheads (directional)
         let rangeDIR = Array(fromLandmarks.length)
           .fill()
           .map((x, i) => i);

@@ -8,10 +8,10 @@ import Popup from "reactjs-popup";
 import LayerControl from "../LayerControl";
 import LayerAdd from "../LayerAdd";
 import Spinner from "../Spinner";
-
 require("../LayerControl.css");
 require("../ProtoMap.css");
 
+// function used later on to group landmarks by layer into one array
 const groupBy = (array, fn) =>
   array.reduce((result, item) => {
     const key = fn(item);
@@ -20,6 +20,8 @@ const groupBy = (array, fn) =>
     return result;
   }, {});
 
+
+// displays the project map with editing capabilities
 function EditMap(props) {
   const [state, setState] = useState({
     markertype: "default",
@@ -72,7 +74,6 @@ function EditMap(props) {
           (response) => {
             setLandmarks(response[0].data);
             setLayers(response[1].data);
-            // setCurrentLayer(layers[0])
             setMapStyle(response[2].data);
             setFetching(false);
           }
@@ -119,9 +120,9 @@ function EditMap(props) {
     setCanClick(false);
     const { lat, lng } = e.latlng;
     let layerlandmarks = groupBy([...landmarks], (i) => i.layer)[currentLayer];
-    console.log(layerlandmarks);
-    console.log(currentLayer);
+    // gets array of all landmarks currently in the layer
     const pos = layerlandmarks ? layerlandmarks.length : 0;
+    // calculates position of new marker, (current number of landmarks) if >1, 0 if none already in layer
     const response = axiosInstance
       .post("/landmarks/", {
         layer: currentLayer,
@@ -141,8 +142,9 @@ function EditMap(props) {
       });
   };
 
+  // function to update the landmarks in state when one is removed
   const updateOnDelete = (newlandmarks) => setLandmarks(newlandmarks);
-
+  
   // function adds new layer through "add layer" button
   const addNewLayer = (name, description) => {
     const response = axiosInstance
@@ -158,22 +160,12 @@ function EditMap(props) {
       });
   };
 
-  // function deletes layer through "edit layer" function
-  // const removeLayerFromState = (layer_id) => {
-  //   /* Deletes the given landmark from the state, by sending a DELETE request to the API */
-  //   const response = axiosInstance
-  //     .delete(`/layers/${layer_id}/`)
-  //     .then((response) => {
-  //       // filter out the landmark that's been deleted from the state
-  //       setLayers(layers.filter((layer) => layer.id !== layer_id));
-  //     });
-  // };
-
   // displays correct layers in dropdown layer select menu
   const handleLayer = (e) => {
     setCurrentLayer(e.target.value);
   };
 
+  // function called by child components to update all layers and landmarks 
   const rerenderParentCallback = () => {
     const landmarkRequest = axiosInstance.get(
       `/landmarks?map_id=${project.map.id}`
@@ -185,19 +177,10 @@ function EditMap(props) {
       setLayers(response[1].data);
       setFetching(false);
     });
-
-    // axiosInstance.get("/landmarks/").then((response) => {
-    //   setLandmarks(response.data);
-
-    //   axiosInstance.get("/layers/").then((response) => {
-    //     setLayers(response.data);
-    //     setFetching(false);
-    //   });
-    // });
-    // forceUpdate();
   };
 
-  // toggle layer visibility menu
+  // dynamically renders the correct content per layer, including markers, lines, 
+  // and a checkbox in the layers overlay to toggle visibility
   const renderlayers = layers.map((e, key) => {
     return (
       <LayersControl.Overlay key={e.id} checked name={e.name}>
@@ -226,13 +209,13 @@ function EditMap(props) {
 
   return (
     <React.Fragment>
-      {fetching ? (
-        <Spinner />
-      ) : (
+      {/* displays a loading spinner while loading*/}
+      {fetching ? (<Spinner />) : (
         <Map
           // onViewportChanged={onViewportChanged}
           viewport={viewport}
           onClick={canClick ? addMarker : undefined}
+          // can only add a marker if 'add marker' toggle button is on
           maxBounds={[
             [90, -180],
             [-90, 180],
@@ -325,13 +308,6 @@ function EditMap(props) {
               Add Marker
             </button>
           </Control>
-
-          {/* reset view button - will this ever be fixed? only time will tell */}
-          {/* <Control position="bottomright">
-        <button className="btn-resetview" onClick={createLines}>
-          Reset View
-        </button>
-      </Control> */}
         </Map>
       )}
     </React.Fragment>

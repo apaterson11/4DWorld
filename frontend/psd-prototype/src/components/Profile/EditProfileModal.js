@@ -11,6 +11,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
+// function that handles edit profile (first name, last name, department, email)
 export default function EditProfileModal(props) {
   const handleChange = (e) => {
     props.setNewProfile({
@@ -18,6 +19,7 @@ export default function EditProfileModal(props) {
       [e.target.name]: e.target.value.trim(),
     });
   };
+
 
   return (
     <div>

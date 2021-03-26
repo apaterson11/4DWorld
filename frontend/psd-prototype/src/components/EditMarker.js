@@ -26,36 +26,26 @@ export default class EditMarker extends React.Component {
     currentImage: "",
   };
 
+  // get images on popup render
   componentDidMount() {
     this.getImages();
-    // this.getLayers()
   }
 
   createSelectItems() {
     let items = [];
     for (let i = 0; i <= this.props.layer; i++) {
-      console.log(i);
       items.push(
         <option key={i} value={i}>
           {i}
         </option>
       );
-      //here I will be creating my options dynamically based on
-      //what props are currently passed to the parent component
+      // creating my options dynamically based on
+      // what props are currently passed to the parent component
     }
     return items;
   }
 
-  // getLayers = () => {
-  //     axiosInstance.get('/layers/')
-  //     .then(response => {
-  //         console.log(response)
-  //         this.setState({schemas: response});
-  //     })
-  //     .catch(error => console.log(error.response));
-  // }
-
-  // passes back to updateLandmarks in LayerContent.js
+  // function to edit a marker, passes back to updateLandmarks in LayerContent.js
   handleEdit = () => {
     this.props.markerEdit(
       this.state.layer,
@@ -69,14 +59,10 @@ export default class EditMarker extends React.Component {
     );
   };
 
-  // passes back to removeMarkerFromState in LayerContent.js
+  // function for deleting a marker, passes back to removeMarkerFromState in LayerContent.js
   handleDelete = () => {
     this.props.markerDelete(this.props.id);
   };
-
-  // handleChange = (event) => {
-  //     this.setState({icontype: event.target.value})
-  // }
 
   // handles rich text editor
   onChange = (value) => {
@@ -109,7 +95,6 @@ export default class EditMarker extends React.Component {
     };
 
     axiosInstance.post("/landmark-images/", formData, config).then((res) => {
-      console.log(res);
       this.getImages();
     });
   };
@@ -206,6 +191,7 @@ export default class EditMarker extends React.Component {
       imagelabel = "";
       deletelabel = "";
     } else {
+      // display an image gallery
       imagelabel = <InputLabel id="label">Images</InputLabel>;
       imageGalleryMessage = (
         <ImageGallery
@@ -228,6 +214,7 @@ export default class EditMarker extends React.Component {
         />
       );
 
+      // creates a selection panel for all images
       imageselect = this.state.images.map((e, key) => (
         <option key={e.id} value={e.id}>
           {e.image_name}
@@ -236,6 +223,7 @@ export default class EditMarker extends React.Component {
 
       deletelabel = <InputLabel id="label">Delete Image</InputLabel>;
 
+      // functionality for deleting an image
       deleteimage = (
         <select
           onFocus={(e) => this.setState({ currentImage: e.target.value })}
@@ -305,7 +293,7 @@ export default class EditMarker extends React.Component {
             </button>
           </Grid>
 
-          {/* icon type */}
+          {/* icon type selector*/}
           <Grid item>
             <InputLabel id="label">Icon type</InputLabel>
             <Select
@@ -316,8 +304,8 @@ export default class EditMarker extends React.Component {
               <MenuItem value={"default"}>Default</MenuItem>
               <MenuItem value={"node"}>Border Node</MenuItem>
               <MenuItem value={"army"}>Army</MenuItem>
-              <MenuItem value={"PinkArmy"}>Pink Army</MenuItem>
-              <MenuItem value={"GreenArmy"}>Green Army</MenuItem>
+              <MenuItem value={"PinkArmy"}>Army (pink)</MenuItem>
+              <MenuItem value={"GreenArmy"}>Army (green)</MenuItem>
               <MenuItem value={"individual"}>Significant Individual</MenuItem>
               <MenuItem value={"knowledge"}>Knowledge Site</MenuItem>
               <MenuItem value={"trading"}>Trading Site</MenuItem>

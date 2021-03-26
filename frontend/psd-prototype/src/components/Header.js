@@ -4,7 +4,7 @@ import MenuIcon from '@material-ui/icons/Menu'
 import { withStyles } from '@material-ui/styles'
 import React from 'react'
 
-
+// define styling for the navigation bar
 const styles = () => ({
     navbarDiv: {
         display: 'flex',
@@ -15,6 +15,7 @@ const styles = () => ({
     }
 });
 
+// displays navigation bar at top of page
 class Header extends React.Component {
 
     constructor(props) {
@@ -35,6 +36,8 @@ class Header extends React.Component {
         
         let navLinks;
         if (this.props.isAuthenticated) {
+            // if user is logged in, show links to Dashboard and Log Out pages
+            // otherwise show links to Login and Register pages
             navLinks = (
                 <React.Fragment>
                     <li>
@@ -65,6 +68,7 @@ class Header extends React.Component {
         }
 
         return (
+            // renders navigation bar at top of page
             <div className="navBar">
                 <button className="btn-right menu-hamburger-icon" onClick={this.Toggle}>
                     <MenuIcon />

@@ -18,6 +18,7 @@ export default class EditMarker extends React.Component {
 
   // adds layer via POST request
   addLayer = (layer_name, layer_desc) => {
+    // defaults description to 'default' if no description provided
     if (layer_desc === null || layer_desc === '') {
       layer_desc = 'default'
     }
@@ -27,7 +28,7 @@ export default class EditMarker extends React.Component {
         description: layer_desc,
         type: "NDR",
         colour: "#000000",
-        map: this.state.map.id,
+        map: this.state.map.id, //Saves new layer into the Datebase
       })
       .then((response) => {
         let newLayers = [...this.state.layers]; // copy original state
@@ -37,9 +38,6 @@ export default class EditMarker extends React.Component {
   };
 
   render() {
-    // let addFunc = this.props.addNewLayer // what is this for?
-    //   ? this.props.addNewLayer
-    //   : this.addLayer;
 
     return (
       <div className="layerControlPopup">

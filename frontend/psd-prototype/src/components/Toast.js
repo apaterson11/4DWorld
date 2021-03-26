@@ -1,6 +1,7 @@
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
+// displays a pop-up during link sharing procedure
 function Toast() {
   return (
     <ToastContainer

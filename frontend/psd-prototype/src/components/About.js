@@ -6,10 +6,12 @@ import { Link } from "react-router-dom";
 
 require("./About.css");
 
+// displays the homepage
 function HomeMap() {
   const { userDetails, setUserDetails } = useContext(UserContext);
   const { isAuthenticated, setIsAuthenticated } = useContext(IsAuthenticated);
 
+  // checks if the user is logged in
   useEffect(() => {
     if (userDetails === undefined) {
       const details = JSON.parse(localStorage.getItem("userDetails"));
@@ -23,6 +25,7 @@ function HomeMap() {
   }, [userDetails]);
 
   return (
+    // semi-interactive map on homepage
     <Map
       center={[50, -40]}
       zoom={4}
@@ -34,6 +37,7 @@ function HomeMap() {
       <div className="title">
         <h1 className="titleh1">4DWorld</h1>
         <h3 className="titleh3">Not much to see here... go get started!</h3>
+        {/* if the user is logged in, home page button goes to dashboard, otherwise a login page */}
         {isAuthenticated ? (
           <Link to="/dashboard/" className="btn">
             Dashboard

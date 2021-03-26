@@ -8,6 +8,7 @@ const override = css`
   height: 93vh;
 `;
 
+// defines a spinner loading icon for displaying during data loading process
 function Spinner() {
     return <BeatLoader loading={true} css={override} size='10vh' color='#90caf9' />
 }

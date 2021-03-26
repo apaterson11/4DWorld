@@ -27,11 +27,11 @@ function Dashboard() {
   const classes = useStyles();
   const history = useHistory();
   const { userDetails, setUserDetails } = useContext(UserContext);
-  const { isAuthenticated, setIsAuthenticated } = useContext(IsAuthenticated);
+  const { isAuthenticated, setIsAuthenticated } = useContext(IsAuthenticated); //User must be logged in to see dashboard 
 
   useEffect(() => {
     if (userDetails === undefined) {
-      const details = JSON.parse(localStorage.getItem("userDetails"));
+      const details = JSON.parse(localStorage.getItem("userDetails")); //Retrieves userdetails which will be displayed in the dashboard
       if (!details) {
         history.push("/login");
       }
@@ -40,6 +40,7 @@ function Dashboard() {
     }
   }, [userDetails]);
 
+  //Displays dashboard with group card, profile card and project container 
   return (
     <>
       {userDetails == undefined ? (

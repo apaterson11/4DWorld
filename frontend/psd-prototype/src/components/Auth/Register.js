@@ -57,6 +57,7 @@ class Register extends React.Component {
         }).then(res => this.props.history.push('/login'))
     }
 
+    //Validation checks for each input 
     handleChange = (e) => {
         const value = e.target.value.trim()
         this.setState({
@@ -77,20 +78,22 @@ class Register extends React.Component {
         }
     }
 
+
+
     emailValidate = (value) => {
         if (value.indexOf('@') != -1) {
             axiosInstance.post('/ajax/check_email/', {email: value}).then(res => {
-                const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                let lenAfterAt = value.length - value.indexOf('@')
+                const pattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; 
+                let lenAfterAt = value.length - value.indexOf('@') 
 
-                // check email provided is of a right format
+                // check email provided is of a right format for email
                 if (!pattern.test(value)) {
                     this.setState({
                         emailHasError: true,
                         emailHelpText: (lenAfterAt > 4) ? 'This is not a valid email' : ''
                     })
                 }
-                // check the return data and inform user if email is taken
+                // check the return data and inform user if the email exists in the database already 
                 else if (res.data.exists) {
                     this.setState({
                         emailHasError: true,
@@ -112,15 +115,15 @@ class Register extends React.Component {
     }
 
     usernameValidate = (value) => {
-        let hasSpaces = value.split(" ").length > 1
-        if (hasSpaces) {
+        let hasSpaces = value.split(" ").length > 1 
+        if (hasSpaces) { // invalid username if there are spaces 
             this.setState({
                 usernameHasError: true,
                 usernameHelpText: 'Username should not contain spaces'
             }) 
         } else {
             axiosInstance.post('/ajax/check_username/', {username: value}).then(res => {
-                if (res.data.exists) {
+                if (res.data.exists) { // returns an error if username exists in the database 
                     this.setState({
                         usernameHasError: true,
                         usernameHelpText: 'This username is already taken'
@@ -136,7 +139,7 @@ class Register extends React.Component {
     }
 
     validatePassword = (value) => {
-        if (value.length < 4) {
+        if (value.length < 4) { // password must be longer than 4 characters, error returned
             this.setState({
                 passwordHasError: true,
                 passwordHelpText: (value.length > 0) ? 'Password is too short' : ''
@@ -150,9 +153,9 @@ class Register extends React.Component {
     }
 
     checkPasswordsMatch = (value) => {
-        if (value != this.state.password) {
+        if (value != this.state.password) { // error returned if password values do not match 
             this.setState({
-                passwordMismatch: true,
+                passwordMismatch: true, 
                 mismatchHelpText: (value.length > 0) ? 'Passwords do not match' : ''
             })
         } else {
@@ -175,6 +178,7 @@ class Register extends React.Component {
             this.state.passwordHasError || this.state.passwordMismatch
     }
 
+    //displays register form
     render() {
         const {classes} = this.props
         const disableSubmitBtn = this.disableSubmit()

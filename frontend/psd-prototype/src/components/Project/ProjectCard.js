@@ -31,6 +31,7 @@ function ProjectCard(props) {
     props.setOpen(true);
   };
 
+  //Displays project card which has info about the project and buttons to route to view/edit project
   return (
     <>
       <Card className={classes.card} variant="outlined">
