@@ -1,7 +1,8 @@
 import React from "react";
 import axiosInstance from "../axios";
-import { Marker, Popup, Polyline, Polygon } from "react-leaflet";
-import EditMarker from "./EditMarker_copy";
+import { Marker, Popup, Polygon, Circle } from "react-leaflet";
+import EditMarker from "./EditMarker_viewmode";
+import Polyline from "react-leaflet-arrowheads";
 
 import {
   army,
@@ -18,6 +19,7 @@ import {
   village,
   PinkArmy,
   GreenArmy,
+  node
 } from "./Icons";
 
 const iconRef = {
@@ -34,6 +36,7 @@ const iconRef = {
   religious: religious,
   trading: trading,
   village: village,
+  node: node
 };
 
 // groups layer landmarks
@@ -59,13 +62,17 @@ export class LayerContent extends React.Component {
     lng: this.props.longitude,
     icontype: this.props.markertype,
     position: this.props.position,
+    map: this.props.map,
   };
 
-  componentDidMount() {
-    this.fetchData();
-  }
+  // fetches all markers when page is loaded
+//   componentDidMount() {
+//     this.fetchData();
+//     console.log("this.state.layer", this.state.layer);
+//   }
 
   fetchData() {
+    console.log("fetch data")
     this.getLandmarks();
   }
 
@@ -132,7 +139,6 @@ export class LayerContent extends React.Component {
     // update position if the layer has changed
     let newposition = 0;
     let updateOldLayer = false;
-    this.getLandmarks();
     if (oldlayer !== layer) {
       let positions = [];
       let landmarksgrouped = groupBy([...this.props.landmarks], (i) => i.layer);
@@ -151,6 +157,7 @@ export class LayerContent extends React.Component {
       newposition = this.state.position;
     }
 
+    // update marker
     const response = axiosInstance
       .put(`/landmarks/${landmark_id}/`, {
         content: content,
@@ -158,7 +165,7 @@ export class LayerContent extends React.Component {
         latitude: lat,
         longitude: lng,
         layer: layer,
-        position: position,
+        position: newposition,
       })
       .then((response) => {
         let updatedLandmarks = [...this.state.landmarks]; // copy original state
@@ -172,7 +179,7 @@ export class LayerContent extends React.Component {
         updatedLandmarks.splice(idx, 1, response.data);
 
         // set the state with the newly updated landmark
-        this.setState({ landmarks: updatedLandmarks }, this.getLandmarks);
+        this.setState({ landmarks: updatedLandmarks });
       });
 
     // find all markers to update and send to updatePositions function
@@ -192,32 +199,25 @@ export class LayerContent extends React.Component {
       });
       updateOldLayer = false;
     }
-    this.props.rerenderParentCallback();
   };
 
   // updates positions of all markers after a marker's layer is changed
   updatePositions(array) {
-    array.forEach((marker, index) => {
-      const response = axiosInstance
-        .put(`/landmarks/${marker.id}/`, {
-          content: marker.content,
-          markertype: marker.markertype,
-          latitude: marker.latitude,
-          longitude: marker.longitude,
-          layer: marker.layer,
-          position: index,
-        })
-        .then((response) => {
-          this.getLandmarks();
+        array.forEach((marker, index) => {
+        const response = axiosInstance
+            .patch(`/landmarks/${marker.id}/`, {
+            position: index,
+            })
         });
-    });
+        console.log("updatePositions")
+        this.getLandmarks()
   }
 
   // function gets all landmarks
   getLandmarks = () => {
     const results = [];
     const allmarkers = [];
-    const response = axiosInstance.get("/landmarks/", {}).then(
+    const response = axiosInstance.get(`/landmarks?map_id=${this.state.map.id}`, {}).then(
       (response) =>
         response.data.forEach((item) => {
           if (item.layer === this.state.layer) {
@@ -257,7 +257,6 @@ export class LayerContent extends React.Component {
             (landmark) => landmark.id !== landmark_id
           ),
         });
-        // this.getLandmarks()
         let markersToUpdate = [...this.state.layerlandmarks];
         this.updatePositions(markersToUpdate);
         this.props.updateOnDelete(this.state.landmarks);
@@ -265,10 +264,10 @@ export class LayerContent extends React.Component {
   };
 
   render() {
-    const layerlandmarks = this.state.layerlandmarks;
+    let layerlandmarks = this.state.layerlandmarks;
+
     let markers = "";
     let layercolour = "#000000";
-
     for (var i = 0; i < this.state.layers.length; i++) {
       // console.log(this.state.layers[i])
       if (parseInt(this.state.layers[i].id) == parseInt(this.state.layer)) {
@@ -277,6 +276,7 @@ export class LayerContent extends React.Component {
         }
       }
     }
+
     if (this.state.layerlandmarks) {
       // if there are any markers in this layer, show all markers
       markers = layerlandmarks.map((landmark, index) => (
@@ -308,8 +308,6 @@ export class LayerContent extends React.Component {
                 id={landmark.id}
                 layer={this.state.layer}
                 layers={this.state.layers}
-                markerEdit={this.submitEdit}
-                markerDelete={this.submitDelete}
               ></EditMarker>
             </React.Fragment>
           </Popup>
@@ -371,10 +369,6 @@ export class LayerContent extends React.Component {
           fillLandmarks[i].longitude,
         ]);
 
-        // positions.concat([landmarks[0].latitude, landmarks[0].longitude])
-        // positions.push([landmarks[((landmarks.length)-1)].latitude, landmarks[((landmarks.length)-1)].longitude])
-        // console.log(positions[parseInt(positions.length)])
-        // console.log(positions)
         let testcenter = positions[1];
         let test = "";
         let test2 = "";
@@ -395,10 +389,8 @@ export class LayerContent extends React.Component {
             color={layercolour}
             arrowheads={{ size: "12px", frequency: "50px" }}
           />
-        )); //Add arrows to the polylines between markers
+        ));
       }
-      // test2 = <Circle color={'purple'} center={[54, -4]} radius={1000000}/>
-      // const fillcolour = {color: 'blue'}
 
       return (
         <React.Fragment>

@@ -1,57 +1,64 @@
-import React, { useState, useEffect, useContext } from "react";
-import Typography from "@material-ui/core/Typography";
-import axiosInstance from "../axios";
-
-import { makeStyles } from "@material-ui/core/styles";
-import Grid from "@material-ui/core/Grid";
-
-import FormLabel from "@material-ui/core/FormLabel";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import RadioGroup from "@material-ui/core/RadioGroup";
-import Radio from "@material-ui/core/Radio";
-import Paper from "@material-ui/core/Paper";
-
-import TextCard from "./TextCard";
-import Footer from "./Footer";
+import React from "react";
+import { Map, TileLayer } from "react-leaflet";
+import opacity from '../opacity.png'
 import { IsAuthenticated } from "../Context";
 
-const useStyles = makeStyles((theme) => ({
-  root: {
-    flexGrow: 1,
-  },
-  paper: {
-    height: 200,
-    width: 100,
-  },
-  control: {
-    padding: theme.spacing(2),
-  },
-}));
+require("./About.css");
 
-export default function SpacingGrid() {
-  const [spacing, setSpacing] = React.useState(2);
-  const classes = useStyles();
-  const { isAuthenticated, setIsauthenticated } = useContext(IsAuthenticated);
+const DEFAULT_VIEWPORT = {
+  center: [55.86515, -4.25763], // needs to be changed to values defined in project creation
+  zoom: 13,
+};
 
-  return (
-    //   <Grid container className={classes.root} spacing={2} justify="center">
-    //     <Grid item xs={"auto"}>
-    //       <Grid container justify="center" spacing={spacing}>
-    //         {[0, 1, 2, 3].map((value) => (
-    //           <Grid key={value} item>
-    <>
-      <TextCard
-        header="Hello World"
-        subheader="minimum styling subheader"
-        body="This is the body of the text, test"
-      />
-      <Footer isAuthenticated={isAuthenticated} />
-    </>
-    //           </Grid>
-    //         ))}
-    //       </Grid>
-    //     </Grid>
+class HomeMap extends React.Component {
+  state = {
+    viewport: DEFAULT_VIEWPORT,
+  };
 
-    //   </Grid>
-  );
+  constructor(props) {
+    super(props)
+  }
+
+  render() {
+    let goButton = ''
+    console.log(this.props)
+    if (this.props.IsAuthenticated) {
+      goButton = <a href="/dashboard/" className="btn">Dashboard</a>
+    }
+    else {
+      goButton = <a href="/login/" className="btn">Login</a>
+    }
+    return (
+      <Map
+          center={[50, -40]}
+          zoom={4}
+          maxBounds={[
+            [90, -180],
+            [-90, 180],
+          ]}
+        >
+        <div className="title">
+          <h1 className="titleh1">4DWorld</h1>
+          <h3 className="titleh3">Not much to see here... go get started!</h3>
+          {goButton}
+        </div>
+      <TileLayer 
+        url={opacity}
+        minZoom={3}
+        maxZoom={18}
+        noWrap={true}
+        zIndex={1}>
+      </TileLayer>
+      <TileLayer
+            url="http://{s}.tile.osm.org/{z}/{x}/{y}.png"
+            minZoom={3}
+            maxZoom={18}
+            noWrap={true}
+            zIndex={0}
+          />
+      </Map>
+    )
+  }
 }
+
+export default HomeMap;

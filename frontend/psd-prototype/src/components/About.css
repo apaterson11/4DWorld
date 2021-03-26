@@ -1,0 +1,43 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+}
+
+.title {
+  position: absolute;
+  z-index: 401;
+  left: 100px;
+  top: 100px;
+}
+
+.titleh1 {
+  color: white; font-family: 'Enriqueta', arial, serif; line-height: 1.25; margin: 100px 100px; font-size: 150px; font-weight: bold;
+}
+.titleh3 {
+  color: white; font-family: 'Enriqueta', arial, serif; line-height: 1.25; margin: -130px 115px; font-size: 30px; font-weight: normal;
+}
+
+a.btn {
+  top: 150px;
+  left: 115px;
+  position: relative;
+  padding:0.35em 1.2em;
+  border:0.1em solid #FFFFFF;
+  margin:0 0.3em 0.3em 0;
+  border-radius:0.12em;
+  box-sizing: border-box;
+  text-decoration:none;
+  font-family:'Roboto',sans-serif;
+  font-weight:300;
+  font-size: 20px;
+  color:white;
+  text-align:center;
+  transition: all 0.5s;
+}
+
+a.btn:hover {
+  color:#000000;
+  background-color:#FFFFFF;
+}

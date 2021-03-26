@@ -3,7 +3,7 @@ import { Map, TileLayer, LayersControl, LayerGroup } from "react-leaflet";
 import { useParams } from "react-router-dom";
 import Control from "@skyeer/react-leaflet-custom-control";
 import axiosInstance from "../../axios";
-import { LayerContent } from "../LayerContent_copy";
+import { LayerContent } from "../LayerContent";
 import Popup from "reactjs-popup";
 import LayerControl from "../LayerControl";
 import LayerAdd from "../LayerAdd";
@@ -32,7 +32,9 @@ function EditMap(props) {
   const [landmarks, setLandmarks] = useState();
   const [layers, setLayers] = useState([]);
   const [mapStyle, setMapStyle] = useState();
+  const [map, setMap] = useState();
   const [canClick, setCanClick] = useState(false);
+  const [addMarkerState, setAddMarkerState] = useState(false);
   const [currentLayer, setCurrentLayer] = useState(null);
   const [fetching, setFetching] = useState(true);
   const [addLayerPopupOpen, setAddLayerPopupOpen] = useState(false);
@@ -46,6 +48,7 @@ function EditMap(props) {
     axiosInstance
       .get(`/projects/${projectID}`)
       .then((response) => {
+        console.log(projectID)
         setProject(response.data);
         setViewport({
           center: [response.data.map.latitude, response.data.map.longitude],
@@ -55,6 +58,7 @@ function EditMap(props) {
       })
       .then((response) => {
         // get the landmarks
+        setMap(response.map)
         const landmarkRequest = axiosInstance.get(
           `/landmarks?map_id=${response.map.id}`
         );
@@ -69,6 +73,7 @@ function EditMap(props) {
           (response) => {
             setLandmarks(response[0].data);
             setLayers(response[1].data);
+            // setCurrentLayer(layers[0])
             setMapStyle(response[2].data);
             setFetching(false);
           }
@@ -88,6 +93,19 @@ function EditMap(props) {
       setCanClick(!prevState);
       e.target.style.background = !prevState ? "#b8bfba" : "white";
     });
+    setAddMarkerState((prevState) => {
+      setAddMarkerState(!prevState);
+    });
+  };
+
+  // prevents user from clicking through edit layer and add layer buttons
+  const handleClick = () => {
+    if (canClick == true) {
+      setCanClick(false);
+    }
+    else if (addMarkerState == true) {
+      setCanClick(true);
+    }
   };
 
   // function adds marker to map on click via post request
@@ -95,7 +113,10 @@ function EditMap(props) {
     /* Adds a new landmark to the map at a given latitude and longitude, via a POST request */
     setCanClick(false);
     const { lat, lng } = e.latlng;
-    const pos = landmarks.length;
+    let layerlandmarks = groupBy([...landmarks], (i) => i.layer)[currentLayer]
+    console.log(layerlandmarks)
+    console.log(currentLayer)
+    const pos = layerlandmarks ? layerlandmarks.length : 0;
     const response = axiosInstance
       .post("/landmarks/", {
         layer: currentLayer,
@@ -189,6 +210,7 @@ function EditMap(props) {
             position={state.position}
             layers={layers}
             landmarks={landmarks}
+            map={map}
             rerenderParentCallback={rerenderParentCallback}
             updateOnDelete={updateOnDelete}
           ></LayerContent>
@@ -243,7 +265,7 @@ function EditMap(props) {
 
           {/* edit layer button */}
           <Popup
-            trigger={() => <button className="layerControl">Edit Layer</button>}
+            trigger={() => <button className="layerControl" onMouseEnter={handleClick} onMouseLeave={handleClick}>Edit Layer</button>}
             position="bottom right"
             closeOnDocumentClick
           >
@@ -263,7 +285,7 @@ function EditMap(props) {
 
           {/* add layer button */}
           <Popup
-            trigger={() => <button className="layerControl">Add Layer</button>}
+            trigger={() => <button className="layerControl" onMouseEnter={handleClick} onMouseLeave={handleClick}>Add Layer</button>}
             position="bottom right"
             closeOnDocumentClick
           >

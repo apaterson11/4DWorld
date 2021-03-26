@@ -48,16 +48,7 @@ class ProtoMap extends React.Component {
     canClick: false, // add marker functionality, changes when "add marker" button is clicked
     addMarkerState: false,
     currentlayer: "",
-    loadCurrentLayer: false,
   };
-
-//   componentDidUpdate(prevProps, prevState) {
-//       if (this.state.loadCurrentLayer === false) {
-//             this.refLayerSelect.current.focus();
-//             this.setState({loadCurrentLayer: true})
-//       }
-    
-//   }
 
   rerenderParentCallback() {
       console.log("callback")
