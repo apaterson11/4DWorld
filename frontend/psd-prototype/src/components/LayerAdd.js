@@ -37,7 +37,7 @@ export default class EditMarker extends React.Component {
   };
 
   render() {
-    // let addFunc = this.props.addNewLayer // what is htis for?
+    // let addFunc = this.props.addNewLayer // what is this for?
     //   ? this.props.addNewLayer
     //   : this.addLayer;
 
