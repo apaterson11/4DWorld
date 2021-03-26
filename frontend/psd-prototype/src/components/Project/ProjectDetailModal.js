@@ -185,6 +185,7 @@ export default function ProjectDetailModal(props) {
                 getOptionLabel={(option) => option.name}
                 size="small"
                 fullWidth
+                disableClearable={true}
                 defaultValue={group}
                 value={group ? group : null}
                 renderInput={(params) => (
