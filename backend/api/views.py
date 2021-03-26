@@ -8,6 +8,7 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from api.mixins import FilterByMapMixin
 from api.models import City, Country, Landmark, LandmarkImage, Map, MapStyle, Project, Profile, State, Layer
+from api.permissions import UUIDAccess
 from api.serializers import (
     RegisterUserSerializer,
     LandmarkSerializer,
@@ -84,38 +85,43 @@ class DeleteUserFromGroup(APIView):
 
 
 class LandmarkAPIView(FilterByMapMixin, viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [UUIDAccess]
     serializer_class = LandmarkSerializer
     model = Landmark
     queryset = Landmark.objects.all()
 
 
 class LandmarkImageAPIView(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     serializer_class = LandmarkImageSerializer
     model = LandmarkImage
     queryset = LandmarkImage.objects.all()
 
 
 class LayerAPIView(FilterByMapMixin, viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [UUIDAccess]
     serializer_class = LayerSerializer
     model = Layer
     queryset = Layer.objects.all()
 
 class ProjectAPIView(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [UUIDAccess]
     serializer_class = UserProjectsSerializer
     model = Project
 
     def get_queryset(self):
+        # check kwargs
+        uuid = self.request.GET.get('uuid')
+        if uuid:
+            return Project.objects.all()
+            
         user = self.request.user
         user_groups = user.groups.all()
         return Project.objects.filter(group__in=user_groups)
 
 
 class CityAPIView(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     serializer_class = CitySerializer
     model = City
 
@@ -131,14 +137,14 @@ class CityAPIView(viewsets.ModelViewSet):
 
 
 class CountryAPIView(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     serializer_class = CountrySerializer
     model = Country
     queryset = Country.objects.all()
 
 
 class StateAPIView(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     serializer_class = StateSerializer
     model = State
     
@@ -150,7 +156,7 @@ class StateAPIView(viewsets.ModelViewSet):
 
 
 class MapStylesAPIView(viewsets.ModelViewSet):
-    permission_classes = [IsAuthenticated]
+    permission_classes = [AllowAny]
     serializer_class = MapStyleSerializer
     model = MapStyle
     queryset = MapStyle.objects.all()

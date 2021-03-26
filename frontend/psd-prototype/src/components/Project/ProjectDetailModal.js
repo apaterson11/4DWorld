@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useContext } from "react";
 import Button from "@material-ui/core/Button";
-import { useHistory } from "react-router-dom"
+import { useHistory } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
 import TextField from "@material-ui/core/TextField";
 import Dialog from "@material-ui/core/Dialog";
@@ -13,6 +13,10 @@ import Grid from "@material-ui/core/Grid";
 import Spinner from "../Spinner";
 import { Autocomplete } from "@material-ui/lab";
 import { UserContext } from "../../Context";
+import Chip from "@material-ui/core/Chip";
+import ShareIcon from "@material-ui/icons/Share";
+import { toast } from "react-toastify";
+import Toast from "../Toast";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -26,6 +30,19 @@ const useStyles = makeStyles({
     paddingRight: "5px",
     paddingLeft: "5px",
   },
+  chip: {
+    backgroundColor: "#6C8C4C",
+    fontSize: "18px",
+    color: "white",
+  },
+  icon: {
+    color: "white",
+  },
+  row: {
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
 });
 
 export default function ProjectDetailModal(props) {
@@ -34,8 +51,8 @@ export default function ProjectDetailModal(props) {
   const { userDetails, setUserDetails } = useContext(UserContext);
   const [title, setTitle] = useState(null);
   const [description, setDescription] = useState(null);
-  const [group, setGroup] = useState('');
-  const [groups, setGroups] = useState('');
+  const [group, setGroup] = useState("");
+  const [groups, setGroups] = useState("");
   const [map, setMap] = useState(null);
   const [creator, setCreator] = useState(null);
   const [latitude, setLatitude] = useState(null);
@@ -44,6 +61,7 @@ export default function ProjectDetailModal(props) {
   const [mapStyle, setMapStyle] = useState(null);
   const [zoom, setZoom] = useState(null);
   const [maxZoom, setMaxZoom] = useState(null);
+  const [viewUrl, setViewUrl] = useState();
 
   useEffect(() => {
     if (userDetails === undefined) {
@@ -57,34 +75,39 @@ export default function ProjectDetailModal(props) {
       let proj = props.project;
       setTitle(proj.title);
       setDescription(proj.description);
-      setCreator(proj.creator)
+      setCreator(proj.creator);
       setMap(proj.map);
       setLatitude(proj.map.latitude);
       setLongitude(proj.map.longitude);
       setZoom(proj.map.zoom);
+      setViewUrl(
+        `${window.location.origin.toString()}/projects/view/${proj.id}/${
+          proj.hash_field
+        }`
+      );
 
       const details = JSON.parse(localStorage.getItem("userDetails"));
       if (userDetails === undefined) {
         if (details === null) {
           // if it can't be recovered from localStorage, user needs to login again
           return history.push("/login");
+        }
+        setUserDetails(details);
       }
-      setUserDetails(details);
-    }
 
       axiosInstance.get(`/groups/${proj.group}/`).then((response) => {
         setGroup(response.data);
       });
 
       axiosInstance
-      .get(`/user-details/${details.profile_id}`)
-      .then((response) => {
-        setGroups(
-          response.data.user.groups.sort((g1, g2) =>
-            g1.name > g2.name ? 1 : -1
-          )
-        );
-      });
+        .get(`/user-details/${details.profile_id}`)
+        .then((response) => {
+          setGroups(
+            response.data.user.groups.sort((g1, g2) =>
+              g1.name > g2.name ? 1 : -1
+            )
+          );
+        });
 
       axiosInstance.get("/map-styles/").then((response) => {
         setMapOptions(response.data);
@@ -111,7 +134,7 @@ export default function ProjectDetailModal(props) {
   };
 
   const handleSubmit = (e) => {
-    console.log(group)
+    console.log(group);
     const putProject = axiosInstance.put(`/projects/${props.project.id}/`, {
       title: title,
       description: description,
@@ -136,6 +159,18 @@ export default function ProjectDetailModal(props) {
     setMaxZoom(style.max_zoom);
   };
 
+  const notify = () => {
+    navigator.clipboard.writeText(viewUrl);
+    toast.info("View-only mode link copied to your clipboard!", {
+      position: "top-right",
+      autoClose: 3000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+    });
+  };
+
   return (
     <div>
       <Dialog
@@ -154,7 +189,21 @@ export default function ProjectDetailModal(props) {
             <Spinner />
           ) : (
             <>
-              <Typography variant="h5">Project</Typography>
+              <div className={classes.row}>
+                <div>
+                  <Typography variant="h5">Project</Typography>
+                </div>
+                <div>
+                  <Toast />
+                  <Chip
+                    label={"Share"}
+                    className={classes.chip}
+                    icon={<ShareIcon className={classes.icon} />}
+                    clickable={true}
+                    onClick={notify}
+                  />
+                </div>
+              </div>
               <TextField
                 autoFocus
                 margin="dense"
@@ -178,29 +227,27 @@ export default function ProjectDetailModal(props) {
                 onChange={(e) => setDescription(e.target.value)}
               />
               <Grid item xs={8} md={6}>
-              <Autocomplete
-                id="group-combobox"
-                label="Group"
-                options={groups}
-                getOptionLabel={(option) => option.name}
-                size="small"
-                fullWidth
-                disableClearable={true}
-                defaultValue={group}
-                value={group ? group : null}
-                renderInput={(params) => (
-                  <TextField
-                    {...params}
-                    label="Group"
-                    variant="outlined"
-                    margin="dense"
-                  />
-                )}
-                onChange={(e, value) =>
-                  setGroup(value)
-                }
-              />
-            </Grid>
+                <Autocomplete
+                  id="group-combobox"
+                  label="Group"
+                  options={groups}
+                  getOptionLabel={(option) => option.name}
+                  size="small"
+                  fullWidth
+                  disableClearable={true}
+                  defaultValue={group}
+                  value={group ? group : null}
+                  renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Group"
+                      fullWidth
+                      margin="dense"
+                    />
+                  )}
+                  onChange={(e, value) => setGroup(value)}
+                />
+              </Grid>
               <Typography className={classes.padTop} variant="h5">
                 Project Map
               </Typography>

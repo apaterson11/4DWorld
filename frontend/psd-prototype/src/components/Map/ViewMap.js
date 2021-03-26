@@ -39,14 +39,16 @@ function ViewMap(props) {
   const [addLayerPopupOpen, setAddLayerPopupOpen] = useState(false);
   const refLayerSelect = useRef();
   const refAddMarkerButton = useRef();
-  const { projectID } = useParams();
+  const { projectID, uuid } = useParams();
   const history = useHistory();
 
   useEffect(() => {
     // get project information
-    console.log("RENDERING");
+    const getRoute = uuid
+      ? `/projects/${projectID}?uuid=${uuid}`
+      : `/projects/${projectID}`;
     axiosInstance
-      .get(`/projects/${projectID}`)
+      .get(getRoute)
       .then((response) => {
         setProject(response.data);
         setViewport({
@@ -58,10 +60,10 @@ function ViewMap(props) {
       .then((response) => {
         // get the landmarks
         const landmarkRequest = axiosInstance.get(
-          `/landmarks?map_id=${response.map.id}`
+          `/landmarks?map_id=${response.map.id}&uuid=${uuid || ""}`
         );
         const layerRequest = axiosInstance.get(
-          `/layers?map_id=${response.map.id}`
+          `/layers?map_id=${response.map.id}&uuid=${uuid || ""}`
         );
         const mapStyleRequest = axiosInstance.get(
           `/map-styles/${response.map.style}`
@@ -93,9 +95,11 @@ function ViewMap(props) {
 
   const rerenderParentCallback = () => {
     const landmarkRequest = axiosInstance.get(
-      `/landmarks?map_id=${project.map.id}`
+      `/landmarks?map_id=${project.map.id}&uuid=${uuid || ""}`
     );
-    const layerRequest = axiosInstance.get(`/layers?map_id=${project.map.id}`);
+    const layerRequest = axiosInstance.get(
+      `/layers?map_id=${project.map.id}&uuid=${uuid || ""}`
+    );
 
     Promise.all([landmarkRequest, layerRequest]).then((response) => {
       setLandmarks(response[0].data);
@@ -133,6 +137,7 @@ function ViewMap(props) {
             layers={layers}
             landmarks={landmarks}
             rerenderParentCallback={rerenderParentCallback}
+            uuid={uuid}
           ></LayerContent>
         </LayerGroup>
       </LayersControl.Overlay>

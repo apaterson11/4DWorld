@@ -54,10 +54,11 @@ class MapSerializer(ModelSerializer):
 
 class UserProjectsSerializer(ModelSerializer):
     map = MapSerializer(required=False)
+    hash_field = serializers.UUIDField(required=False)
 
     class Meta:
         model = Project
-        fields = ('id', 'title', 'description', 'creator', 'group', 'map')
+        fields = ('id', 'title', 'description', 'creator', 'group', 'map', 'hash_field')
     
     def create(self, validated_data):
         user = self.context.get('request').user.profile

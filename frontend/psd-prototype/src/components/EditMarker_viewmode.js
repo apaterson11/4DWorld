@@ -34,32 +34,33 @@ export default class EditMarker extends React.Component {
   getImages = (e) => {
     const results = [];
     const items = [];
-    const response = axiosInstance
-      .get("/landmark-images/", {})
-      .then((response) =>
-        response.data.forEach((item) => {
-          if (item.landmark == this.props.id) {
-            // matches up each series of images to their corresponding landmark
-            results.push({
-              image: item.image,
-            });
-            items.push({
-              id: item.id,
-              landmark: item.landmark,
-              image: item.image,
-              image_name: item.image_name,
-            });
-          }
-
-          // maps results so that they can be displayed in image gallery
-          this.setState({
-            items: results.map((obj) => ({
-              original: `${obj.image}`,
-              thumbnail: `${obj.image}`,
-            })),
+    const getRoute = this.props.uuid
+      ? `/landmark-images?uuid=${this.props.uuid}`
+      : "/landmark-images/";
+    const response = axiosInstance.get(getRoute, {}).then((response) =>
+      response.data.forEach((item) => {
+        if (item.landmark == this.props.id) {
+          // matches up each series of images to their corresponding landmark
+          results.push({
+            image: item.image,
           });
-        })
-      );
+          items.push({
+            id: item.id,
+            landmark: item.landmark,
+            image: item.image,
+            image_name: item.image_name,
+          });
+        }
+
+        // maps results so that they can be displayed in image gallery
+        this.setState({
+          items: results.map((obj) => ({
+            original: `${obj.image}`,
+            thumbnail: `${obj.image}`,
+          })),
+        });
+      })
+    );
 
     this.setState({ images: items });
   };
@@ -166,7 +167,10 @@ export default class EditMarker extends React.Component {
             {/* temporary position label for debugging purposes */}
             <br></br>
             <InputLabel id="label">Content</InputLabel>
-            <div className="content" dangerouslySetInnerHTML={{__html: this.state.content}}></div>
+            <div
+              className="content"
+              dangerouslySetInnerHTML={{ __html: this.state.content }}
+            ></div>
           </Grid>
 
           {/* image gallery */}
@@ -191,9 +195,7 @@ export default class EditMarker extends React.Component {
                 Latitude: {this.state.lat}
                 <br></br>
               </label>
-              <label>
-                Longitude: {this.state.lng}
-              </label>
+              <label>Longitude: {this.state.lng}</label>
             </form>
           </Grid>
         </Grid>
