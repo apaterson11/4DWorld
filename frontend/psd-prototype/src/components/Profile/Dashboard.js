@@ -5,6 +5,7 @@ import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
 import ProfileCard from "./ProfileCard";
 import ProjectContainer from "../Project/ProjectContainer";
+import DropFileContainer from '../Project/DropFileContainer'
 import UserGroupsCard from "./UserGroupsCard";
 import { IsAuthenticated, UserContext } from "../../Context";
 import Spinner from "../Spinner";
@@ -61,6 +62,11 @@ function Dashboard() {
             <Grid item xs={12}>
               <UserGroupsCard />
             </Grid>
+
+            <Grid item xs={12}>
+              <DropFileContainer />
+            </Grid>
+
           </Grid>
           <Grid
             item
