@@ -8,6 +8,7 @@ django.setup()
 from api.models import User
 
 def main():
+    # detect any csv files in current directory and process them
     cwd = os.getcwd()
     for root, dirs, files in os.walk(cwd):
         for file in files:
@@ -20,9 +21,12 @@ def main():
                     add_user(row[2], row[2].split('@')[0], row[3], row[0], row[1], row[4], row[5])
                 f.close()
 
+# function adds users using parsed data from csv file
 def add_user(email, username, password, first_name, last_name, superuser, status):
     u = User.objects.get_or_create(username=username, email=email, first_name=first_name, last_name=last_name)[0]
     u.set_password(password) 
+
+    # sets user permissions
     if (superuser == "Manager"):
         u.is_superuser = True
         u.is_staff = True
@@ -30,6 +34,7 @@ def add_user(email, username, password, first_name, last_name, superuser, status
         u.is_staff = False
         u.is_superuser = False
     
+    # sets user active/suspended
     if (status == "Suspended"):
         u.is_active = False
     else:
