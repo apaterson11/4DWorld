@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import include, path
 from rest_framework.routers import DefaultRouter
 from api.views import (
     BlacklistTokenUpdateView,
@@ -34,6 +34,7 @@ router.register('maps', MapAPIView, basename='maps')
 urlpatterns = [
     path('groups/<int:pk>/user/<int:user_pk>/', DeleteUserFromGroup.as_view(), name='del-user-from-group'),
     path('register/', UserRegisterView.as_view(), name='register'),
+    path('api-auth/', include('rest_framework.urls')),
     path('logout/blacklist/', BlacklistTokenUpdateView.as_view(), name='blacklist')
 ]
 
