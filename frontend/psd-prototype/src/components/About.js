@@ -2,6 +2,7 @@ import React, { useContext, useEffect } from "react";
 import { Map, TileLayer } from "react-leaflet";
 import opacity from "../opacity.png";
 import { IsAuthenticated, UserContext } from "../Context";
+import { Link } from "react-router-dom";
 
 require("./About.css");
 
@@ -34,13 +35,13 @@ function HomeMap() {
         <h1 className="titleh1">4DWorld</h1>
         <h3 className="titleh3">Not much to see here... go get started!</h3>
         {isAuthenticated ? (
-          <a href="/dashboard/" className="btn">
+          <Link to="/dashboard/" className="btn">
             Dashboard
-          </a>
+          </Link>
         ) : (
-          <a href="/login/" className="btn">
+          <Link to="/login/" className="btn">
             Login
-          </a>
+          </Link>
         )}
       </div>
       <TileLayer

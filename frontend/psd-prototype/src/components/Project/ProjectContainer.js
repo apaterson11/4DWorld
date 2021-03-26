@@ -33,7 +33,7 @@ const useStyles = makeStyles({
   },
 });
 
-function ProjectContainer(props) {
+function ProjectContainer() {
   const classes = useStyles();
   const [projects, setProjects] = useState([]);
   const [open, setOpen] = useState(false);
@@ -88,7 +88,7 @@ function ProjectContainer(props) {
           </Typography>
         </div>
         <div>
-          <Link to="projects/create/">
+          <Link to="/projects/create/">
             <Chip
               label={"Add"}
               className={classes.chip}
