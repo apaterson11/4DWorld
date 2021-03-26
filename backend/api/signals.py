@@ -21,5 +21,5 @@ def save_user_profile(sender, instance, **kwargs):
 @receiver(post_save, sender=Map)
 def create_layer_with_map(sender, instance, created, **kwargs):
     if created:
-        layer = Layer(name=f'Map {instance.id} Base', description="Base layer", map=instance)
+        layer = Layer(name=f'Default layer', description="Default layer", map=instance)
         layer.save()
