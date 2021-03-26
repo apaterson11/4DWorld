@@ -12,6 +12,7 @@ import Spinner from "../Spinner";
 require("../LayerControl.css");
 require("../ProtoMap.css");
 
+// function used later on to group landmarks by layer into one array
 const groupBy = (array, fn) =>
   array.reduce((result, item) => {
     const key = fn(item);
@@ -20,6 +21,7 @@ const groupBy = (array, fn) =>
     return result;
   }, {});
 
+// displays the map with only viewing capabilities  
 function ViewMap(props) {
   const [state, setState] = useState({
     markertype: "default",
@@ -87,12 +89,14 @@ function ViewMap(props) {
       });
   }, []);
 
+  // default current layer to 1
   useEffect(() => {
     if (currentLayer == null && layers.length > 0) {
       setCurrentLayer(layers[0].id);
     }
   }, [layers]);
 
+  // function called by child components to update all layers and landmarks 
   const rerenderParentCallback = () => {
     const landmarkRequest = axiosInstance.get(
       `/landmarks?map_id=${project.map.id}&uuid=${uuid || ""}`
@@ -106,19 +110,10 @@ function ViewMap(props) {
       setLayers(response[1].data);
       setFetching(false);
     });
-
-    // axiosInstance.get("/landmarks/").then((response) => {
-    //   setLandmarks(response.data);
-
-    //   axiosInstance.get("/layers/").then((response) => {
-    //     setLayers(response.data);
-    //     setFetching(false);
-    //   });
-    // });
-    // forceUpdate();
   };
 
-  // toggle layer visibility menu
+  // dynamically renders the correct content per layer, including markers, lines, 
+  // and a checkbox in the layers overlay to toggle visibility
   const renderlayers = layers.map((e, key) => {
     return (
       <LayersControl.Overlay key={e.id} checked name={e.name}>
@@ -145,7 +140,9 @@ function ViewMap(props) {
   });
 
   return (
+    
     <React.Fragment>
+      {/* displays a loading spinner while loading*/}
       {fetching ? (
         <Spinner />
       ) : (
@@ -166,13 +163,6 @@ function ViewMap(props) {
 
           {/* toggle layer visibility menu */}
           <LayersControl position="topright">{renderlayers}</LayersControl>
-
-          {/* reset view button - will this ever be fixed? only time will tell */}
-          {/* <Control position="bottomright">
-        <button className="btn-resetview" onClick={createLines}>
-          Reset View
-        </button>
-      </Control> */}
         </Map>
       )}
     </React.Fragment>

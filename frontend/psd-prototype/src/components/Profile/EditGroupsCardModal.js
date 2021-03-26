@@ -16,6 +16,7 @@ export default function EditProfileModal(props) {
 
   const [newGroup, setNewGroup] = useState({name: ''})
 
+  // displays the format for editing groups, inline with the aesthetic of the rest of the site
   return (
     <div>
       <Dialog 
@@ -38,6 +39,7 @@ export default function EditProfileModal(props) {
             onChange={(e) => setNewGroup({name: e.target.value.trim()})}
           />
         </DialogContent>
+
         <DialogActions>
           <Button onClick={props.onClose} color="primary">
             Cancel

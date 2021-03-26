@@ -45,6 +45,7 @@ const useStyles = makeStyles({
   },
 });
 
+// allows user to edit details on project e.g. name, desc, groups
 export default function ProjectDetailModal(props) {
   const history = useHistory();
   const classes = useStyles();
@@ -63,6 +64,7 @@ export default function ProjectDetailModal(props) {
   const [maxZoom, setMaxZoom] = useState(null);
   const [viewUrl, setViewUrl] = useState();
 
+  // get user details to use later
   useEffect(() => {
     if (userDetails === undefined) {
       const details = JSON.parse(localStorage.getItem("userDetails"));
@@ -70,6 +72,7 @@ export default function ProjectDetailModal(props) {
     }
   }, [userDetails]);
 
+  // get project details to use later
   useEffect(() => {
     if (props.open) {
       let proj = props.project;
@@ -126,6 +129,7 @@ export default function ProjectDetailModal(props) {
     }
   }, [maxZoom]);
 
+  // delete project
   const handleDelete = (e) => {
     axiosInstance.delete(`/projects/${props.project.id}/`).then((res) => {
       props.setProjects();
@@ -133,8 +137,8 @@ export default function ProjectDetailModal(props) {
     });
   };
 
+  // handles updating of project details
   const handleSubmit = (e) => {
-    console.log(group);
     const putProject = axiosInstance.put(`/projects/${props.project.id}/`, {
       title: title,
       description: description,

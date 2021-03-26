@@ -43,7 +43,6 @@ function App(props) {
           setIsAuthenticated(true);
         })
         .catch((err) => {
-          console.log(err);
           localStorage.removeItem("access_token");
           localStorage.removeItem("refresh_token");
           localStorage.removeItem("user");

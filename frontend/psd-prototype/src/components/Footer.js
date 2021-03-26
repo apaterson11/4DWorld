@@ -8,17 +8,16 @@ import MenuIcon from '@material-ui/icons/Menu'
 
 class Footer extends React.Component{
 
-    // Constructor for the Footer
+    // Constructor for the footer
     constructor(props){
         super(props)
-
         this.state={
             toggle: false,
         }
 
     }
 
-    // Cahnges the state of 'toggle' on call to the opp bool value
+    // Changes the state of 'toggle' on call to the opp bool value
     Toggle = () => {
         this.setState({
             toggle: !this.state.toggle

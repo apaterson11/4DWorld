@@ -43,7 +43,7 @@ function ProjectContainer() {
     axiosInstance
       .get("/projects/")
       .then((response) => setProjects(response.data));
-  };
+  }; // Fetches projects that user has access to 
 
   useEffect(() => {
     fetchProjects();
@@ -65,6 +65,7 @@ function ProjectContainer() {
     ));
   };
 
+  // Displays projects that the user has access to 
   return (
     <React.Fragment>
       <ProjectDetailModal

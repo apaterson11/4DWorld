@@ -31,6 +31,7 @@ const useStyles = makeStyles({
     }
 })
 
+// allows user to create a map to user for project
 function CreateMapForm(props) {
     const mapRef = useRef(null)
     const classes = useStyles()
@@ -100,6 +101,7 @@ function CreateMapForm(props) {
         props.setCenter([lat, lng])
     }
 
+    //Displays Map Form
     return (
         <>
         <Grid container>

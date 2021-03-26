@@ -35,7 +35,7 @@ export default function UserGroupsCard() {
 
   const userDetailsRequest = () =>
     axiosInstance
-      .get(`/user-details/${userDetails.profile_id}`)
+      .get(`/user-details/${userDetails.profile_id}`) 
       .then((response) => {
         const userGroups = response.data.user.groups.filter(
           (grp) => grp.id !== userDetails.default_group
@@ -59,7 +59,7 @@ export default function UserGroupsCard() {
       axiosInstance
         .post(`/groups/`, {
           name: newGroup.name,
-        })
+        }) // Post request for new group
         .then((response) => {
           let groupsClone = [...groups];
           groupsClone.push(response.data);
@@ -83,7 +83,7 @@ export default function UserGroupsCard() {
       let requests = [];
       for (let idx of indices) {
         const groupId = groupsClone[idx].id;
-        requests.push(axiosInstance.delete(`/groups/${groupId}`));
+        requests.push(axiosInstance.delete(`/groups/${groupId}`)); //Removes group that has been selected via GroupID
       }
       Promise.all(requests).then((res) => {
         // sort the indices from highest to lowest
@@ -103,6 +103,7 @@ export default function UserGroupsCard() {
     },
   };
 
+  // Displays Edit Group model and Add Users to group model, lists current groups
   return (
     <>
       <EditGroupsCardModal

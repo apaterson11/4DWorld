@@ -95,8 +95,7 @@ class Login extends React.Component {
 
         this.props.login();
         this.props.history.push("/dashboard");
-      })
-      .catch((err) => {
+      }).catch((err) => {     // If post request fails, the exact error should be shown to the user 
         this.setState({
           passwordHasError: false,
           usernameHasError: false,
@@ -114,7 +113,7 @@ class Login extends React.Component {
                   passwordHelpText: "Incorrect password",
                 });
               } else {
-                // username does not exist
+                // There is no account that exists with  that username 
                 this.setState({
                   usernameHasError: true,
                   usernameHelpText:
@@ -126,6 +125,7 @@ class Login extends React.Component {
       });
   };
 
+  //Displays Login form 
   render() {
     const { classes } = this.props;
     const disableSubmitBtn = this.disableSubmit();

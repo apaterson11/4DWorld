@@ -2,7 +2,7 @@ import React, { Component } from "react";
 import axiosInstance from "../axios";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 
-// a little function to help us with reordering the result
+// reorders cards
 const reorder = (list, startIndex, endIndex) => {
   const result = Array.from(list);
   const [removed] = result.splice(startIndex, 1);
@@ -34,6 +34,7 @@ const getListStyle = (isDraggingOver) => ({
   width: 250,
 });
 
+// container that allows us to change order of markers in each layer
 export default class DnD extends Component {
   constructor(props) {
     super(props);
@@ -55,8 +56,8 @@ export default class DnD extends Component {
     }
   }
 
+  // get cards
   getItems = () => {
-    // console.log(this.state.landmarksgrouped[this.state.currentlayer.id])
     let options = "";
     if (this.props.layerlandmarks) {
       options = this.props.layerlandmarks
@@ -71,6 +72,7 @@ export default class DnD extends Component {
     }
   };
 
+  // when card is dropped, update markers
   onDragEnd(result) {
     // dropped outside the list
     if (!result.destination) {
@@ -83,6 +85,7 @@ export default class DnD extends Component {
       result.destination.index
     );
 
+    // update markers
     items.forEach((item, index) => {
       let marker = items[index];
       if (index == items.length - 1) {
@@ -105,8 +108,7 @@ export default class DnD extends Component {
     });
   }
 
-  // Normally you would want to split things out into separate components.
-  // But in this example everything is just done in one place for simplicity
+  
   render() {
     return (
       <DragDropContext onDragEnd={this.onDragEnd}>

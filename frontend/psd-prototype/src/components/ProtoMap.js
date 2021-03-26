@@ -51,7 +51,6 @@ class ProtoMap extends React.Component {
   };
 
   rerenderParentCallback() {
-      console.log("callback")
     axiosInstance.get("/landmarks/").then(
       (response) => this.setState({ landmarks: response.data, fetched: true }),
       axiosInstance
@@ -314,12 +313,6 @@ class ProtoMap extends React.Component {
           </button>
         </Control>
 
-        {/* reset view button - will this ever be fixed? only time will tell */}
-        <Control position="bottomright">
-          <button className="btn-resetview" onClick={this.handleClick}>
-            Reset View
-          </button>
-        </Control>
       </Map>
     );
   }
