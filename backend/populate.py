@@ -21,7 +21,8 @@ def main():
                 f.close()
 
 def add_user(email, username, password, first_name, last_name, superuser, status):
-    u = User.objects.get_or_create(username=username, email=email, password=password, first_name=first_name, last_name=last_name)[0]
+    u = User.objects.get_or_create(username=username, email=email, first_name=first_name, last_name=last_name)[0]
+    u.set_password(password) 
     if (superuser == "Manager"):
         u.is_superuser = True
         u.is_staff = True
