@@ -1,4 +1,5 @@
 import React, { useContext, useEffect } from "react";
+import { useHistory } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
 import Paper from "@material-ui/core/Paper";
@@ -24,11 +25,15 @@ const useStyles = makeStyles({
 
 function Dashboard() {
   const classes = useStyles();
+  const history = useHistory();
   const { userDetails, setUserDetails } = useContext(UserContext);
 
   useEffect(() => {
     if (userDetails === undefined) {
       const details = JSON.parse(localStorage.getItem("userDetails"));
+      if (!details) {
+        history.push("/login");
+      }
       setUserDetails(details);
     }
   }, [userDetails]);

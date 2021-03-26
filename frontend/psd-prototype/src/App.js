@@ -48,6 +48,7 @@ function App(props) {
           localStorage.removeItem("user");
           localStorage.removeItem("userDetails");
           setIsAuthenticated(false);
+          setUserDetails(null);
         });
     }
   }, []);
@@ -61,6 +62,7 @@ function App(props) {
 
   const logout = () => {
     setIsAuthenticated(false);
+    setUserDetails(null);
   };
 
   return (
@@ -73,9 +75,6 @@ function App(props) {
           <Switch>
             <Route exact path="/" component={About}/>
             <Route exact path="/change-password" component={ResetPasswordRequest}/>
-            <Route exact path="/demo-map/" render={() => (
-              <ProtoMap latitude={defaultLocation.defaultLat} longitude={defaultLocation.defaultLon}/>
-            )} />
             <Route exact path="/dashboard/" render={() => (
               <Dashboard />
             )} />

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, useContext } from "react";
 import { Map, TileLayer, LayersControl, LayerGroup } from "react-leaflet";
-import { useParams } from "react-router-dom";
+import { useParams, useHistory } from "react-router-dom";
 import Control from "@skyeer/react-leaflet-custom-control";
 import axiosInstance from "../../axios";
 import { LayerContent } from "../LayerContent_viewmode";
@@ -40,6 +40,7 @@ function ViewMap(props) {
   const refLayerSelect = useRef();
   const refAddMarkerButton = useRef();
   const { projectID } = useParams();
+  const history = useHistory();
 
   useEffect(() => {
     // get project information
@@ -74,6 +75,9 @@ function ViewMap(props) {
             setFetching(false);
           }
         );
+      })
+      .catch((err) => {
+        history.push("/login");
       });
   }, []);
 

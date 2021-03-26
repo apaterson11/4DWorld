@@ -56,7 +56,7 @@ function CreateProject() {
     if (userDetails === undefined) {
       if (details === null) {
         // if it can't be recovered from localStorage, user needs to login again
-        history.push("/login");
+        return history.push("/login");
       }
       setUserDetails(details);
     }
