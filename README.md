@@ -19,7 +19,11 @@ On the Frontend please be in the psd-prototype directory (cs23-main/frontend/psd
 npm install
 npm start
 ```
-
+If npm install does not work, you can use;
+```bash
+yarn install
+npm start
+```
 
 
 ## License
