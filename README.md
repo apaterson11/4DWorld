@@ -24,7 +24,14 @@ If npm install does not work, you can use;
 yarn install
 npm start
 ```
+## Populating Users from CSV file
 
+If you wish to populate the database with users of your own, you can do this through your choice of terminal. 
+First, simply drop any CSV files you want imported into the backend folder (cs23-main/backend). Then, run the following command:
+``` bash
+python populate.py
+```
+Then, as long as you adhere to the template provided exactly, the database will be populated with your users.
 
 ## License
 []()
