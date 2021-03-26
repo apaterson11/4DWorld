@@ -1,0 +1,25 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+}
+
+#map,
+#mapUI {
+  z-index: 0;
+}
+
+.title {
+  position: absolute;
+  z-index: 401;
+  left: 100px;
+  top: 100px;
+}
+
+h1 {
+  color: white; font-family: 'Enriqueta', arial, serif; line-height: 1.25; margin: 100px 100px; font-size: 150px; font-weight: bold;
+}
+h3 {
+  color: white; font-family: 'Enriqueta', arial, serif; line-height: 1.25; margin: -130px 115px; font-size: 30px; font-weight: normal;
+}
