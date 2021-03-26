@@ -47,6 +47,7 @@ function App(props) {
           localStorage.removeItem("user");
           localStorage.removeItem("userDetails");
           setIsAuthenticated(false);
+          setUserDetails(null);
         });
     }
   }, []);
@@ -60,6 +61,7 @@ function App(props) {
 
   const logout = () => {
     setIsAuthenticated(false);
+    setUserDetails(null);
   };
 
   return (
@@ -70,8 +72,8 @@ function App(props) {
         >
           <Header isAuthenticated={isAuthenticated} />
           <Switch>
-            <Route exact path="/" component={About}/>
-            {/* <Route
+            <Route exact path="/" component={About} />
+            <Route
               exact
               path="/demo-map/"
               render={() => (
