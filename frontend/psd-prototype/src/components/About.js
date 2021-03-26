@@ -38,8 +38,8 @@ class HomeMap extends React.Component {
           ]}
         >
         <div className="title">
-          <h1>4DWorld</h1>
-          <h3>Not much to see here... go get started!</h3>
+          <h1 className="titleh1">4DWorld</h1>
+          <h3 className="titleh3">Not much to see here... go get started!</h3>
           {goButton}
         </div>
       <TileLayer 
