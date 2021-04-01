@@ -33,5 +33,12 @@ python populate.py
 ```
 Then, as long as you adhere to the template provided exactly, the database will be populated with your users.
 
+## Running tests
+
+To test the build, simply navigate to the backend folder (cs23-main/backend) and run the following command:
+``` bash
+python manage.py test
+```
+
 ## License
 []()
