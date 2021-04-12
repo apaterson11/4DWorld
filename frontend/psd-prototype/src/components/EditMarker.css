@@ -1,0 +1,21 @@
+@import "~react-image-gallery/styles/css/image-gallery.css";
+
+.image-gallery {
+    width: 400px;
+}
+
+.image-gallery-slide img {
+    width: 200px;
+}
+
+.rte {
+    height: 100%;
+    max-width: 450px;
+}
+
+.content {
+    overflow: auto;
+    max-height: 1000px;
+    max-width: 450px;
+}
+
