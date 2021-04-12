@@ -1,6 +1,15 @@
 # 4DWorld
 
-4DWorld was created by CS23. It is a interactive mapping tool.
+4DWorld was created by CS23 as part of the University of Glasgow's Team Project and Professional Software Development modules.
+
+## Current Features
+- core marker functionality (add, delete, edit, change layer, upload image, change icon type)
+- core layer functionality (add, delete, edit, change polyline type, change colour)
+- view/edit modes for each project
+- edit mode that can be accessed from a generated link by any user (authenticated or not)
+- allow user to create, delete and edit groups 
+- allow user to have several projects that correspond to one group
+- allow user to edit profile details
 
 ## Installation and Setup
 
